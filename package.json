@@ -1,0 +1,20 @@
+{
+	"name": "bodao-corp-bot",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"build": "tsc -p tsconfig.json",
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"test": "vitest",
+		"cf-typegen": "wrangler types"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.5.28",
+		"@cloudflare/workers-types": "^4.20241112.0",
+		"vitest": "2.1.5",
+		"typescript": "^5.7.3",
+		"wrangler": "^3.109.1"
+	}
+}
