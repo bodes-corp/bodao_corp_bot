@@ -1,5 +1,9 @@
 interface Environment {
 	SECRET_TELEGRAM_API_TOKEN: string;
+	TG_THREADBOT:string;
+	TG_SECRET:string;
+	TG_CHATID:string;
+
 }
 
 function tgApiUrl(methodName:any, tgToken:any, params = {}) {
@@ -41,7 +45,7 @@ async function tgSendMessage(env:any, text:string) {
  }
 
 export default {
-	async fetch(request: Request, env: any, ctx: ExecutionContext): Promise<Response> {
+	async fetch(request: Request, env:  Environment, ctx: ExecutionContext): Promise<Response> {
 
 		const secret = env.TG_SECRET;
 		console.log('debug secret', env.TG_SECRET)
