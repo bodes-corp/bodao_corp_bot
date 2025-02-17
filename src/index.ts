@@ -41,8 +41,10 @@ async function tgSendMessage(env:any, text:string) {
  }
 
 export default {
-	async fetch(request: Request, env: Environment, ctx: ExecutionContext): Promise<Response> {
+	async fetch(request: Request, env: any, ctx: ExecutionContext): Promise<Response> {
 
+		const secret = env.TG_SECRET;
+		console.log('debug secret', env.TG_SECRET)
 		if (!isAuthorized(request, env)) {
 			return new Response('Unauthorized test', { status: 403 });
 		 }
