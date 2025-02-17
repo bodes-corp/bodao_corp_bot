@@ -49,10 +49,10 @@ export default {
 
 		const secret = env.TG_SECRET;
 		console.log('debug secret', env.TG_SECRET)
-		if (!isAuthorized(request, env)) {
-			console.log('debug no Secret')
-			return new Response('Unauthorized test', { status: 403 });
-		 }
+		//if (!isAuthorized(request, env)) {
+		//	console.log('debug no Secret')
+		//	return new Response('Unauthorized test', { status: 403 });
+//}
 
 		const url = new URL(request.url);
 		console.log ('debug url.pathname', url.pathname);
