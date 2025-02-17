@@ -50,6 +50,7 @@ export default {
 		const secret = env.TG_SECRET;
 		console.log('debug secret', env.TG_SECRET)
 		if (!isAuthorized(request, env)) {
+			console.log('debug no Secret')
 			return new Response('Unauthorized test', { status: 403 });
 		 }
 
@@ -70,7 +71,7 @@ export default {
 
 
 				}
-
+				return new Response('ok');
 
 			}catch(error){
 				console.log('debug error', error);
