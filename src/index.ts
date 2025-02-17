@@ -9,7 +9,7 @@ function tgApiUrl(methodName:any, tgToken:any, params = {}) {
 
 async function tgSendRequest(method:string, env:any, params:any) {
 	try {
-	    const response = await fetch(tgApiUrl(method, env.TG_TOKEN, params), {
+	    const response = await fetch(tgApiUrl(method, env.SECRET_TELEGRAM_API_TOKEN, params), {
 		   method: 'POST',
 		   headers: { 'Content-Type': 'application/json' }
 	    });
@@ -36,8 +36,17 @@ async function tgSendMessage(env:any, text:string) {
 	});
  }
 
+ function isAuthorized(request:any, env:any) {
+	return request.headers.get('X-Telegram-Bot-Api-Secret-Token') === env.TG_SECRET;
+ }
+
 export default {
 	async fetch(request: Request, env: Environment, ctx: ExecutionContext): Promise<Response> {
+
+		if (!isAuthorized(request, env)) {
+			return new Response('Unauthorized test', { status: 403 });
+		 }
+
 		const url = new URL(request.url);
 		console.log ('debug url.pathname', url.pathname);
 		if (url.pathname === '/' && request.method === 'POST') {
