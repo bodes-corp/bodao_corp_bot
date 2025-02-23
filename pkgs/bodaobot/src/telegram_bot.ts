@@ -176,8 +176,7 @@ currentContext!: TG_ExecutionContext;
  * @param {*} env the worker env variables
  * @param {*} update the request object json formated
  */
-async handleUpdate(env:any, request: Request) {
-     const update: TelegramUpdate = await request.json();
+async handleUpdate(env:any, update: TelegramUpdate) {
      this.update = update;
 	
 	if (this.update.message) {   

@@ -36,8 +36,8 @@ export default {
 		//  which the Workers runtime will continue executing, even after a response has been returned by 
 		// the Worker's handler.
 		const update: TelegramUpdate = await request.json();
-		const clone:Request = await request.clone();
-		context.waitUntil(rafaelBot.handleUpdate(env, clone));
+		//const clone:Request = await request.clone();
+		context.waitUntil(rafaelBot.handleUpdate(env, update));
 		return new Response('Ok');
 		} catch (error) {
 		console.error('Error processing update:', error);
