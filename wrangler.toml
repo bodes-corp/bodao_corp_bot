@@ -18,7 +18,10 @@ compatibility_flags = ["nodejs_compat"]
 # - https://developers.cloudflare.com/workers/configuration/secrets/
 # [vars]
 # MY_VARIABLE = "production_value"
-
+SECRET_TELEGRAM_API_TOKEN = "7530215388:AAE-xq_eQP3ilbFLxZwIh11gHDrPaORZsCg"
+TG_THREADBOT = "2"
+TG_SECRET = "720617fsolq29cdjf3G3tT"
+TG_CHATID = "-1002271335705"
 # Bind the Workers AI model catalog. Run machine learning models, powered by serverless GPUs, on Cloudflare’s global network
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#workers-ai
 # [ai]
@@ -106,3 +109,7 @@ compatibility_flags = ["nodejs_compat"]
 # [[vectorize]]
 # binding = "MY_INDEX"
 # index_name = "my-index"
+# wrangler.toml (wrangler v3.88.0^)
+[observability.logs]
+enabled = true
+invocation_logs = false
