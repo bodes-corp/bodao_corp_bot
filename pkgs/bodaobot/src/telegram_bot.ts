@@ -266,7 +266,7 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 					switch (ctx.update_type) {
 						case 'message': {
 							args = this.update.message?.text?.split(' ') ?? [];
-                                   await this.handleMessage(env, this.update);
+                                   await this.handleMessage(env,ctx);
 							break;
 						}
                               case 'edited_message': {
@@ -324,8 +324,8 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 		//return new Response('ok');
 	}
 
-     async handleMessage(env:any, messageJson:any) {
-
+     async handleMessage(env:any, ctx:TG_ExecutionContext) {
+          const messageJson:any = ctx.update.message;
           const message:TG_Message = new Message(messageJson);
           //console.log("operation: ", message.operation);
           //console.log("env: ", env.json());
