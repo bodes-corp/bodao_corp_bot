@@ -231,7 +231,7 @@ currentContext!: TG_ExecutionContext;
 					if (!(command in this.handlers)) {
 						command = ':message';
 					}
-					return await this.handlers[command](ctx);
+					//return await this.handlers[command](ctx);
 				}
 				case 'GET': {
 					switch (url.searchParams.get('command')) {
