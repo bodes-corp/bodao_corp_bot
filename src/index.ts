@@ -1499,7 +1499,7 @@ async function handleUpdate(env:any, update:any) {
  async function tgDeleteMessages(env:any, chunk:any) {
 	try {
 	    const deleteParams = { chat_id: env.TG_CHATID, message_ids: chunk };
-	    const response = await fetch(tgApiUrl('deleteMessages', env.TG_TOKEN), {
+	    const response = await fetch(tgApiUrl('deleteMessages', env.SECRET_TELEGRAM_API_TOKEN), {
 		   method: 'POST',
 		   headers: { 'Content-Type': 'application/json' },
 		   body: JSON.stringify(deleteParams)
