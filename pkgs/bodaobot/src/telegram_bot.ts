@@ -178,6 +178,8 @@ currentContext!: TG_ExecutionContext;
           console.log(`[LOGGING FROM /handle]: Request came from ${request.url}`);
 		this.webhook = new Webhook(this.token, request);
 		const url = new URL(request.url);
+          console.log(`[LOGGING FROM /handle]: this token: ${this.token}`);
+
 		if (`/${this.token}` === url.pathname) {
 			switch (request.method) {
 				case 'POST': {
