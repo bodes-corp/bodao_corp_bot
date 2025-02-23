@@ -510,7 +510,7 @@ async handleUpdate(update: TelegramUpdate) {
               '/active_gp': TIOZAO_API.listActiveGp,
               '/chat': TIOZAO_API.listChat,
               '/gp_td': TIOZAO_API.listTdGp,
-              '/info': () => TIOZAO_API.listInfo( ctx.bot.env,this, user.id),
+              '/info': () => TIOZAO_API.listInfo( ctx.bot.env, ctx.bot, user.id),
               '/spa': this.handleSpaCommand,
               '/top_gp': TIOZAO_API.listTopGp,
               '/top_rp': TIOZAO_API.listTopRp,
@@ -521,17 +521,17 @@ async handleUpdate(update: TelegramUpdate) {
           const commandKey = Object.keys(commandHandlers).find(prefix => command.startsWith(prefix));
       
           if (commandKey) {
-              await this.tgAnswerCallbackQuery(this.env, callbackQuery.id, commandKey);
+              await ctx.bot.tgAnswerCallbackQuery( ctx.bot.env, callbackQuery.id, commandKey);
               const commandFunction:any = commandHandlers[commandKey];
-              response_ids = await commandFunction(this.env, callbackQuery, command.slice(commandKey.length).trim());
+              response_ids = await commandFunction( ctx.bot.env, callbackQuery, command.slice(commandKey.length).trim());
           } else {
               return new Response(`Unknown command: ${command}`, { status: 400 });
           }
           if (command !== '/spa') {
-              await  TIOZAO_API.showMenu( ctx.bot.env,this, response_ids);
+              await  TIOZAO_API.showMenu( ctx.bot.env, ctx.bot, response_ids);
           }
-          await this.handleBotResponses( ctx.bot.env, response_ids);
-          await this.handleOldMessages();
+          await  ctx.bot.handleBotResponses( ctx.bot.env, response_ids);
+          await  ctx.bot.handleOldMessages();
           return new Response('ok');
       }
       
