@@ -339,15 +339,6 @@ async handleUpdate(update: TelegramUpdate) {
 		//return new Response('ok');
 	}
 
-     async test(bot: TG_ExecutionContext)  {
-          const file_id: string = bot.update.message?.document?.file_id ?? '';
-          const file_response = await bot.getFile(file_id);
-          const id = crypto.randomUUID().slice(0, 5);
-          //await env.R2.put(id, await file_response.arrayBuffer());
-          await bot.reply(`https://r2.seanbehan.ca/${id}`);
-          return new Response('ok');
-     }
-
      async handleMessage(ctx:TG_ExecutionContext) {
           const messageJson:any = ctx.update.message;
           const message:TG_Message = new Message(messageJson);
@@ -363,18 +354,18 @@ async handleUpdate(update: TelegramUpdate) {
           }
       
           if (message.msg_txt.startsWith('/')) {
-              await this.handleBotCommand( ctx.bot.env, message);
+              await ctx.bot.handleBotCommand( ctx.bot.env, message);
           }
           
           switch (message.operation) {
               case 'create_thread':
-                  await this.handleCreateThread(message);
+                  await ctx.bot.handleCreateThread(message);
                   break;
               case 'new_media':
-                  await this.handleNewMedia( ctx.bot.env, message);
+                  await ctx.bot.handleNewMedia( ctx.bot.env, message);
                   break;
               case 'new_post':
-                  await this.handleNewPost( ctx.bot.env, message);
+                  await ctx.bot.handleNewPost( ctx.bot.env, message);
                   break;
           }
 
