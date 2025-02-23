@@ -48,7 +48,7 @@ export default {
 	async fetch(request: Request, env:Environment, context: ExecutionContext): Promise<Response> {
 		//console.log(`[LOGGING FROM /hello]: Request came from ${context.request.url}`);
 		
-		const { waitUntil } = context;
+		//const { waitUntil } = context;
 
 		if (false /*!isAuthorized(request, env)*/) {
 		return new Response('Unauthorized test', { status: 403 });
@@ -59,11 +59,12 @@ export default {
 		// when a POS request arrives at the webhooendPoint, thebot reads te JSON
 		//body of this request, interpreting this as an Update from Telegram
 		const update = await request.json();
+		console.log('dbg update',update)
 		//ctx.waitUntil() extends the lifetime of your Worker, allowing you to perform work without blocking 
 		// returning a response, and that may continue after a response is returned. It accepts a Promise,
 		//  which the Workers runtime will continue executing, even after a response has been returned by 
 		// the Worker's handler.
-		waitUntil(handleUpdate(env, update));
+		context.waitUntil(handleUpdate(env, update));
 		return new Response('Ok');
 		} catch (error) {
 		console.error('Error processing update:', error);
