@@ -13,6 +13,7 @@ function isValidChat(message:any , env:any ) {
      return message.chat_id === parseInt(env.TG_CHATID);
 }
 
+type Handler = Record<string, (ctx:TG_ExecutionContext) => Promise<Response>>
 
 /**
  * Class representinhg a Telegram Bot
@@ -25,7 +26,7 @@ export default class TG_BOT {
      api: URL;
 
      /** The telegram handlers record map */
-     handlers: Record<string, (ctx:TG_ExecutionContext) => Promise<Response>> = {};
+     handlers:Handler  = {};
 
      /** The telegram update object */
      update: TelegramUpdate = new TelegramUpdate({});
@@ -38,7 +39,7 @@ export default class TG_BOT {
 
      /** The envirownment variables */
      env:Environment;
-     
+
      /**
 	*	Create a bot
 	*	@param token - the telegram secret token
@@ -47,7 +48,16 @@ export default class TG_BOT {
           this.env = env;
 		this.token = token;
 		this.api = new URL('https://api.telegram.org/bot' + token);
+          this.handlers = {
+               ':message': this.handleMessage,
+               ':edited_message': this.handleEditedMessage,
+               ':callback': this.handleCallbackQuery,
+           }
 	}
+
+    
+
+    
 
 
      tgApiUrl(methodName:any, params = {}) {
@@ -172,7 +182,7 @@ export default class TG_BOT {
           return await this.tgSendRequest('answerCallbackQuery', env, params);
      }
 
-
+    
 
      	/**
  * This method handles the updates from Telegram.
@@ -203,12 +213,12 @@ async handleUpdate(update: TelegramUpdate) {
 	switch (ctx.update_type) {
 		case 'message': {
 		     args = this.update.message?.text?.split(' ') ?? [];
-               await this.handleMessage(this.currentContext);
+         
 		     break;
 		}
           case 'edited_message': {
 			args = this.update.message?.text?.split(' ') ?? [];
-               await this.handleEditedMessage(this.currentContext );
+
 			break;
 		}
 		case 'business_message': {
@@ -229,7 +239,6 @@ async handleUpdate(update: TelegramUpdate) {
 		}
 		case 'callback': {
 			updType = ':callback';
-               await this.handleCallbackQuery(this.currentContext );
 			break;
 		}
 		default:
@@ -241,7 +250,7 @@ async handleUpdate(update: TelegramUpdate) {
 	if (!(updType in this.handlers)) {
 		updType = ':message';
 	}
-	//return await this.handlers[updType](ctx);
+	return await this.handlers[updType](ctx);
  }
  
 
@@ -330,6 +339,15 @@ async handleUpdate(update: TelegramUpdate) {
 		//return new Response('ok');
 	}
 
+     async test(bot: TG_ExecutionContext)  {
+          const file_id: string = bot.update.message?.document?.file_id ?? '';
+          const file_response = await bot.getFile(file_id);
+          const id = crypto.randomUUID().slice(0, 5);
+          //await env.R2.put(id, await file_response.arrayBuffer());
+          await bot.reply(`https://r2.seanbehan.ca/${id}`);
+          return new Response('ok');
+     }
+
      async handleMessage(ctx:TG_ExecutionContext) {
           const messageJson:any = ctx.update.message;
           const message:TG_Message = new Message(messageJson);
@@ -341,11 +359,11 @@ async handleUpdate(update: TelegramUpdate) {
               //console.log("invalid chat: ");
               //console.log("env: ", env.json());
               //return new Response("Hello, world!");
-              return new Response('Unauthorized', { status: 403 });
+             return  new Response('Unauthorized', { status: 403 });
           }
       
           if (message.msg_txt.startsWith('/')) {
-              return await this.handleBotCommand(this.env, message);
+              await this.handleBotCommand(this.env, message);
           }
           
           switch (message.operation) {
@@ -360,7 +378,8 @@ async handleUpdate(update: TelegramUpdate) {
                   break;
           }
 
-          return await DB_API.dbInsertMessage(this.env, message);
+          await DB_API.dbInsertMessage(this.env, message);
+          return new Response('ok');
      }
 
      async handleEditedMessage(ctx:TG_ExecutionContext) {
@@ -375,7 +394,8 @@ async handleUpdate(update: TelegramUpdate) {
                   await this.handleEditPost(this.env, message);
                   break;
           }
-          return await DB_API.dbEditMessage(this.env, message);
+          await DB_API.dbEditMessage(this.env, message);
+          return new Response('ok');
      }
 
       
@@ -511,7 +531,8 @@ async handleUpdate(update: TelegramUpdate) {
               await  TIOZAO_API.showMenu(this.env,this, response_ids);
           }
           await this.handleBotResponses(this.env, response_ids);
-          return await this.handleOldMessages();
+          await this.handleOldMessages();
+          return new Response('ok');
       }
       
       async handleSpaCommand(env:any, callbackQuery:any, spa:string) {
