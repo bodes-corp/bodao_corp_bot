@@ -352,9 +352,9 @@ async handleUpdate(update: TelegramUpdate) {
           const messageJson:any = ctx.update.message;
           const message:TG_Message = new Message(messageJson);
           console.log("operation: ", message.operation);
-          console.log("env: ", this.env);
+          console.log("env: ", ctx.bot.env);
           //return new Response("Hello, world!");
-          if (!isValidChat(message, this.env)) {''
+          if (!isValidChat(message,  ctx.bot.env)) {''
               
               //console.log("invalid chat: ");
               //console.log("env: ", env.json());
@@ -363,7 +363,7 @@ async handleUpdate(update: TelegramUpdate) {
           }
       
           if (message.msg_txt.startsWith('/')) {
-              await this.handleBotCommand(this.env, message);
+              await this.handleBotCommand( ctx.bot.env, message);
           }
           
           switch (message.operation) {
@@ -371,14 +371,14 @@ async handleUpdate(update: TelegramUpdate) {
                   await this.handleCreateThread(message);
                   break;
               case 'new_media':
-                  await this.handleNewMedia(this.env, message);
+                  await this.handleNewMedia( ctx.bot.env, message);
                   break;
               case 'new_post':
-                  await this.handleNewPost(this.env, message);
+                  await this.handleNewPost( ctx.bot.env, message);
                   break;
           }
 
-          await DB_API.dbInsertMessage(this.env, message);
+          await DB_API.dbInsertMessage( ctx.bot.env, message);
           return new Response('ok');
      }
 
@@ -388,13 +388,13 @@ async handleUpdate(update: TelegramUpdate) {
       
           switch (message.operation) {
               case 'edit_media':
-                  await this.handleEditMedia(this.env, message);
+                  await this.handleEditMedia( ctx.bot.env, message);
                   break;
               case 'edit_post':
-                  await this.handleEditPost(this.env, message);
+                  await this.handleEditPost( ctx.bot.env, message);
                   break;
           }
-          await DB_API.dbEditMessage(this.env, message);
+          await DB_API.dbEditMessage( ctx.bot.env, message);
           return new Response('ok');
      }
 
@@ -510,7 +510,7 @@ async handleUpdate(update: TelegramUpdate) {
               '/active_gp': TIOZAO_API.listActiveGp,
               '/chat': TIOZAO_API.listChat,
               '/gp_td': TIOZAO_API.listTdGp,
-              '/info': () => TIOZAO_API.listInfo(this.env,this, user.id),
+              '/info': () => TIOZAO_API.listInfo( ctx.bot.env,this, user.id),
               '/spa': this.handleSpaCommand,
               '/top_gp': TIOZAO_API.listTopGp,
               '/top_rp': TIOZAO_API.listTopRp,
@@ -528,9 +528,9 @@ async handleUpdate(update: TelegramUpdate) {
               return new Response(`Unknown command: ${command}`, { status: 400 });
           }
           if (command !== '/spa') {
-              await  TIOZAO_API.showMenu(this.env,this, response_ids);
+              await  TIOZAO_API.showMenu( ctx.bot.env,this, response_ids);
           }
-          await this.handleBotResponses(this.env, response_ids);
+          await this.handleBotResponses( ctx.bot.env, response_ids);
           await this.handleOldMessages();
           return new Response('ok');
       }
