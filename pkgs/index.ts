@@ -1,5 +1,6 @@
 import TG_BOT from "./bodaobot/src/telegram_bot";
 import TelegramUpdate from "./bodaobot/src/types/TelegramUpdate";
+import Webhook from "./bodaobot/src/webhook";
 
 interface Environment {
 	SECRET_TELEGRAM_API_TOKEN: string;
@@ -35,9 +36,39 @@ export default {
 		// returning a response, and that may continue after a response is returned. It accepts a Promise,
 		//  which the Workers runtime will continue executing, even after a response has been returned by 
 		// the Worker's handler.
-		const update: TelegramUpdate = await request.json();
-		//const clone:Request = await request.clone();
-		context.waitUntil(rafaelBot.handleUpdate(env, update));
+		
+
+
+		console.log(`[LOGGING FROM /handle]: Request came from ${request.url}`);
+		const webhook = new Webhook(env.SECRET_TELEGRAM_API_TOKEN, request);
+		const url = new URL(request.url);
+		console.log(`[LOGGING FROM /handle]: this token: ${env.SECRET_TELEGRAM_API_TOKEN}`);
+		
+		
+			switch (request.method) {
+				case 'POST': {
+							
+					const update: TelegramUpdate = await request.json();
+					//const clone:Request = await request.clone();
+					//console.log(this.update);
+					context.waitUntil(rafaelBot.handleUpdate(env, update));
+				}
+				case 'GET': {
+					switch (url.searchParams.get('command')) {
+						case 'set':
+							return webhook.set();
+						default:
+							break;
+					}
+					break;
+				}
+		
+				default:
+				break;
+			}	
+
+
+
 		return new Response('Ok');
 		} catch (error) {
 		console.error('Error processing update:', error);
