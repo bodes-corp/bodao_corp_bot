@@ -176,12 +176,11 @@ currentContext!: TG_ExecutionContext;
  * @param {*} env the worker env variables
  * @param {*} update the request object json formated
  */
-async handleUpdate(env:any, request: Request) {
-
-	this.update = await request.json();
+async handleUpdate(env:any, update: TelegramUpdate) {
+     this.update = update;
+	
 	if (this.update.message) {   
 	
- 
 	    await this.handleMessage(env, this.update.message);
 	} else if (this.update.edited_message) {
 	    await this.handleEditedMessage(env, this.update.edited_message);
