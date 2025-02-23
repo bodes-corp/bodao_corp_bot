@@ -113,5 +113,9 @@ TG_CHATID = "-1002271335705"
 # index_name = "my-index"
 # wrangler.toml (wrangler v3.88.0^)
 [observability.logs]
-enabled = true
-invocation_logs = false
+enabled = false
+#invocation_logs = false
+
+
+
+
