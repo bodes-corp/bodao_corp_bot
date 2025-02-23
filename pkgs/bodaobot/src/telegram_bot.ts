@@ -180,7 +180,7 @@ currentContext!: TG_ExecutionContext;
 		const url = new URL(request.url);
           console.log(`[LOGGING FROM /handle]: this token: ${this.token}`);
 
-		if (`/${this.token}` === url.pathname) {
+		//if (`/${this.token}` === url.pathname) {
 			switch (request.method) {
 				case 'POST': {
 					this.update = await request.json();
@@ -247,7 +247,7 @@ currentContext!: TG_ExecutionContext;
 				default:
 					break;
 			}
-		}
+		//}
 		return new Response('ok');
 	}
 
