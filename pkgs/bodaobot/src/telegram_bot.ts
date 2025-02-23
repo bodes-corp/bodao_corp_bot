@@ -197,7 +197,7 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 	switch (ctx.update_type) {
 		case 'message': {
 		     args = this.update.message?.text?.split(' ') ?? [];
-               await this.handleMessage(env, this.update);
+               await this.handleMessage(env, this.update.message);
 		     break;
 		}
           case 'edited_message': {
