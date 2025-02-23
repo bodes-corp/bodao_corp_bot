@@ -50,7 +50,7 @@ export default {
 		
 		const { waitUntil } = context;
 
-		if (!isAuthorized(request, env)) {
+		if (true /*!isAuthorized(request, env)*/) {
 		return new Response('Unauthorized test', { status: 403 });
 		}
 
@@ -156,7 +156,7 @@ async function handleUpdate(env:any, update:any) {
 	//console.log("operation: ", message.operation);
 	//console.log("env: ", env.json());
 	//return new Response("Hello, world!");
-	if (true /*!isValidChat(message, env)*/) {
+	if (!isValidChat(message, env)) {
 	    
 	    //console.log("invalid chat: ");
 	    //console.log("env: ", env.json());
