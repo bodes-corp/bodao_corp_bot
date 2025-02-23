@@ -175,6 +175,7 @@ currentContext!: TG_ExecutionContext;
       * @param request - the request to handle
 	*/
 	async handle(env:any, request: Request): Promise<Response> {
+          console.log(`[LOGGING FROM /handle]: Request came from ${request.url}`);
 		this.webhook = new Webhook(this.token, request);
 		const url = new URL(request.url);
 		if (`/${this.token}` === url.pathname) {
