@@ -1,15 +1,15 @@
-import TelegramInlineQuery from './TelegramInlineQuery.js';
-import TelegramMessage from './TelegramMessage.js';
 import PartialTelegramUpdate from './PartialTelegramUpdate.js';
-import TelegramCallbackQuery from './TelegramCallbackQuery.js';
 import TelegramBusinessMessage from './TelegramBusinessMessage.js';
+import TelegramCallbackQuery from './TelegramCallbackQuery.js';
+import TelegramInlineQuery from './TelegramInlineQuery.js';
+import TG_Message from './TG_Message.js';
 
 export default class TelegramUpdate {
 	update_id: number;
-	message?: TelegramMessage;
-	edited_message?: TelegramMessage;
-	channel_post?: TelegramMessage;
-	edited_channel_post?: TelegramMessage;
+	message?: TG_Message;
+	edited_message?: TG_Message;
+	channel_post?: TG_Message;
+	edited_channel_post?: TG_Message;
 	inline_query?: TelegramInlineQuery;
 	// chosen_inline_result?: TelegramChosenInlineResult;
 	callback_query?: TelegramCallbackQuery;

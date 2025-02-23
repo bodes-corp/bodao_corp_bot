@@ -1,4 +1,4 @@
-import TelegramMessage from './TelegramMessage.js';
+import TG_Message from './TG_Message.js';
 
 interface TelegramChat {
 	id: number;
@@ -12,7 +12,7 @@ interface TelegramChat {
 	has_private_forwards: boolean;
 	description?: string;
 	invite_link?: string;
-	pinned_message?: TelegramMessage;
+	pinned_message?: TG_Message;
 	// permissions?: TelegramChatPermissions;
 	slow_mode_delay?: number;
 	message_auto_delete_time?: number;

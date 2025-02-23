@@ -4,7 +4,7 @@ import TelegramFrom from './TelegramFrom.js';
 import TelegramMessageEntity from './TelegramMessageEntity.js';
 import TelegramPhotoSize from './TelegramPhotoSize.js';
 import TelegramUser from './TelegramUser.js';
-import TelegramMessage from './TelegramMessage.js';
+import TG_Message from './TG_Message.js';
 
 interface TelegramBusinessMessage {
 	message_id: number;
@@ -20,7 +20,7 @@ interface TelegramBusinessMessage {
 	forward_sender_name?: string;
 	forward_date?: number;
 	is_automatic_forward?: boolean;
-	reply_to_message?: TelegramMessage;
+	reply_to_message?: TG_Message;
 	via_bot?: TelegramUser;
 	edit_date?: number;
 	has_protected_content?: boolean;
@@ -55,7 +55,7 @@ interface TelegramBusinessMessage {
 	// message_auto_delete_timer_changed?: TelegramAutoDeleteTimerChanged;
 	migrate_to_chat_id?: number;
 	migrate_from_chat_id?: number;
-	pinned_message?: TelegramMessage;
+	pinned_message?: TG_Message;
 	// invoice?: TelegramInvoice;
 	// successful_payment?: TelegramSuccessfulPayment;
 	connected_website?: string;

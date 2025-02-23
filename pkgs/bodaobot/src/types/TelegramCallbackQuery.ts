@@ -1,5 +1,5 @@
 import TelegramFrom from './TelegramFrom.js';
-import TelegramMessage from './TelegramMessage.js';
+import TG_Message from './TG_Message.js';
 
 interface TelegramCallbackQuery {
     chat_type: 'sender' | 'private' | 'group' | 'supergroup' | 'channel';
@@ -7,7 +7,7 @@ interface TelegramCallbackQuery {
     id: number;
     offset: string;
     query: string;
-    message: TelegramMessage,
+    message: TG_Message,
     inline_message_id: string;
     chat_instance: string;
     data: string;
