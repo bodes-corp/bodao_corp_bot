@@ -250,7 +250,7 @@ async handleUpdate(update: TelegramUpdate) {
 	if (!(updType in this.handlers)) {
 		updType = ':message';
 	}
-	return await this.handlers[updType](ctx);
+	return await this.handlers[updType](this.currentContext);
  }
  
 
@@ -351,8 +351,8 @@ async handleUpdate(update: TelegramUpdate) {
      async handleMessage(ctx:TG_ExecutionContext) {
           const messageJson:any = ctx.update.message;
           const message:TG_Message = new Message(messageJson);
-          //console.log("operation: ", message.operation);
-          //console.log("env: ", env.json());
+          console.log("operation: ", message.operation);
+          console.log("env: ", this.env);
           //return new Response("Hello, world!");
           if (!isValidChat(message, this.env)) {''
               
