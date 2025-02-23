@@ -248,7 +248,7 @@ currentContext!: TG_ExecutionContext;
 					break;
 			}
 		//}
-		return new Response('ok');
+		//return new Response('ok');
 	}
 
      async handleMessage(env:any, messageJson:any) {
