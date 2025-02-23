@@ -1,4 +1,5 @@
 import TG_BOT from "./bodaobot/src/telegram_bot";
+import TelegramUpdate from "./bodaobot/src/types/TelegramUpdate";
 
 interface Environment {
 	SECRET_TELEGRAM_API_TOKEN: string;
@@ -34,7 +35,7 @@ export default {
 		// returning a response, and that may continue after a response is returned. It accepts a Promise,
 		//  which the Workers runtime will continue executing, even after a response has been returned by 
 		// the Worker's handler.
-		const update = await request.json();
+		const update: TelegramUpdate = await request.json();
 		context.waitUntil(rafaelBot.handleUpdate(env, update));
 		return new Response('Ok');
 		} catch (error) {
