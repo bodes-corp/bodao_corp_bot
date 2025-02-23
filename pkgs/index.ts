@@ -1,3 +1,5 @@
+import TgBot from "./bodaobot/src/telegram_bot";
+
 interface Environment {
 	SECRET_TELEGRAM_API_TOKEN: string;
 	TG_THREADBOT:string;
@@ -6,43 +8,9 @@ interface Environment {
 
 }
 
-function tgApiUrl(methodName:any, tgToken:any, params = {}) {
-	const query = params ? `?${new URLSearchParams(params).toString()}` : '';
-	return `https://api.telegram.org/bot${tgToken}/${methodName}${query}`;
- }
-
-async function tgSendRequest(method:string, env:any, params:any) {
-	try {
-	    const response = await fetch(tgApiUrl(method, env.SECRET_TELEGRAM_API_TOKEN, params), {
-		   method: 'POST',
-		   headers: { 'Content-Type': 'application/json' }
-	    });
- 
-	    const data:any = await response.json();
-	    if (!data.ok) {
-		   throw new Error(`Telegram API Error: ${data.description}`);
-	    }
- 
-	    return data;
-	} catch (error) {
-	    console.error(`Error in ${method} request:`, error);
-	    throw error;
-	}
- }
-
-async function tgSendMessage(env:any, text:string) {
-	return await tgSendRequest('sendMessage', env, {
-	    chat_id: env.TG_CHATID,
-	    message_thread_id: env.TG_THREADBOT,
-	    text,
-	    parse_mode: 'html',
-	    disable_notification: 'true'
-	});
- }
-
- function isAuthorized(request:any, env:any) {
+function isAuthorized(request:any, env:any) {
 	return request.headers.get('X-Telegram-Bot-Api-Secret-Token') === env.TG_SECRET;
- }
+}
 
 export default {
 	async fetch(request: Request, env:Environment, context: ExecutionContext): Promise<Response> {
@@ -54,6 +22,8 @@ export default {
 		return new Response('Unauthorized test', { status: 403 });
 		}
 
+		const rafaelBot = new TgBot(env.SECRET_TELEGRAM_API_TOKEN);
+
 		try {
 
 		// when a POS request arrives at the webhooendPoint, thebot reads te JSON
@@ -64,7 +34,7 @@ export default {
 		// returning a response, and that may continue after a response is returned. It accepts a Promise,
 		//  which the Workers runtime will continue executing, even after a response has been returned by 
 		// the Worker's handler.
-		context.waitUntil(handleUpdate(env, update));
+		context.waitUntil(handleUpdate(env, rafaelBot, update));
 		return new Response('Ok');
 		} catch (error) {
 		console.error('Error processing update:', error);
@@ -139,20 +109,20 @@ export default {
  * @param {*} env the worker env variables
  * @param {*} update the request object json formated
  */
-async function handleUpdate(env:any, update:any) {
+async function handleUpdate(env:any, bot: TgBot, update:any) {
 
 	if (update.message) {   
 	
  
-	    await handleMessage(env, update.message);
+	    await handleMessage(env, bot, update.message);
 	} else if (update.edited_message) {
-	    await handleEditedMessage(env, update.edited_message);
+	    await handleEditedMessage(env, bot, update.edited_message);
 	} else if (update.callback_query) {
-	    await handleCallbackQuery(env, update.callback_query);
+	    await handleCallbackQuery(env, bot, update.callback_query);
 	}
  }
  
- async function handleMessage(env:any, messageJson:any) {
+ async function handleMessage(env:any, bot: TgBot,  messageJson:any) {
 	const message:Message = new Message(messageJson);
 	//console.log("operation: ", message.operation);
 	//console.log("env: ", env.json());
@@ -166,25 +136,25 @@ async function handleUpdate(env:any, update:any) {
 	}
  
 	if (message.msg_txt.startsWith('/')) {
-	    return await handleBotCommand(env, message);
+	    return await handleBotCommand(env, bot, message);
 	}
 	
 	switch (message.operation) {
 	    case 'create_thread':
-		   await handleCreateThread(env, message);
+		   await handleCreateThread(env, bot, message);
 		   break;
 	    case 'new_media':
 		   await handleNewMedia(env, message);
 		   break;
 	    case 'new_post':
-		   await handleNewPost(env, message);
+		   await handleNewPost(env, bot, message);
 		   break;
 	}
 	return await dbInsertMessage(env, message);
  }
  
- async function handleOldMessages (env:any) {
-	await removeOldMessages(env);
+ async function handleOldMessages (env:any, bot: TgBot,) {
+	await removeOldMessages(env, bot);
  }
  
  async function handleBotResponses(env:any, response_ids:any[]) {
@@ -194,10 +164,10 @@ async function handleUpdate(env:any, update:any) {
 	}
  }
  
- async function handleCreateThread (env:any, message:Message) {
+ async function handleCreateThread (env:any,  bot: TgBot, message:Message) {
 	let response_ids:any[] = [];
  
-	await checkDuplicatedThread(env, message.threadname, message.id_thread);
+	await checkDuplicatedThread(env, bot, message.threadname, message.id_thread);
 	return await handleBotResponses(env, response_ids);
  }
  
@@ -208,16 +178,16 @@ async function handleUpdate(env:any, update:any) {
 	return await handleBotResponses(env, response_ids);
  }
  
- async function handleNewPost (env:any, message:Message) {
+ async function handleNewPost (env:any,  bot: TgBot, message:Message) {
 	let response_ids:any[] = [];
 	//console.log("handleNewPost: ", message.operation);
 	if (message.td_rp || message.td) {
-	    response_ids.push(await confirmTD(env, message, 0));
+	    response_ids.push(await confirmTD(env,bot,  message, 0));
 	}
 	return await handleBotResponses(env, response_ids);
  }
  
- async function handleEditedMessage(env:any, messageJson:any) {
+ async function handleEditedMessage(env:any,  bot: TgBot, messageJson:any) {
 	const message:EditedMessage = new EditedMessage(messageJson);
  
 	switch (message.operation) {
@@ -225,7 +195,7 @@ async function handleUpdate(env:any, update:any) {
 		   await handleEditMedia(env, message);
 		   break;
 	    case 'edit_post':
-		   await handleEditPost(env, message);
+		   await handleEditPost(env, bot,message);
 		   break;
 	}
 	return await dbEditMessage(env, message);
@@ -238,17 +208,17 @@ async function handleUpdate(env:any, update:any) {
 	return await handleBotResponses(env, response_ids);
  }
  
- async function handleEditPost (env:any, message:EditedMessage) {
+ async function handleEditPost (env:any,  bot: TgBot,message:EditedMessage) {
 	let response_ids:any[] = [];
  
 	if (message.td_rp || message.td) {
-	    response_ids.push(await confirmTD(env, message, 1));
+	    response_ids.push(await confirmTD(env, bot,message, 1));
 	}
 	return await handleBotResponses(env, response_ids);
  
  }
  
- async function handleBotCommand(env:any, message:Message) {
+ async function handleBotCommand(env:any,  bot: TgBot, message:Message) {
 	const id_msg = message.id_msg;
 	const id_thread = message.id_thread;
 	const id_user = message.id_user;
@@ -260,7 +230,7 @@ async function handleUpdate(env:any, update:any) {
 	    '/active_gp': { func: listActiveGp, requiresArg: false },
 	    '/chat': { func: listChat, requiresArg: false },
 	    '/gp_td': { func: listTdGp, requiresArg: false },
-	    '/info': { func: (env:any, _:any) => listInfo(env, id_user), requiresArg: false },
+	    '/info': { func: (env:any, _:any) => listInfo(env, bot, id_user), requiresArg: false },
 	    '/spa': { func: listSpa, requiresArg: false },
 	    '/s': {func: searchTerm, requiresArg: true},
 	    '/top_gp': { func: listTopGp, requiresArg: false },
@@ -278,25 +248,25 @@ async function handleUpdate(env:any, update:any) {
 	    const argument = msg_txt.slice(selectedCommand.length).trim();
  
 	    if (requiresArg && argument === '') {
-		   response_ids.push(await botAlert(env, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, id_msg));
+		   response_ids.push(await botAlert(env, bot, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, id_msg));
 	    } else if (requiresArg && !msg_txt.startsWith(selectedCommand + ' ')) {
-		   response_ids.push(await botAlert(env, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, id_msg));
+		   response_ids.push(await botAlert(env,  bot, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, id_msg));
 	    } else {
 		   response_ids = await commandFunction(env, argument);
 	    }
 	} else {
-	    response_ids.push(await botAlert(env, 'Comando desconhecido: ' + command, id_thread, id_msg));
+	    response_ids.push(await botAlert(env,  bot, 'Comando desconhecido: ' + command, id_thread, id_msg));
 	}
  
 	if (commandEntry != '/spa') {
-	    await showMenu(env, response_ids);
+	    await showMenu(env, bot,response_ids);
 	}
 	response_ids.push(id_msg);
 	await handleBotResponses(env, response_ids);
-	return await handleOldMessages(env);
+	return await handleOldMessages(env, bot);
  }
  
- async function handleCallbackQuery(env:any, callbackQuery:any) {
+ async function handleCallbackQuery(env:any,bot: TgBot,  callbackQuery:any) {
 	const { from: user, data: command } = callbackQuery;
 	let response_ids:any[] = [];
  
@@ -304,7 +274,7 @@ async function handleUpdate(env:any, update:any) {
 	    '/active_gp': listActiveGp,
 	    '/chat': listChat,
 	    '/gp_td': listTdGp,
-	    '/info': () => listInfo(env, user.id),
+	    '/info': () => listInfo(env,bot, user.id),
 	    '/spa': handleSpaCommand,
 	    '/top_gp': listTopGp,
 	    '/top_rp': listTopRp,
@@ -315,25 +285,25 @@ async function handleUpdate(env:any, update:any) {
 	const commandKey = Object.keys(commandHandlers).find(prefix => command.startsWith(prefix));
  
 	if (commandKey) {
-	    await tgAnswerCallbackQuery(env, callbackQuery.id, commandKey);
+	    await bot.tgAnswerCallbackQuery(env, callbackQuery.id, commandKey);
 	    const commandFunction:any = commandHandlers[commandKey];
 	    response_ids = await commandFunction(env, callbackQuery, command.slice(commandKey.length).trim());
 	} else {
 	    return new Response(`Unknown command: ${command}`, { status: 400 });
 	}
 	if (command !== '/spa') {
-	    await showMenu(env, response_ids);
+	    await showMenu(env,bot, response_ids);
 	}
 	await handleBotResponses(env, response_ids);
-	return await handleOldMessages(env);
+	return await handleOldMessages(env,bot);
  }
  
- async function handleSpaCommand(env:any, callbackQuery:any, spa:string) {
+ async function handleSpaCommand(env:any,  bot: TgBot, callbackQuery:any, spa:string) {
 	if (spa === '') {
-	    return await listSpa(env);
+	    return await listSpa(env,bot);
 	} else {
-	    await tgAnswerCallbackQuery(env, callbackQuery.id, spa);
-	    return await searchSpa(env, spa);
+	    await bot.tgAnswerCallbackQuery(env, callbackQuery.id, spa);
+	    return await searchSpa(env, bot,spa);
 	}
  }
  
@@ -907,7 +877,7 @@ async function handleUpdate(env:any, update:any) {
  ///////////////////////////////////////////////////////////////////////////////
  // Bot commands
  
- async function botShowMenu(env:any) {
+ async function botShowMenu(env:any, bot: TgBot ) {
 	const menu = [
 	    [{ text: 'Lista GPs', callback_data: '/gp_td'}, { text: 'Top GPs', callback_data: '/top_gp'}],
 	    [{ text: 'Top Repetecos', callback_data: '/top_rp'},{ text: 'GPs Ativas', callback_data: '/active_gp'}],
@@ -915,33 +885,33 @@ async function handleUpdate(env:any, update:any) {
 	    [{ text: 'Membros', callback_data: '/user' },{ text: 'Bate Papo', callback_data: '/chat' }],
 	    [{ text: 'Perfil', callback_data: '/info' }]
 	];
-	return await botResponseButton(env, menu, 'Menu:');
+	return await ResponseButton(env, bot, menu, 'Menu:');
  }
  
- async function botResponseButton(env:any, buttons:any[], text:string) {
-	return await tgButton(env, buttons, text);
+ async function ResponseButton(env:any,  bot: TgBot, buttons:any[], text:string) {
+	return await bot.tgButton(env, buttons, text);
  }
  
- async function botResponseTxt(env:any, text:string) {
-	return await tgMessage(env, text);
+ async function botResponseTxt(env:any,  bot: TgBot, text:string) {
+	return await bot.tgMessage(env, text);
  }
  
- async function botResponseMedia(env:any, json:any) {
-	const response = await tgSendMedia(env, json);
+ async function botResponseMedia(env:any, bot: TgBot,  json:any) {
+	const response = await bot.tgSendMedia(env, json);
 	return response.result.map((media: { message_id: any; }) => Number(media.message_id));
  }
  
- async function botAlert(env:any, text:string, id_thread:any, id_msg:any|null = null) {
-	const response = await tgSendMessageThread(env, text, id_thread, id_msg);
+ async function botAlert(env:any, bot: TgBot,  text:string, id_thread:any, id_msg:any|null = null) {
+	const response = await bot.tgSendMessageThread(env, text, id_thread, id_msg);
 	return Number(response.result.message_id);
  }
  
- async function botSendNotify(env:any, notify:string, id_thread:any, id_msg:any) {
-	const response = await tgSendMessageThread(env, notify, id_thread, id_msg);
+ async function botSendNotify(env:any,  bot: TgBot, notify:string, id_thread:any, id_msg:any) {
+	const response = await bot.tgSendMessageThread(env, notify, id_thread, id_msg);
 	return await dbInsertBotNotify(env, Number(response.result.message_id), id_msg);  
  }
  
- async function botRemoveNotify(env:any, id_msg_ref:any) {
+ async function botRemoveNotify(env:any,  bot: TgBot, id_msg_ref:any) {
 	const result = await dbSearchNotify(env, id_msg_ref);
 	const id_msg_array = [];
  
@@ -950,7 +920,7 @@ async function handleUpdate(env:any, update:any) {
 		   const id_msg = row[0];
 		   id_msg_array.push(id_msg);
 	    }
-	    await tgDeleteMessages(env, id_msg_array);
+	    await bot.tgDeleteMessages(env, id_msg_array);
 	    await dbDeleteBotNotify(env, id_msg_array);
 	}
 	return [];
@@ -959,7 +929,7 @@ async function handleUpdate(env:any, update:any) {
  ///////////////////////////////////////////////////////////////////////////////
  // Main functions
  
- async function listChat (env:any) {
+ async function listChat (env:any, bot: TgBot) {
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Bate Papo</b>\n═════════════════════\n`;
  
@@ -972,16 +942,16 @@ async function handleUpdate(env:any, update:any) {
 			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	}
 	return response_ids;
  }
  
- async function listActiveGp(env:any) {
+ async function listActiveGp(env:any, bot: TgBot) {
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>GPs ativas</b>\nGPs com TDs nos últimos 4 meses\n═════════════════════\n`;
  
@@ -995,17 +965,17 @@ async function handleUpdate(env:any, update:any) {
 			  text += `${day} - <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
- async function listTopGp(env:any) {
+ async function listTopGp(env:any, bot: TgBot) {
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Top GPs</b>\nGPs com TDs de usuários únicos\n═════════════════════\n`;
  
@@ -1018,17 +988,17 @@ async function handleUpdate(env:any, update:any) {
 			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> -> ${row[3]}\n`;
 		   }
 	    }
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
- async function listTopRp(env:any) {
+ async function listTopRp(env:any, bot: TgBot) {
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Top Repetecos</b>\nGPs com repetecos de usuários únicos\n═════════════════════\n`;
  
@@ -1041,17 +1011,17 @@ async function handleUpdate(env:any, update:any) {
 			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> -> ${row[3]}\n`;
 		   }
 	    }
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
- async function listTdGp(env:any) { 
+ async function listTdGp(env:any, bot: TgBot) { 
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Lista GPs</b>\nGPs com TDs + repetecos\n═════════════════════\n`;
  
@@ -1064,16 +1034,16 @@ async function handleUpdate(env:any, update:any) {
 			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[2]}/${row[3]}">${row[0]}</a> -> ${row[1]}\n`;
 		   }
 	    }
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	}
 	return response_ids;
  }
  
- async function listTrendGp(env:any) {
+ async function listTrendGp(env:any, bot: TgBot) {
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>GPs Tendência</b>\nGPs com TDs nos últimos 4 meses de 2 ou mais usuários diferentes\n═════════════════════\n`;
  
@@ -1086,17 +1056,17 @@ async function handleUpdate(env:any, update:any) {
 			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot,text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot,text, response_ids);
 	}
  
 	return response_ids;
  }
  
- async function listMembers(env:any){
+ async function listMembers(env:any, bot: TgBot){
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Membros</b>\n═════════════════════\n`;
  
@@ -1110,17 +1080,17 @@ async function handleUpdate(env:any, update:any) {
 			  text += `• ${row[0]} -> ${row[1]} / ${row[2]} / ${row[3]} \n`;
 		   }
 	    }
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot,text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
- async function listSpa (env:any) {
+ async function listSpa (env:any, bot: TgBot) {
 	let response_ids:any[] = [];
 	let text = '';
  
@@ -1128,23 +1098,23 @@ async function handleUpdate(env:any, update:any) {
 	    const result = await dbListSpa(env);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-		   await sendResponse(env, text, response_ids);
+		   await sendResponse(env, bot,text, response_ids);
 	    } else {
 		   const spas:any[] = result.map((row: any[]) =>
 			  row.map(buttonText => ({ text: buttonText, callback_data: '/spa ' + buttonText }))
 		   );
-		   response_ids = await botResponseButton(env, spas, 'Lista de casas:');
+		   response_ids = await ResponseButton(env, bot, spas, 'Lista de casas:');
 	    }        
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    const errorText = `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, errorText, response_ids);
+	    await sendResponse(env, bot, errorText, response_ids);
 	}
  
 	return response_ids;
  }
  
- async function searchSpa(env:any, spa:string) {
+ async function searchSpa(env:any,  bot: TgBot, spa:string) {
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>GPs ${spa}</b>\n═════════════════════\n`;
  
@@ -1157,17 +1127,17 @@ async function handleUpdate(env:any, update:any) {
 			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[1]}/${row[2]}">${row[0]}</a> -> ${row[3]}\n`;
 		   }
 	    }
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot,text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
- async function listInfo(env:any, id_user: any) {
+ async function listInfo(env:any, bot: TgBot, id_user: any) {
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>Perfil</b>\n═════════════════════\n`;
 	let first_name = '';
@@ -1210,17 +1180,17 @@ async function handleUpdate(env:any, update:any) {
 			  text += `${day} - <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env,bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
- async function searchTerm(env:any, name:string) {
+ async function searchTerm(env:any,  bot: TgBot,name:string) {
  
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>Busca ${name}</b>\n═════════════════════\n`;
@@ -1228,7 +1198,7 @@ async function handleUpdate(env:any, update:any) {
 	// Validate search term
 	if (!isValidSearchTerm(name)) {
 	    const text = `O termo de busca precisa ter ao menos 3 caracteres`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	    return response_ids;
 	}
 	try {
@@ -1240,11 +1210,11 @@ async function handleUpdate(env:any, update:any) {
 			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> \n`;
 		   }
 	    }
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await sendResponse(env, text, response_ids);
+	    await sendResponse(env, bot, text, response_ids);
 	}
  
 	return response_ids;
@@ -1253,18 +1223,18 @@ async function handleUpdate(env:any, update:any) {
  ///////////////////////////////////////////////////////////////////////////////
  // 
  ''
- async function showMenu(env:any, response_ids:any[]) {
-	response_ids.push(await botShowMenu(env));
+ async function showMenu(env:any, bot: TgBot, response_ids:any[]) {
+	response_ids.push(await botShowMenu(env,bot));
  }
  
- async function sendResponse(env:any, text:string, response_ids: any[], media = null) {
-	response_ids.push(await botResponseTxt(env, text));
+ async function sendResponse(env:any, bot: TgBot, text:string, response_ids: any[], media = null) {
+	response_ids.push(await botResponseTxt(env,bot, text));
 	if (media) {
-	    response_ids.push(await botResponseMedia(env, media));
+	    response_ids.push(await botResponseMedia(env, bot, media));
 	}
  }
  
- async function checkDuplicatedThread (env:any, threadname:string, id_thread:any) {
+ async function checkDuplicatedThread (env:any, bot: TgBot, threadname:string, id_thread:any) {
 	let text = '';
  
 	const result = await dbSearchThreadname(env, threadname);
@@ -1278,10 +1248,10 @@ async function handleUpdate(env:any, update:any) {
 		   text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 	    }
 	}
-	return await botAlert(env, text, id_thread);
+	return await botAlert(env, bot,text, id_thread);
  }
  
- async function confirmTD(env:any, message:Message|EditedMessage, edit:any) {
+ async function confirmTD(env:any,  bot: TgBot,message:Message|EditedMessage, edit:any) {
  
 	const result = await dbSearchTDUserThread(env, message.id_user, message.id_thread);
 	const number_rp = result.length;
@@ -1293,7 +1263,7 @@ async function handleUpdate(env:any, update:any) {
 	} else if (message.td_rp) {
 	    text = 'Falta o seu primeiro TD nesse tópico.\nSeguir o padrão: https://gpsp.xyz/td\n';
 	    message.td = 0;
-	    return await botAlert(env, text, message.id_thread, message.id_msg);
+	    return await botAlert(env, bot, text, message.id_thread, message.id_msg);
 	}
  
 	// Determine the response text based on the TD status and whether it's an edit
@@ -1307,7 +1277,7 @@ async function handleUpdate(env:any, update:any) {
  
 	// Send the response if the message has a TD
 	if (message.td) {
-	    return await botAlert(env, text, message.id_thread, message.id_msg);
+	    return await botAlert(env,bot, text, message.id_thread, message.id_msg);
 	}
  }
  
@@ -1392,32 +1362,9 @@ async function handleUpdate(env:any, update:any) {
 	);
  }
  
- function splitMessage(text:string, maxLength:number, maxNewlines:number) {
-	const parts = [];
-	while (text.length > 0) {
-	    let part = text.substring(0, maxLength);
+
  
-	    if (!part.endsWith("\n")) {
-		   const lastNewlineIndex = part.lastIndexOf("\n");
-		   if (lastNewlineIndex !== -1) {
-			  part = part.substring(0, lastNewlineIndex + 1);
-		   }
-	    }
- 
-	    const newlineCount = (part.match(/\n/g) || []).length;
-	    if (newlineCount >= maxNewlines) {
-		   const splitIndex = part.lastIndexOf("\n") + 1;
-		   parts.push(part.substring(0, splitIndex));
-		   text = text.substring(splitIndex);
-	    } else {
-		   parts.push(part);
-		   text = text.substring(part.length);
-	    }
-	}
-	return parts;
- }
- 
- async function removeOldMessages(env:any) {
+ async function removeOldMessages(env:any, bot: TgBot,) {
 	const now = Math.floor(Date.now() / 1000);
 	const old = now - 60;
  
@@ -1431,7 +1378,7 @@ async function handleUpdate(env:any, update:any) {
 	    const chunks = chunkArray(messageIds, 100);
  
 	    for (const chunk of chunks) {
-		   await tgDeleteMessages(env, chunk);
+		   await bot.tgDeleteMessages(env, chunk);
 	    }
  
 	    const deleteQuery = 'DELETE FROM tg_bot WHERE id_msg IN (SELECT id_msg FROM tg_bot WHERE msg_date < ?)';
@@ -1453,98 +1400,7 @@ async function handleUpdate(env:any, update:any) {
 	}
  
  }
- 
- 
-
- 
- async function tgMessage(env:any, text:string) {
-	const parts = splitMessage(text, 4096, 100);
-	const responses = [];
- 
-	for (const part of parts) {
-	    const response = await tgSendMessage(env, part);
-	    responses.push(Number(response.result.message_id));
-	}
- 
-	return responses;
- }
- 
- async function tgSendMedia(env:any, media:any) {
-	return await tgSendRequest('sendMediaGroup', env, {
-	    chat_id: env.TG_CHATID,
-	    message_thread_id: env.TG_THREADBOT,
-	    media,
-	    disable_notification: 'true'
-	});
- }
- 
-
- async function tgSendMessageThread(env:any, text:string, id_thread:any, id_msg:any) {
-	return await tgSendRequest('sendMessage', env, {
-	    chat_id: env.TG_CHATID,
-	    message_thread_id: id_thread,
-	    text,
-	    parse_mode: 'html',
-	    disable_notification: 'true',
-	    reply_to_message_id: id_msg
-	});
- }
- 
- async function tgDeleteMessage(env:any, message_id:any) {
-	return await tgSendRequest('deleteMessage', env, {
-	    chat_id: env.TG_CHATID,
-	    message_id
-	});
- }
- 
- async function tgDeleteMessages(env:any, chunk:any) {
-	try {
-	    const deleteParams = { chat_id: env.TG_CHATID, message_ids: chunk };
-	    const response = await fetch(tgApiUrl('deleteMessages', env.SECRET_TELEGRAM_API_TOKEN), {
-		   method: 'POST',
-		   headers: { 'Content-Type': 'application/json' },
-		   body: JSON.stringify(deleteParams)
-	    });
- 
-	    const result:any = await response.json();
-	    if (!result.ok) {
-		   throw new Error(`Failed to delete messages: ${result.description}`);
-	    }
-	} catch (error) {
-	    console.error('Error deleting messages:', error);
-	}
- }
- 
- async function tgButton(env:any, buttons:string[], text:string) {
-	const batchSize = 90;
-	const responses = [];
- 
-	for (let i = 0; i < buttons.length; i += batchSize) {
-	    const batch = buttons.slice(i, i + batchSize);
-	    const response = await tgSendButton(env, batch, text);
-	    responses.push(Number(response.result.message_id));
-	}
- 
-	return responses;
- }
- 
- async function tgSendButton(env:any, buttons:any, text:any) {
-	return await tgSendRequest('sendMessage', env, {
-	    chat_id: env.TG_CHATID,
-	    message_thread_id: env.TG_THREADBOT,
-	    reply_markup: JSON.stringify({ inline_keyboard: buttons }),
-	    text,
-	    disable_notification: 'true'
-	});
- }
- 
- async function tgAnswerCallbackQuery(env:any, callbackQueryId:any, text:string|null = null) {
-	const params:any = { callback_query_id: callbackQueryId };
-	if (text) params.text = text;
- 
-	return await tgSendRequest('answerCallbackQuery', env, params);
- }
- 
+  
   
  ///////////////////////////////////////////////////////////////////////////////
  // Classes
