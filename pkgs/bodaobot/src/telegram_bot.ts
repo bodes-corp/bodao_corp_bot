@@ -186,6 +186,7 @@ currentContext!: TG_ExecutionContext;
 					let args: string[] = [];
 					const ctx = new TG_ExecutionContext(this, this.update);
 					this.currentContext = ctx;
+                         console.log('debug ctx update_type: ',ctx.update_type)
 					switch (ctx.update_type) {
 						case 'message': {
 							args = this.update.message?.text?.split(' ') ?? [];
