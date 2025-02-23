@@ -3,6 +3,7 @@ import { splitMessage } from "./library";
 import TG_ExecutionContext from "./telegram_execution_context";
 import TIOZAO_API from "./tiozao/tiozao_api";
 import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
+import Environment from "./types/Envirownment";
 import TG_Message, { EditedMessage, Message } from "./types/TelegramMessage";
 import TelegramUpdate from "./types/TelegramUpdate";
 import Webhook from "./webhook";
@@ -17,6 +18,7 @@ function isValidChat(message:any , env:any ) {
  * Class representinhg a Telegram Bot
  */
 export default class TG_BOT {
+
 /** The telegram token */
 token: string;
 /** The telegram api URL */
@@ -34,11 +36,14 @@ webhook: Webhook = new Webhook('', new Request('http://127.0.0.1'));
 /** The current bot context */
 currentContext!: TG_ExecutionContext;
 
+/** The envirownment variables */
+env:Environment;
      /**
 	*	Create a bot
 	*	@param token - the telegram secret token
 	*/
-     constructor(token: string) {
+     constructor(token: string, env:Environment) {
+          this.env = env;
 		this.token = token;
 		this.api = new URL('https://api.telegram.org/bot' + token);
 	}
@@ -176,7 +181,7 @@ currentContext!: TG_ExecutionContext;
  * @param {*} env the worker env variables
  * @param {*} update the request object json formated
  */
-async handleUpdate(env:any, update: TelegramUpdate) {
+async handleUpdate(update: TelegramUpdate) {
      this.update = update;
 	
 	//if (this.update.message) {   
@@ -197,12 +202,12 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 	switch (ctx.update_type) {
 		case 'message': {
 		     args = this.update.message?.text?.split(' ') ?? [];
-               await this.handleMessage(env, this.currentContext);
+               await this.handleMessage(this.currentContext);
 		     break;
 		}
           case 'edited_message': {
 			args = this.update.message?.text?.split(' ') ?? [];
-               await this.handleEditedMessage(env, this.update.edited_message);
+               await this.handleEditedMessage( this.update.edited_message);
 			break;
 		}
 		case 'business_message': {
@@ -223,7 +228,7 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 		}
 		case 'callback': {
 			updType = ':callback';
-               await this.handleCallbackQuery(env, this.update.callback_query);
+               await this.handleCallbackQuery( this.update.callback_query);
 			break;
 		}
 		default:
@@ -266,12 +271,12 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 					switch (ctx.update_type) {
 						case 'message': {
 							args = this.update.message?.text?.split(' ') ?? [];
-                                   await this.handleMessage(env,ctx);
+                                   await this.handleMessage(ctx);
 							break;
 						}
                               case 'edited_message': {
 							args = this.update.message?.text?.split(' ') ?? [];
-                                   await this.handleEditedMessage(env, this.update.edited_message);
+                                   await this.handleEditedMessage( this.update.edited_message);
 							break;
 						}
 						case 'business_message': {
@@ -292,7 +297,7 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 						}
 						case 'callback': {
 							updType = ':callback';
-                                   await this.handleCallbackQuery(env, this.update.callback_query);
+                                   await this.handleCallbackQuery(this.update.callback_query);
 							break;
 						}
 						default:
@@ -324,13 +329,13 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 		//return new Response('ok');
 	}
 
-     async handleMessage(env:any, ctx:TG_ExecutionContext) {
+     async handleMessage(ctx:TG_ExecutionContext) {
           const messageJson:any = ctx.update.message;
           const message:TG_Message = new Message(messageJson);
           //console.log("operation: ", message.operation);
           //console.log("env: ", env.json());
           //return new Response("Hello, world!");
-          if (!isValidChat(message, env)) {''
+          if (!isValidChat(message, this.env)) {''
               
               //console.log("invalid chat: ");
               //console.log("env: ", env.json());
@@ -339,42 +344,42 @@ async handleUpdate(env:any, update: TelegramUpdate) {
           }
       
           if (message.msg_txt.startsWith('/')) {
-              return await this.handleBotCommand(env, message);
+              return await this.handleBotCommand(this.env, message);
           }
           
           switch (message.operation) {
               case 'create_thread':
-                  await this.handleCreateThread(env, message);
+                  await this.handleCreateThread(message);
                   break;
               case 'new_media':
-                  await this.handleNewMedia(env, message);
+                  await this.handleNewMedia(this.env, message);
                   break;
               case 'new_post':
-                  await this.handleNewPost(env, message);
+                  await this.handleNewPost(this.env, message);
                   break;
           }
 
-          return await DB_API.dbInsertMessage(env, message);
+          return await DB_API.dbInsertMessage(this.env, message);
      }
 
-     async handleEditedMessage(env:any, messageJson:any) {
+     async handleEditedMessage(messageJson:any) {
           const message:TG_Message = new EditedMessage(messageJson);
       
           switch (message.operation) {
               case 'edit_media':
-                  await this.handleEditMedia(env, message);
+                  await this.handleEditMedia(this.env, message);
                   break;
               case 'edit_post':
-                  await this.handleEditPost(env, message);
+                  await this.handleEditPost(this.env, message);
                   break;
           }
-          return await DB_API.dbEditMessage(env, message);
+          return await DB_API.dbEditMessage(this.env, message);
      }
 
       
       
-      async handleOldMessages (env:any) {
-          await TIOZAO_BOT_CMDs.removeOldMessages(env, this);
+      async handleOldMessages () {
+          await TIOZAO_BOT_CMDs.removeOldMessages(this.env, this);
       }
       
       async handleBotResponses(env:any, response_ids:any[]) {
@@ -384,11 +389,11 @@ async handleUpdate(env:any, update: TelegramUpdate) {
           }
       }
       
-      async handleCreateThread (env:any, message:TG_Message) {
+      async handleCreateThread ( message:TG_Message) {
           let response_ids:any[] = [];
       
-          await TIOZAO_API.checkDuplicatedThread(env, this, message.threadname, message.id_thread);
-          return await this.handleBotResponses(env, response_ids);
+          await TIOZAO_API.checkDuplicatedThread(this.env, this, message.threadname, message.id_thread);
+          return await this.handleBotResponses(this.env, response_ids);
       }
       
       async handleNewMedia(env:any, message:TG_Message) {
@@ -471,10 +476,10 @@ async handleUpdate(env:any, update: TelegramUpdate) {
           }
           response_ids.push(message_id);
           await this.handleBotResponses(env, response_ids);
-          return await this.handleOldMessages(env);
+          return await this.handleOldMessages();
       }
       
-      async handleCallbackQuery(env:any,  callbackQuery:any) {
+      async handleCallbackQuery(callbackQuery:any) {
           const { from: user, data: command } = callbackQuery;
           let response_ids:any[] = [];
       
@@ -482,7 +487,7 @@ async handleUpdate(env:any, update: TelegramUpdate) {
               '/active_gp': TIOZAO_API.listActiveGp,
               '/chat': TIOZAO_API.listChat,
               '/gp_td': TIOZAO_API.listTdGp,
-              '/info': () => TIOZAO_API.listInfo(env,this, user.id),
+              '/info': () => TIOZAO_API.listInfo(this.env,this, user.id),
               '/spa': this.handleSpaCommand,
               '/top_gp': TIOZAO_API.listTopGp,
               '/top_rp': TIOZAO_API.listTopRp,
@@ -493,17 +498,17 @@ async handleUpdate(env:any, update: TelegramUpdate) {
           const commandKey = Object.keys(commandHandlers).find(prefix => command.startsWith(prefix));
       
           if (commandKey) {
-              await this.tgAnswerCallbackQuery(env, callbackQuery.id, commandKey);
+              await this.tgAnswerCallbackQuery(this.env, callbackQuery.id, commandKey);
               const commandFunction:any = commandHandlers[commandKey];
-              response_ids = await commandFunction(env, callbackQuery, command.slice(commandKey.length).trim());
+              response_ids = await commandFunction(this.env, callbackQuery, command.slice(commandKey.length).trim());
           } else {
               return new Response(`Unknown command: ${command}`, { status: 400 });
           }
           if (command !== '/spa') {
-              await  TIOZAO_API.showMenu(env,this, response_ids);
+              await  TIOZAO_API.showMenu(this.env,this, response_ids);
           }
-          await this.handleBotResponses(env, response_ids);
-          return await this.handleOldMessages(env);
+          await this.handleBotResponses(this.env, response_ids);
+          return await this.handleOldMessages();
       }
       
       async handleSpaCommand(env:any, callbackQuery:any, spa:string) {
