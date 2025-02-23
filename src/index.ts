@@ -50,7 +50,7 @@ export default {
 		
 		const { waitUntil } = context;
 
-		if (true /*!isAuthorized(request, env)*/) {
+		if (false /*!isAuthorized(request, env)*/) {
 		return new Response('Unauthorized test', { status: 403 });
 		}
 
