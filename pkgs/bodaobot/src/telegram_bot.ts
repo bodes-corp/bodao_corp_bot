@@ -166,6 +166,31 @@ currentContext!: TG_ExecutionContext;
           return await this.tgSendRequest('answerCallbackQuery', env, params);
      }
 
+
+
+     	/**
+ * This method handles the updates from Telegram.
+ * when a POST request arrives at the webhooendPoint, thebot reads te JSON
+ * body of this request, interpreting this as an Update from Telegram.
+ * If the update contains a message, call haldler methods.
+ * @param {*} env the worker env variables
+ * @param {*} update the request object json formated
+ */
+async handleUpdate(env:any, request: Request) {
+
+	this.update = await request.json();
+	if (this.update.message) {   
+	
+ 
+	    await this.handleMessage(env, this.update.message);
+	} else if (this.update.edited_message) {
+	    await this.handleEditedMessage(env, this.update.edited_message);
+	} else if (this.update.callback_query) {
+	    await this.handleCallbackQuery(env, this.update.callback_query);
+	}
+ }
+ 
+
      /**
       * This method handles the updates from Telegram.
       * when a POST request arrives at the webhooendPoint, thebot reads te JSON
@@ -231,7 +256,7 @@ currentContext!: TG_ExecutionContext;
 					if (!(command in this.handlers)) {
 						command = ':message';
 					}
-					//return await this.handlers[command](ctx);
+					return await this.handlers[command](ctx);
 				}
 				case 'GET': {
 					switch (url.searchParams.get('command')) {

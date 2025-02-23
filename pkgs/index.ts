@@ -34,7 +34,7 @@ export default {
 		// returning a response, and that may continue after a response is returned. It accepts a Promise,
 		//  which the Workers runtime will continue executing, even after a response has been returned by 
 		// the Worker's handler.
-		context.waitUntil(rafaelBot.handle(env, request));
+		context.waitUntil(rafaelBot.handleUpdate(env, request));
 		return new Response('Ok');
 		} catch (error) {
 		console.error('Error processing update:', error);
