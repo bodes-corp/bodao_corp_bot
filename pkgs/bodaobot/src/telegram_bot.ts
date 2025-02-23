@@ -19,25 +19,26 @@ function isValidChat(message:any , env:any ) {
  */
 export default class TG_BOT {
 
-/** The telegram token */
-token: string;
-/** The telegram api URL */
-api: URL;
+     /** The telegram token */
+     token: string;
+     /** The telegram api URL */
+     api: URL;
 
-/** The telegram handlers record map */
-handlers: Record<string, (ctx:TG_ExecutionContext) => Promise<Response>> = {};
+     /** The telegram handlers record map */
+     handlers: Record<string, (ctx:TG_ExecutionContext) => Promise<Response>> = {};
 
-/** The telegram update object */
-update: TelegramUpdate = new TelegramUpdate({});
+     /** The telegram update object */
+     update: TelegramUpdate = new TelegramUpdate({});
 
-/** The telegram webhook object */
-webhook: Webhook = new Webhook('', new Request('http://127.0.0.1'));
+     /** The telegram webhook object */
+     webhook: Webhook = new Webhook('', new Request('http://127.0.0.1'));
 
-/** The current bot context */
-currentContext!: TG_ExecutionContext;
+     /** The current bot context */
+     currentContext!: TG_ExecutionContext;
 
-/** The envirownment variables */
-env:Environment;
+     /** The envirownment variables */
+     env:Environment;
+     
      /**
 	*	Create a bot
 	*	@param token - the telegram secret token
@@ -207,7 +208,7 @@ async handleUpdate(update: TelegramUpdate) {
 		}
           case 'edited_message': {
 			args = this.update.message?.text?.split(' ') ?? [];
-               await this.handleEditedMessage( this.update.edited_message);
+               await this.handleEditedMessage(this.currentContext );
 			break;
 		}
 		case 'business_message': {
@@ -228,7 +229,7 @@ async handleUpdate(update: TelegramUpdate) {
 		}
 		case 'callback': {
 			updType = ':callback';
-               await this.handleCallbackQuery( this.update.callback_query);
+               await this.handleCallbackQuery(this.currentContext );
 			break;
 		}
 		default:
@@ -276,7 +277,7 @@ async handleUpdate(update: TelegramUpdate) {
 						}
                               case 'edited_message': {
 							args = this.update.message?.text?.split(' ') ?? [];
-                                   await this.handleEditedMessage( this.update.edited_message);
+                                   await this.handleEditedMessage(ctx);
 							break;
 						}
 						case 'business_message': {
@@ -297,7 +298,7 @@ async handleUpdate(update: TelegramUpdate) {
 						}
 						case 'callback': {
 							updType = ':callback';
-                                   await this.handleCallbackQuery(this.update.callback_query);
+                                   await this.handleCallbackQuery(ctx);
 							break;
 						}
 						default:
@@ -362,7 +363,8 @@ async handleUpdate(update: TelegramUpdate) {
           return await DB_API.dbInsertMessage(this.env, message);
      }
 
-     async handleEditedMessage(messageJson:any) {
+     async handleEditedMessage(ctx:TG_ExecutionContext) {
+          const messageJson:any = ctx.update.edited_message
           const message:TG_Message = new EditedMessage(messageJson);
       
           switch (message.operation) {
@@ -479,7 +481,8 @@ async handleUpdate(update: TelegramUpdate) {
           return await this.handleOldMessages();
       }
       
-      async handleCallbackQuery(callbackQuery:any) {
+      async handleCallbackQuery(ctx:TG_ExecutionContext) {
+          const callbackQuery:any = ctx.update.callback_query
           const { from: user, data: command } = callbackQuery;
           let response_ids:any[] = [];
       

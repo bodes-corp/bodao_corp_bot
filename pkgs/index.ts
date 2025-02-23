@@ -1,14 +1,9 @@
 import TG_BOT from "./bodaobot/src/telegram_bot";
+import Environment from "./bodaobot/src/types/Envirownment";
 import TelegramUpdate from "./bodaobot/src/types/TelegramUpdate";
 import Webhook from "./bodaobot/src/webhook";
 
-interface Environment {
-	SECRET_TELEGRAM_API_TOKEN: string;
-	TG_THREADBOT:string;
-	TG_SECRET:string;
-	TG_CHATID:string;
 
-}
 
 function isAuthorized(request:any, env:any) {
 	return request.headers.get('X-Telegram-Bot-Api-Secret-Token') === env.TG_SECRET;
@@ -24,7 +19,7 @@ export default {
 		return new Response('Unauthorized test', { status: 403 });
 		}
 
-		const rafaelBot = new  TG_BOT(env.SECRET_TELEGRAM_API_TOKEN);
+		const rafaelBot = new  TG_BOT(env.SECRET_TELEGRAM_API_TOKEN, env);
 
 		try {
 
@@ -51,7 +46,7 @@ export default {
 					const update: TelegramUpdate = await request.json();
 					//const clone:Request = await request.clone();
 					//console.log(this.update);
-					context.waitUntil(rafaelBot.handleUpdate(env, update));
+					context.waitUntil(rafaelBot.handleUpdate( update));
 				}
 				case 'GET': {
 					switch (url.searchParams.get('command')) {
