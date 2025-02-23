@@ -46,7 +46,7 @@ async function tgSendMessage(env:any, text:string) {
 
 export default {
 	async fetch(request: Request, env:Environment, context: ExecutionContext): Promise<Response> {
-		//console.log(`[LOGGING FROM /hello]: Request came from ${context.request.url}`);
+		console.log(`[LOGGING FROM /hello]: Request came from ${request.url}`);
 		
 		//const { waitUntil } = context;
 
@@ -59,7 +59,7 @@ export default {
 		// when a POS request arrives at the webhooendPoint, thebot reads te JSON
 		//body of this request, interpreting this as an Update from Telegram
 		const update = await request.json();
-		console.log('dbg update',update)
+		//console.log('dbg update',update)
 		//ctx.waitUntil() extends the lifetime of your Worker, allowing you to perform work without blocking 
 		// returning a response, and that may continue after a response is returned. It accepts a Promise,
 		//  which the Workers runtime will continue executing, even after a response has been returned by 
