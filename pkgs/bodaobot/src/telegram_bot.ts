@@ -179,14 +179,63 @@ currentContext!: TG_ExecutionContext;
 async handleUpdate(env:any, update: TelegramUpdate) {
      this.update = update;
 	
-	if (this.update.message) {   
-	
-	    await this.handleMessage(env, this.update.message);
-	} else if (this.update.edited_message) {
-	    await this.handleEditedMessage(env, this.update.edited_message);
-	} else if (this.update.callback_query) {
-	    await this.handleCallbackQuery(env, this.update.callback_query);
+	//if (this.update.message) {   
+	//
+	//    await this.handleMessage(env, this.update.message);
+	//} else if (this.update.edited_message) {
+	//    await this.handleEditedMessage(env, this.update.edited_message);
+	//} else if (this.update.callback_query) {
+	//    await this.handleCallbackQuery(env, this.update.callback_query);
+	//}
+
+
+     let updType = ':message';
+	let args: string[] = [];
+	const ctx = new TG_ExecutionContext(this, this.update);
+	this.currentContext = ctx;
+     console.log('debug ctx update_type: ',ctx.update_type)
+	switch (ctx.update_type) {
+		case 'message': {
+		     args = this.update.message?.text?.split(' ') ?? [];
+               await this.handleMessage(env, this.update);
+		     break;
+		}
+          case 'edited_message': {
+			args = this.update.message?.text?.split(' ') ?? [];
+               await this.handleEditedMessage(env, this.update.edited_message);
+			break;
+		}
+		case 'business_message': {
+			args = this.update.message?.text?.split(' ') ?? [];
+			break;
+		}
+		case 'inline': {
+			args = this.update.inline_query?.query.split(' ') ?? [];
+			break;
+		}
+		case 'photo': {
+			updType = ':photo';
+			break;
+		}
+		case 'document': {
+			updType = ':document';
+			break;
+		}
+		case 'callback': {
+			updType = ':callback';
+               await this.handleCallbackQuery(env, this.update.callback_query);
+			break;
+		}
+		default:
+		break;
 	}
+	if (args.at(0)?.startsWith('/')) {
+		updType = args.at(0)?.slice(1) ?? ':message';
+	}
+	if (!(updType in this.handlers)) {
+		updType = ':message';
+	}
+	//return await this.handlers[updType](ctx);
  }
  
 
@@ -209,7 +258,7 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 				case 'POST': {
 					this.update = await request.json();
 					console.log(this.update);
-					let command = ':message';
+					let updType = ':message';
 					let args: string[] = [];
 					const ctx = new TG_ExecutionContext(this, this.update);
 					this.currentContext = ctx;
@@ -234,15 +283,15 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 							break;
 						}
 						case 'photo': {
-							command = ':photo';
+							updType = ':photo';
 							break;
 						}
 						case 'document': {
-							command = ':document';
+							updType = ':document';
 							break;
 						}
 						case 'callback': {
-							command = ':callback';
+							updType = ':callback';
                                    await this.handleCallbackQuery(env, this.update.callback_query);
 							break;
 						}
@@ -250,12 +299,12 @@ async handleUpdate(env:any, update: TelegramUpdate) {
 							break;
 					}
 					if (args.at(0)?.startsWith('/')) {
-						command = args.at(0)?.slice(1) ?? ':message';
+						updType = args.at(0)?.slice(1) ?? ':message';
 					}
-					if (!(command in this.handlers)) {
-						command = ':message';
+					if (!(updType in this.handlers)) {
+						updType = ':message';
 					}
-					return await this.handlers[command](ctx);
+					return await this.handlers[updType](ctx);
 				}
 				case 'GET': {
 					switch (url.searchParams.get('command')) {
