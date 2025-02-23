@@ -46,11 +46,11 @@ async function tgSendMessage(env:any, text:string) {
 
 export default {
 	async fetch(request: Request, env:Environment, context: ExecutionContext): Promise<Response> {
-		console.log(`[LOGGING FROM /hello]: Request came from ${request.url}`);
+		//console.log(`[LOGGING FROM /hello]: Request came from ${request.url}`);
 		
 		//const { waitUntil } = context;
 
-		if (false /*!isAuthorized(request, env)*/) {
+		if (!isAuthorized(request, env)) {
 		return new Response('Unauthorized test', { status: 403 });
 		}
 
