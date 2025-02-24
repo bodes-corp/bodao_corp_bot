@@ -1,4 +1,4 @@
-import TG_Message from './TG_Message.js';
+import TG_Message from "./TelegramMessage";
 
 interface TelegramChat {
 	id: number;

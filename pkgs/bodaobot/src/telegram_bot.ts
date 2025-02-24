@@ -1,11 +1,13 @@
 import { DB_API } from "./database_api";
 import { splitMessage } from "./library";
+import TG_API from "./telegram_api";
 import TG_ExecutionContext from "./telegram_execution_context";
 import TIOZAO_API from "./tiozao/tiozao_api";
 import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
 import Environment from "./types/Envirownment";
 import TG_Message, { EditedMessage, Message } from "./types/TelegramMessage";
 import TelegramUpdate from "./types/TelegramUpdate";
+import { tgRequestMethod } from "./types/Types";
 import Webhook from "./webhook";
 
 
@@ -40,6 +42,9 @@ export default class TG_BOT {
      /** The envirownment variables */
      env:Environment;
 
+     /** The Bot Thread id */
+     botThreadId: string;
+
      /**
 	*	Create a bot
 	*	@param token - the telegram secret token
@@ -47,6 +52,7 @@ export default class TG_BOT {
      constructor(token: string, env:Environment) {
           this.env = env;
 		this.token = token;
+          this.botThreadId = env.TG_THREADBOT;
 		this.api = new URL('https://api.telegram.org/bot' + token);
           this.handlers = {
                ':message': this.handleMessage,
@@ -55,43 +61,15 @@ export default class TG_BOT {
            }
 	}
 
-    
-
-    
-
-
-     tgApiUrl(methodName:any, params = {}) {
-          const query = params ? `?${new URLSearchParams(params).toString()}` : '';
-          return this.api+`/${methodName}${query}`;
-     }
-
-     async tgSendRequest(method:string, env:any, params:any) {
-          try {
-              const response = await fetch(this.tgApiUrl(method, params), {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' }
-              });
-      
-              const data:any = await response.json();
-              if (!data.ok) {
-                  throw new Error(`Telegram API Error: ${data.description}`);
-              }
-      
-              return data;
-          } catch (error) {
-              console.error(`Error in ${method} request:`, error);
-              throw error;
-          }
-     }
-
-     async tgSendMessage(env:any, text:string) {
-          return await this.tgSendRequest('sendMessage', env, {
-              chat_id: env.TG_CHATID,
-              message_thread_id: env.TG_THREADBOT,
-              text,
-              parse_mode: 'html',
-              disable_notification: 'true'
-          });
+     async tgSendMessageToBotThread(env:any, text:string) {
+          const params = {
+               chat_id: env.TG_CHATID,
+               message_thread_id: env.TG_THREADBOT,
+               text,
+               parse_mode: 'html',
+               disable_notification: 'true'
+           };
+          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE, env.SECRET_TELEGRAM_API_TOKEN, params );
       }
 
      async tgMessage(env:any, text:string) {
@@ -99,7 +77,7 @@ export default class TG_BOT {
           const responses = [];
       
           for (const part of parts) {
-              const response = await this.tgSendMessage(env, part);
+              const response = await this.tgSendMessageToBotThread(env, part);
               responses.push(Number(response.result.message_id));
           }
       
@@ -107,37 +85,42 @@ export default class TG_BOT {
      }
       
      async tgSendMedia(env:any, media:any) {
-          return await this.tgSendRequest('sendMediaGroup', env, {
-              chat_id: env.TG_CHATID,
-              message_thread_id: env.TG_THREADBOT,
-              media,
-              disable_notification: 'true'
-          });
+          const params = {
+               chat_id: env.TG_CHATID,
+               message_thread_id: env.TG_THREADBOT,
+               media,
+               disable_notification: 'true'
+           }
+          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MEDIA_GROUP,  env.SECRET_TELEGRAM_API_TOKEN, params );
      }
       
      
      async tgSendMessageThread(env:any, text:string, id_thread:any, message_id:any) {
-          return await this.tgSendRequest('sendMessage', env, {
-              chat_id: env.TG_CHATID,
-              message_thread_id: id_thread,
-              text,
-              parse_mode: 'html',
-              disable_notification: 'true',
-              reply_to_message_id: message_id
-          });
+          
+          const params = {
+               chat_id: env.TG_CHATID,
+               message_thread_id: id_thread,
+               text,
+               parse_mode: 'html',
+               disable_notification: 'true',
+               reply_to_message_id: message_id
+          }
+          
+          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE,  env.SECRET_TELEGRAM_API_TOKEN,params );
      }
       
      async tgDeleteMessage(env:any, message_id:any) {
-          return await this.tgSendRequest('deleteMessage', env, {
-              chat_id: env.TG_CHATID,
-              message_id
-          });
+          const params = {
+               chat_id: env.TG_CHATID,
+               message_id
+          }
+          return await TG_API.tgSendRequest(tgRequestMethod.DELETE_MESSAGE,  env.SECRET_TELEGRAM_API_TOKEN,params);
      }
       
      async tgDeleteMessages(env:any, chunk:any) {
           try {
               const deleteParams = { chat_id: env.TG_CHATID, message_ids: chunk };
-              const response = await fetch(this.tgApiUrl('deleteMessages'), {
+              const response = await fetch(TG_API.tgApiUrl(tgRequestMethod.DELETE_MESSAGES, this.token), {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify(deleteParams)
@@ -166,92 +149,85 @@ export default class TG_BOT {
      }
       
      async tgSendButton(env:any, buttons:any, text:any) {
-          return await this.tgSendRequest('sendMessage', env, {
-              chat_id: env.TG_CHATID,
-              message_thread_id: env.TG_THREADBOT,
-              reply_markup: JSON.stringify({ inline_keyboard: buttons }),
-              text,
-              disable_notification: 'true'
-          });
+
+          const params = {
+               chat_id: env.TG_CHATID,
+               message_thread_id: env.TG_THREADBOT,
+               reply_markup: JSON.stringify({ inline_keyboard: buttons }),
+               text,
+               disable_notification: 'true'
+          }
+
+          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE,  env.SECRET_TELEGRAM_API_TOKEN,params);
      }
       
      async tgAnswerCallbackQuery(env:any, callbackQueryId:any, text:string|null = null) {
           const params:any = { callback_query_id: callbackQueryId };
           if (text) params.text = text;
       
-          return await this.tgSendRequest('answerCallbackQuery', env, params);
+          return await TG_API.tgSendRequest(tgRequestMethod.ANSWER_CALLBACK, env.SECRET_TELEGRAM_API_TOKEN, params);
      }
 
     
 
-     	/**
- * This method handles the updates from Telegram.
- * when a POST request arrives at the webhooendPoint, thebot reads te JSON
- * body of this request, interpreting this as an Update from Telegram.
- * If the update contains a message, call haldler methods.
- * @param {*} env the worker env variables
- * @param {*} update the request object json formated
- */
-async handleUpdate(update: TelegramUpdate) {
-     this.update = update;
-	
-	//if (this.update.message) {   
-	//
-	//    await this.handleMessage(env, this.update.message);
-	//} else if (this.update.edited_message) {
-	//    await this.handleEditedMessage(env, this.update.edited_message);
-	//} else if (this.update.callback_query) {
-	//    await this.handleCallbackQuery(env, this.update.callback_query);
-	//}
+     /**
+      * This method handles the updates from Telegram.
+      * when a POST request arrives at the webhooendPoint, thebot reads te JSON
+      * body of this request, interpreting this as an Update from Telegram.
+      * If the update contains a message, call haldler methods.
+      * @param {*} env the worker env variables
+      * @param {*} update the request object json formated
+     */
+     async handleUpdate(update: TelegramUpdate) {
+          this.update = update;
+          
+          let updType = ':message';
+          let args: string[] = [];
+          const ctx = new TG_ExecutionContext(this, this.update);
+          this.currentContext = ctx;
+          console.log('debug ctx update_type: ',ctx.update_type)
+          switch (ctx.update_type) {
+               case 'message': {
+                    args = this.update.message?.text?.split(' ') ?? [];
+          
+                    break;
+               }
+               case 'edited_message': {
+                    args = this.update.message?.text?.split(' ') ?? [];
 
-
-     let updType = ':message';
-	let args: string[] = [];
-	const ctx = new TG_ExecutionContext(this, this.update);
-	this.currentContext = ctx;
-     console.log('debug ctx update_type: ',ctx.update_type)
-	switch (ctx.update_type) {
-		case 'message': {
-		     args = this.update.message?.text?.split(' ') ?? [];
-         
-		     break;
-		}
-          case 'edited_message': {
-			args = this.update.message?.text?.split(' ') ?? [];
-
-			break;
-		}
-		case 'business_message': {
-			args = this.update.message?.text?.split(' ') ?? [];
-			break;
-		}
-		case 'inline': {
-			args = this.update.inline_query?.query.split(' ') ?? [];
-			break;
-		}
-		case 'photo': {
-			updType = ':photo';
-			break;
-		}
-		case 'document': {
-			updType = ':document';
-			break;
-		}
-		case 'callback': {
-			updType = ':callback';
-			break;
-		}
-		default:
-		break;
-	}
-	if (args.at(0)?.startsWith('/')) {
-		updType = args.at(0)?.slice(1) ?? ':message';
-	}
-	if (!(updType in this.handlers)) {
-		updType = ':message';
-	}
-	return await this.handlers[updType](this.currentContext);
- }
+                    break;
+               }
+               case 'business_message': {
+                    args = this.update.message?.text?.split(' ') ?? [];
+                    break;
+               }
+               case 'inline': {
+                    args = this.update.inline_query?.query.split(' ') ?? [];
+                    break;
+               }
+               case 'photo': {
+                    updType = ':photo';
+                    break;
+               }
+               case 'document': {
+                    updType = ':document';
+                    break;
+               }
+               case 'callback': {
+                    updType = ':callback';
+                    break;
+               }
+               default:
+               break;
+          }
+          if (args.at(0)?.startsWith('/')) {
+               updType = args.at(0)?.slice(1) ?? ':message';
+          }
+          if (!(updType in this.handlers)) {
+               updType = ':message';
+          }
+          return await this.handlers[updType](this.currentContext);
+     }
  
 
      /**
@@ -261,7 +237,7 @@ async handleUpdate(update: TelegramUpdate) {
       * If the update contains a message, call haldler methods.
       * @param {*} env the worker env variables
       * @param request - the request to handle
-	*/
+	
 	async handle(env:any, request: Request): Promise<Response> {
           console.log(`[LOGGING FROM /handle]: Request came from ${request.url}`);
 		this.webhook = new Webhook(this.token, request);
@@ -337,7 +313,7 @@ async handleUpdate(update: TelegramUpdate) {
 			}
 		//}
 		//return new Response('ok');
-	}
+	}*/
 
      async handleMessage(ctx:TG_ExecutionContext) {
           const messageJson:any = ctx.update.message;
