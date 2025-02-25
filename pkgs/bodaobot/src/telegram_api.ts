@@ -11,7 +11,7 @@ export default class TG_API {
 	 * @param slug - slug to append to the API URL
 	 * @param data - data to append to the request
 	 */
-	getApiUrl(botApiURL: string, slug:tgRequestMethod_t, data: Record<string, number | string | boolean>) {
+	public static getApiUrl(botApiURL: string, slug:tgRequestMethod_t, data: Record<string, number | string | boolean>) {
 		const request = new URL(botApiURL + (slug.startsWith('/') || botApiURL.endsWith('/') ? '' : '/') + slug);
 		const params = new URLSearchParams();
 		for (const i in data) {
@@ -34,8 +34,9 @@ export default class TG_API {
 	 */
 	public static async tgSendRequest(method: tgRequestMethod_t, token:string, params:Record<string, string >) {
 			try {
-			    const response = await fetch(TG_API.tgApiUrl(method, token, params), {
-				   method: 'POST',
+			    	//const response = await fetch(TG_API.tgApiUrl(method, token, params), {
+				const response = await fetch(TG_API.tgApiUrl(method, token, params), {
+					method: 'POST',
 				   headers: { 'Content-Type': 'application/json' }
 			    });
 		 
@@ -49,10 +50,23 @@ export default class TG_API {
 			    console.error(`Error in ${method} request:`, error);
 			    throw error;
 			}
-		}
+	}
 
-	async sendChatAction(botApiURL: string, data: { business_connection_id?: string; chat_id: number | string; action: string }) {
-		const url = this.getApiUrl(botApiURL, tgRequestMethod.SEND_CHAT_ACTION, data);
+	public static async sendButtonToBotThread(token:string, chatID:string, threadID:string, buttons:any, text:any) {
+
+          const params = {
+               chat_id: chatID,
+               message_thread_id: threadID,
+               reply_markup: JSON.stringify({ inline_keyboard: buttons }),
+               text,
+               disable_notification: 'true'
+          }
+
+          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE, token, params);
+     }
+
+	public static async sendChatAction(botApiURL: string, data: { business_connection_id?: string; chat_id: number | string; action: string }) {
+		const url = TG_API.getApiUrl(botApiURL, tgRequestMethod.SEND_CHAT_ACTION, data);
 		const response = await fetch(url);
 		return response;
 	}
@@ -63,11 +77,11 @@ export default class TG_API {
 	 * @param data - data to append to the request
 	 * @param token - bot token
 	 */
-	async getFile(botApiURL: string, data: Record<string, number | string | boolean>, token: string) {
+	public static async getFile(botApiURL: string, data: Record<string, number | string | boolean>, token: string) {
 		if (data.file_id === '') {
 			return new Response();
 		}
-		const url = this.getApiUrl(botApiURL, tgRequestMethod.GET_FILE, data);
+		const url = TG_API.getApiUrl(botApiURL, tgRequestMethod.GET_FILE, data);
 		const response = await fetch(url);
 		const json: { result: { file_path: string } } = await response.json();
 		let file_path: string;
@@ -85,7 +99,7 @@ export default class TG_API {
 	 * @param botApiURL - full URL to the telegram API without slug
 	 * @param data - data to append to the request
 	 */
-	async sendMessage(
+	public static async sendMessage(
 		botApiURL: string,
 		data: {
 			reply_to_message_id?: number | string;
@@ -95,7 +109,7 @@ export default class TG_API {
 			business_connection_id?: number | string;
 		},
 	) {
-		const url = this.getApiUrl(botApiURL, tgRequestMethod.SEND_MESSAGE, data);
+		const url = TG_API.getApiUrl(botApiURL, tgRequestMethod.SEND_MESSAGE, data);
 		console.log(url.url);
 		try {
 			const response = await fetch(url.url, {
@@ -121,7 +135,7 @@ export default class TG_API {
 	 * @param botApiURL - full URL to the telegram API without slug
 	 * @param data - data to append to the request
 	 */
-	async sendVideo(
+	public static async sendVideo(
 		botApiURL: string,
 		data: {
 			reply_to_message_id: number | string;
@@ -129,7 +143,7 @@ export default class TG_API {
 			video: string;
 		},
 	) {
-		const url = this.getApiUrl(botApiURL, tgRequestMethod.SEND_VIDEO, data);
+		const url = TG_API.getApiUrl(botApiURL, tgRequestMethod.SEND_VIDEO, data);
 		return await fetch(url);
 	}
 
@@ -138,7 +152,7 @@ export default class TG_API {
 	 * @param botApiURL - full URL to the telegram API without slug
 	 * @param data - data to append to the request
 	 */
-	async sendPhoto(
+	public static async sendPhoto(
 		botApiURL: string,
 		data: {
 			reply_to_message_id: number | string;
@@ -147,7 +161,7 @@ export default class TG_API {
 			caption: string;
 		},
 	) {
-		const url = this.getApiUrl(botApiURL, tgRequestMethod.SEND_PHOTO, data);
+		const url = TG_API.getApiUrl(botApiURL, tgRequestMethod.SEND_PHOTO, data);
 		return await fetch(url);
 	}
 
@@ -156,14 +170,14 @@ export default class TG_API {
 	 * @param botApiURL - full URL to the telegram API without slug
 	 * @param data - data to append to the request
 	 */
-	async answerInline(
+	public static async answerInline(
 		botApiURL: string,
 		data: {
 			inline_query_id: number | string;
 			results: TelegramInlineQueryResultArticle[] | TelegramInlineQueryResultPhoto[] | TelegramInlineQueryResultVideo[];
 		},
 	) {
-		const url = this.getApiUrl(botApiURL, tgRequestMethod.ANSWER_INLINE, {
+		const url = TG_API.getApiUrl(botApiURL, tgRequestMethod.ANSWER_INLINE, {
 			inline_query_id: data.inline_query_id,
 			results: JSON.stringify(data.results),
 		});
@@ -175,7 +189,7 @@ export default class TG_API {
 	 * @param botApiURL - full URL to the telegram API without slug
 	 * @param data - data to append to the request
 	 */
-	async answerCallback(
+	public static async answerCallback(
 		botApiURL: string,
 		data: {
 			callback_query_id: number | string;
@@ -185,7 +199,13 @@ export default class TG_API {
 			cache_time?: number;
 		},
 	) {
-		const url = this.getApiUrl(botApiURL, tgRequestMethod.ANSWER_CALLBACK, data);
+		const url = TG_API.getApiUrl(botApiURL, tgRequestMethod.ANSWER_CALLBACK, data);
 		return await fetch(url);
 	}
+
+	public static async tgAnswerCallbackQuery(token:string, callbackQueryId:any, text:string|null = null) {
+          const params:any = { callback_query_id: callbackQueryId };
+          if (text) params.text = text;
+          return await TG_API.tgSendRequest(tgRequestMethod.ANSWER_CALLBACK, token, params);
+     }
 }

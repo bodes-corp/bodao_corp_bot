@@ -77,7 +77,7 @@ export default class TG_BOT {
           const responses = [];
       
           for (const part of parts) {
-              const response = await this.tgSendMessageToBotThread(env, part);
+              const response:any  = await this.tgSendMessageToBotThread(env, part);
               responses.push(Number(response.result.message_id));
           }
       
@@ -141,31 +141,20 @@ export default class TG_BOT {
       
           for (let i = 0; i < buttons.length; i += batchSize) {
               const batch = buttons.slice(i, i + batchSize);
-              const response = await this.tgSendButton(env, batch, text);
+              const response:any = await this.tgSendButton(env, batch, text);
+              console.log("debug rsponse from bot: ", response);
               responses.push(Number(response.result.message_id));
           }
       
           return responses;
      }
       
-     async tgSendButton(env:any, buttons:any, text:any) {
-
-          const params = {
-               chat_id: env.TG_CHATID,
-               message_thread_id: env.TG_THREADBOT,
-               reply_markup: JSON.stringify({ inline_keyboard: buttons }),
-               text,
-               disable_notification: 'true'
-          }
-
-          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE,  env.SECRET_TELEGRAM_API_TOKEN,params);
+     async tgSendButton(env:any, buttons:any, text:any): Promise<Response> {
+          return await TG_API.sendButtonToBotThread(env.SECRET_TELEGRAM_API_TOKEN, env.TG_CHATID, env.TG_THREADBOT, buttons, text);
      }
       
-     async tgAnswerCallbackQuery(env:any, callbackQueryId:any, text:string|null = null) {
-          const params:any = { callback_query_id: callbackQueryId };
-          if (text) params.text = text;
-      
-          return await TG_API.tgSendRequest(tgRequestMethod.ANSWER_CALLBACK, env.SECRET_TELEGRAM_API_TOKEN, params);
+     async tgAnswerCallbackQuery(env:any, callbackQueryId:any, text:string|null = null) {       
+          return await TG_API.tgAnswerCallbackQuery(env.SECRET_TELEGRAM_API_TOKEN, callbackQueryId, text);
      }
 
     
