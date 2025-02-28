@@ -498,16 +498,18 @@ export default class TG_BOT {
           const msg_txt = message.msg_txt?.trim();
           const command = msg_txt?.split(' ')[0];
           let response_ids:any[] = [];
+          console.log('debug command:', command);
           this.onCommand('/info', { func: (env:any, _:any) => TIOZAO_API.listInfo(this, id_user), requiresArg: false });
       
           const commandEntry:any = Object.entries(this.commands).find(([prefix]) =>
               msg_txt?.startsWith(prefix)
           );
-      
+         
           if (commandEntry) {
               const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
               const argument = msg_txt?.slice(selectedCommand.length).trim();
-      
+              await TIOZAO_BOT_CMDs.botAlert(env, this, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
+              
               if (requiresArg && argument === '') {
                   response_ids.push(await TIOZAO_BOT_CMDs.botAlert(env, this, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
               } else if (requiresArg && !msg_txt?.startsWith(selectedCommand + ' ')) {
