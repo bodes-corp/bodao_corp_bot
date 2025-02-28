@@ -7,7 +7,7 @@ import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
 import Environment from "./types/Envirownment";
 import { ContextMessage, TG_Message } from "./types/TelegramMessage";
 import TelegramUpdate from "./types/TelegramUpdate";
-import { botResponse, Handler, tgRequestMethod, updOperation, updType } from "./types/Types";
+import { botResponse, commandFunc, CommandHandler, Handler, handlerFunc, tgRequestMethod, updOperation, updType } from "./types/Types";
 import Webhook from "./webhook";
 
 
@@ -27,6 +27,8 @@ export default class TG_BOT {
 
      /** The telegram handlers record map */
      handlers:Handler  = {};
+
+     commands:CommandHandler = {}
 
      /** The telegram update object */
      update: TelegramUpdate = new TelegramUpdate({});
@@ -65,16 +67,41 @@ export default class TG_BOT {
            .on(':callback',this.handleCallbackQuery)
            .on(':edit_thread',this.handleEditThread)
            .on(':create_thread',this.handleCreateThread);
+           
+
+           this.onCommand('/active_gp', { func: TIOZAO_API.listActiveGp, requiresArg: false })
+          .onCommand( '/chat', { func: TIOZAO_API.listChat, requiresArg: false })
+          .onCommand('/gp_td', { func: TIOZAO_API.listTdGp, requiresArg: false })
+          .onCommand('/spa', { func: TIOZAO_API.listSpa, requiresArg: false })
+          .onCommand('/top_gp', { func: TIOZAO_API.listTopGp, requiresArg: false })
+          .onCommand('/top_rp', { func: TIOZAO_API.listTopRp, requiresArg: false })
+          .onCommand('/trend_gp', { func: TIOZAO_API.listTrendGp, requiresArg: false })
+          .onCommand('/user', { func: TIOZAO_API.listMembers, requiresArg: false })
+          .onCommand('/s', {func: TIOZAO_API.searchTerm, requiresArg: true})
+          
 	}
 
      /**
-	 * Register a function on the bot
+	 * Register a handler on the bot
 	 * @param event - the event or command name
 	 * @param callback - the bot context
 	 */
-	on(event: string, callback: (ctx: TG_ExecutionContext) => Promise<Response>) {
+	on(event: string, callback: handlerFunc) {
 		if (!['on', 'handle'].includes(event)) {
 			this.handlers[event] = callback;
+		}
+		return this;
+	}
+
+
+     /**
+	 * Register a command on the bot
+	 * @param event - the event or command name
+	 * @param callback - the bot context
+	 */
+	onCommand(event: string, callback: commandFunc) {
+		if (!['on', 'handle'].includes(event)) {
+			this.commands[event] = callback;
 		}
 		return this;
 	}
@@ -193,12 +220,26 @@ export default class TG_BOT {
           switch (ctx.update_type) {
                case updType.MESSAGE: {
                     args = this.update.message?.text?.split(' ') ?? [];
-          
+                    handlerName = ':message';
+                    switch(ctx.update_operation){
+                         case updOperation.THREAD_CREATE:
+                              handlerName = ':create_thread';
+                              break;
+                         case updOperation.THREAD_EDIT:
+                              handlerName = ':edit_thread';
+                              break;
+                         case updOperation.POST_NEW:
+                              handlerName = ':message';
+                              break;
+                         case updOperation.POST_EDIT:
+                              handlerName = ':edited_message';
+                              break;
+                    }
                     break;
                }
                case updType.MESSAGE_EDIT: {
                     args = this.update.message?.text?.split(' ') ?? [];
-
+                    handlerName = ':edited_message';
                     break;
                }
                case updType.MESSAGE_BUSINESS: {
@@ -233,13 +274,19 @@ export default class TG_BOT {
                default:
                break;
           }
-          if (args.at(0)?.startsWith('/')) {
+          if (args.at(0)?.startsWith('/')) { //check replication
                handlerName = args.at(0)?.slice(1) ?? ':message';
           }
           if (!( handlerName in this.handlers)) {
                handlerName = ':message';
           }
+          if (ctx.commandFlag) {
+               await ctx.bot.handleBotCommand( ctx.bot.env, ctx.update_message);
+          }
+               
           return await this.handlers[handlerName](this.currentContext);
+          
+          
      }
  
 
@@ -341,9 +388,7 @@ export default class TG_BOT {
              return  new Response('Unauthorized', { status: 403 });
           }
       
-          if (ctx.update_message.msg_txt?.startsWith('/')) {
-              await ctx.bot.handleBotCommand( ctx.bot.env, ctx.update_message);
-          }
+          
           
           switch (ctx.update_operation) {
               case updOperation.THREAD_EDIT:
@@ -352,10 +397,10 @@ export default class TG_BOT {
               case updOperation.THREAD_CREATE:
                   await ctx.bot.handleCreateThread(ctx);
                   break;
-              case updOperation.NEW_MEDIA:
+              case updOperation.MEDIA_NEW:
                   await ctx.bot.handleNewMedia( ctx.bot.env, ctx.update_message);
                   break;
-              case updOperation.NEW_POST:
+              case updOperation.POST_NEW:
                   await ctx.bot.handleNewPost( ctx.bot.env, ctx.update_message);
                   break;
           }
@@ -453,21 +498,9 @@ export default class TG_BOT {
           const msg_txt = message.msg_txt?.trim();
           const command = msg_txt?.split(' ')[0];
           let response_ids:any[] = [];
-          
-          const commands = {
-              '/active_gp': { func: TIOZAO_API.listActiveGp, requiresArg: false },
-              '/chat': { func: TIOZAO_API.listChat, requiresArg: false },
-              '/gp_td': { func: TIOZAO_API.listTdGp, requiresArg: false },
-              '/info': { func: (env:any, _:any) => TIOZAO_API.listInfo(env, this, id_user), requiresArg: false },
-              '/spa': { func: TIOZAO_API.listSpa, requiresArg: false },
-              '/s': {func: TIOZAO_API.searchTerm, requiresArg: true},
-              '/top_gp': { func: TIOZAO_API.listTopGp, requiresArg: false },
-              '/top_rp': { func: TIOZAO_API.listTopRp, requiresArg: false },
-              '/trend_gp': { func: TIOZAO_API.listTrendGp, requiresArg: false },
-              '/user': { func: TIOZAO_API.listMembers, requiresArg: false }
-          };
+          this.onCommand('/info', { func: (env:any, _:any) => TIOZAO_API.listInfo(this, id_user), requiresArg: false });
       
-          const commandEntry:any = Object.entries(commands).find(([prefix]) =>
+          const commandEntry:any = Object.entries(this.commands).find(([prefix]) =>
               msg_txt?.startsWith(prefix)
           );
       
@@ -499,23 +532,13 @@ export default class TG_BOT {
           const { from: user, data: command } = callbackQuery;
           let response_ids:any[] = [];
       
-          const commandHandlers:any = {
-              '/active_gp': TIOZAO_API.listActiveGp,
-              '/chat': TIOZAO_API.listChat,
-              '/gp_td': TIOZAO_API.listTdGp,
-              '/info': () => TIOZAO_API.listInfo( ctx.bot.env, ctx.bot, user.id),
-              '/spa': this.handleSpaCommand,
-              '/top_gp': TIOZAO_API.listTopGp,
-              '/top_rp': TIOZAO_API.listTopRp,
-              '/trend_gp': TIOZAO_API.listTrendGp,
-              '/user': TIOZAO_API.listMembers
-          };
+          
       
-          const commandKey = Object.keys(commandHandlers).find(prefix => command.startsWith(prefix));
+          const commandKey = Object.keys(this.commands).find(prefix => command.startsWith(prefix));
       
           if (commandKey) {
               await ctx.bot.tgAnswerCallbackQuery( ctx.bot.env, callbackQuery.id, commandKey);
-              const commandFunction:any = commandHandlers[commandKey];
+              const commandFunction:any = this.commands[commandKey];
               response_ids = await commandFunction( ctx.bot.env, callbackQuery, command.slice(commandKey.length).trim());
           } else {
               return new Response(`Unknown command: ${command}`, { status: 400 });
@@ -530,7 +553,7 @@ export default class TG_BOT {
       
       async handleSpaCommand(env:any, callbackQuery:any, spa:string) {
           if (spa === '') {
-              return await TIOZAO_API.listSpa(env,this);
+              return await TIOZAO_API.listSpa(this);
           } else {
               await this.tgAnswerCallbackQuery(env, callbackQuery.id, spa);
               return await TIOZAO_API.searchSpa(env, this,spa);

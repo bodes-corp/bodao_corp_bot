@@ -9,7 +9,8 @@ export default class TIOZAO_API {
 ///////////////////////////////////////////////////////////////////////////////
  // Main functions
  
- public static async listChat (env:any, bot:  TG_BOT) {
+ public static async listChat (bot:  TG_BOT) {
+	const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Bate Papo</b>\n═════════════════════\n`;
  
@@ -31,7 +32,8 @@ export default class TIOZAO_API {
 	return response_ids;
  }
  
- public static async listActiveGp(env:any, bot:  TG_BOT) {
+ public static async listActiveGp(bot:  TG_BOT) {
+	const env = bot.env
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>GPs ativas</b>\nGPs com TDs nos últimos 4 meses\n═════════════════════\n`;
  
@@ -55,7 +57,8 @@ export default class TIOZAO_API {
 	return response_ids;
  }
  
- public static async listTopGp(env:any, bot:  TG_BOT) {
+ public static async listTopGp(bot:  TG_BOT) {
+	const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Top GPs</b>\nGPs com TDs de usuários únicos\n═════════════════════\n`;
  
@@ -78,7 +81,8 @@ export default class TIOZAO_API {
 	return response_ids;
  }
  
- public static async listTopRp(env:any, bot:  TG_BOT) {
+ public static async listTopRp(bot:  TG_BOT) {
+	const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Top Repetecos</b>\nGPs com repetecos de usuários únicos\n═════════════════════\n`;
  
@@ -101,7 +105,8 @@ export default class TIOZAO_API {
 	return response_ids;
  }
  
- public static async listTdGp(env:any, bot:  TG_BOT) { 
+ public static async listTdGp(bot:  TG_BOT) {
+	const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Lista GPs</b>\nGPs com TDs + repetecos\n═════════════════════\n`;
  
@@ -123,7 +128,8 @@ export default class TIOZAO_API {
 	return response_ids;
  }
  
- public static async listTrendGp(env:any, bot:  TG_BOT) {
+ public static async listTrendGp(bot:  TG_BOT) {
+	const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>GPs Tendência</b>\nGPs com TDs nos últimos 4 meses de 2 ou mais usuários diferentes\n═════════════════════\n`;
  
@@ -146,7 +152,8 @@ export default class TIOZAO_API {
 	return response_ids;
  }
  
- public static async listMembers(env:any, bot:  TG_BOT){
+ public static async listMembers(bot:  TG_BOT) {
+	const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Membros</b>\n═════════════════════\n`;
  
@@ -170,7 +177,8 @@ export default class TIOZAO_API {
 	return response_ids;
  }
  
- public static async listSpa (env:any, bot:  TG_BOT) {
+ public static async listSpa (bot:  TG_BOT) {
+	const env = bot.env;
 	let response_ids:any[] = [];
 	let text = '';
  
@@ -217,7 +225,9 @@ export default class TIOZAO_API {
 	return response_ids;
  }
  
- public static async listInfo(env:any, bot:  TG_BOT, id_user: any) {
+ public static async listInfo(bot:  TG_BOT, id_user: any) {
+	const env = bot.env;
+	
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>Perfil</b>\n═════════════════════\n`;
 	let first_name = '';
@@ -270,7 +280,8 @@ export default class TIOZAO_API {
 	return response_ids;
  }
  
- public static async searchTerm(env:any,  bot:  TG_BOT,name:string) {
+ public static async searchTerm(bot:  TG_BOT, name:string) {
+	const env = bot.env;
  
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>Busca ${name}</b>\n═════════════════════\n`;

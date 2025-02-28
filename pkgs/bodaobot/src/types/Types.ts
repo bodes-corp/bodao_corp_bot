@@ -1,3 +1,4 @@
+import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
 import { TG_Message } from "./TelegramMessage";
 
@@ -21,11 +22,11 @@ export type tgRequestMethod_t = typeof tgRequestMethod[keyof typeof  tgRequestMe
 export const updOperation = {
      UNKNOWN: 'unknonw',
      NO_OP: 'no_operation',
-     NEW_POST: 'new_post', //message with text
-     NEW_MEDIA: 'new_media', //photo or video
+     POST_NEW: 'new_post', //message with text
+     MEDIA_NEW: 'new_media', //photo or video
     
-     EDIT_POST: 'edit_post',
-     EDIT_MEDIA: 'edit_media', //photo or video
+     POST_EDIT: 'edit_post',
+     MEDIA_EDIT: 'edit_media', //photo or video
      //topic messages for supergroups
      THREAD_CREATE: 'create_thread',
      THREAD_EDIT: 'update_thread',
@@ -33,7 +34,6 @@ export const updOperation = {
      
      HANDLE_PHOTO: 'photo',
      HANDLE_DOC: 'document',
-     HANDLE_COMMAND: 'command',
    } as const;
 
 
@@ -106,10 +106,16 @@ export const updType = {
 } as const
 export type updType_t = typeof updType[keyof typeof  updType];
 
-
-export type Handler = Record<string, (ctx:TG_ExecutionContext) => Promise<Response>>
+export type handlerFunc = (ctx:TG_ExecutionContext) => Promise<Response>
+export type Handler = Record<string, handlerFunc>
 export type botResponse = {
      "ok": boolean,
      "result": TG_Message
 } 
    
+export type commandFunc = {
+     func:(bot:TG_BOT , ...args:any) => Promise<any[]>;
+     requiresArg: boolean;
+}
+
+export type CommandHandler = Record<string, commandFunc>

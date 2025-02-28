@@ -20,6 +20,9 @@ export default class TG_ExecutionContext {
 	update_message: ContextMessage;
 
 	update_operation: updOperation_t = updOperation.UNKNOWN;
+
+	/** boolean representing this is a bot command */
+	commandFlag:boolean=false;
 	
 
 	/**
@@ -41,19 +44,24 @@ export default class TG_ExecutionContext {
 		if (this.update.message?.message_id) {
 			this.update_type = updType.MESSAGE;
 			this.update_operation= updOperation.NO_OP;
+
+			if (this.update.message?.text?.startsWith('/')) {
+				this.commandFlag = true;;
+			}
+
 			if (this.update.message?.text || this.update.message?.video || this.update.message?.photo 
 				|| this.update.message?.document || this.update.message?.voice || this.update.message?.poll 
 				|| this.update.message?.location) {    
 				//this.msg_txt = 'new_post'
 				if (this.update.message?.text) {
-				    this.update_operation = updOperation.NEW_POST;
+				    this.update_operation = updOperation.POST_NEW;
 				    //this.msg_txt = msgJson.text;
 				    //this.is_td = checkTD(msgJson.text);
 				    //this.is_td_rp = checkRP(msgJson.text);
 				}
 	   
 				if (this.update.message?.video || this.update.message?.photo) {
-				    this.update_operation = updOperation.NEW_MEDIA;
+				    this.update_operation = updOperation.MEDIA_NEW;
 				}
 				
 			}
@@ -63,13 +71,13 @@ export default class TG_ExecutionContext {
 			this.update_type = updType.MESSAGE_EDIT;
 			this.update_operation= updOperation.NO_OP;
 			if (this.update.message?.text) {
-				   this.update_operation = updOperation.EDIT_POST;
+				   this.update_operation = updOperation.POST_EDIT;
 				   //this.msg_txt = msgJson.text;
 				   //this.is_td = checkTD(msgJson.text);
 				   //this.is_td_rp = checkRP(msgJson.text);
 			}
 			if (this.update.message?.video || this.update.message?.photo) {
-				   this.update_operation = updOperation.EDIT_MEDIA;
+				   this.update_operation = updOperation.MEDIA_EDIT;
 				   
 			}
 		
@@ -114,7 +122,9 @@ export default class TG_ExecutionContext {
 				//this.threadname = msgJson.forum_topic_edited?.name;
 				this.update_operation = updOperation.THREAD_EDIT;
 			}
-		 }
+		}
+		
+		
 	}
 
 	/**
@@ -170,7 +180,7 @@ export default class TG_ExecutionContext {
 							photo,
 							caption,
 						});
-					case updOperation.NEW_POST:
+					case updOperation.POST_NEW:
 						return await TG_API.sendPhoto(this.bot.api.toString(), {
 							...options,
 							chat_id: this.update.message?.chat.id.toString() ?? '',
@@ -241,7 +251,7 @@ export default class TG_ExecutionContext {
 			case updType.MESSAGE:
 				{
 					switch (this.update_operation){
-						case updOperation.NEW_POST:
+						case updOperation.POST_NEW:
 							return await TG_API.sendMessage(this.bot.api.toString(), {
 								...options,
 								chat_id: this.update.message?.chat.id.toString() ?? '',
