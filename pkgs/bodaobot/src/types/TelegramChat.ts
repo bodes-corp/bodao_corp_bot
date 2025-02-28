@@ -1,4 +1,4 @@
-import TG_Message from "./TelegramMessage";
+import { TG_Message } from "./TelegramMessage";
 
 interface TelegramChat {
 	id: number;

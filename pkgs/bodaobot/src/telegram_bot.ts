@@ -1,21 +1,19 @@
 import { DB_API } from "./database_api";
-import { splitMessage } from "./library";
+import { isValidChat, splitMessage } from "./library";
 import TG_API from "./telegram_api";
 import TG_ExecutionContext from "./telegram_execution_context";
 import TIOZAO_API from "./tiozao/tiozao_api";
 import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
 import Environment from "./types/Envirownment";
-import TG_Message, { EditedMessage, Message } from "./types/TelegramMessage";
+import { ContextMessage, TG_Message } from "./types/TelegramMessage";
 import TelegramUpdate from "./types/TelegramUpdate";
-import { tgRequestMethod } from "./types/Types";
+import { botResponse, Handler, tgRequestMethod, updOperation, updType } from "./types/Types";
 import Webhook from "./webhook";
 
 
-function isValidChat(message:any , env:any ) {
-     return message.chat_id === parseInt(env.TG_CHATID);
-}
 
-type Handler = Record<string, (ctx:TG_ExecutionContext) => Promise<Response>>
+
+
 
 /**
  * Class representinhg a Telegram Bot
@@ -54,14 +52,34 @@ export default class TG_BOT {
 		this.token = token;
           this.botThreadId = env.TG_THREADBOT;
 		this.api = new URL('https://api.telegram.org/bot' + token);
-          this.handlers = {
+         /* this.handlers = {
                ':message': this.handleMessage,
                ':edited_message': this.handleEditedMessage,
                ':callback': this.handleCallbackQuery,
-           }
+               ':edit_thread':this.handleEditThread,
+               ':create_thread':this.handleCreateThread
+           }*/
+
+           this.on(':message', this.handleMessage)
+           .on(':edited_message',this.handleEditedMessage)
+           .on(':callback',this.handleCallbackQuery)
+           .on(':edit_thread',this.handleEditThread)
+           .on(':create_thread',this.handleCreateThread);
 	}
 
-     async tgSendMessageToBotThread(env:any, text:string) {
+     /**
+	 * Register a function on the bot
+	 * @param event - the event or command name
+	 * @param callback - the bot context
+	 */
+	on(event: string, callback: (ctx: TG_ExecutionContext) => Promise<Response>) {
+		if (!['on', 'handle'].includes(event)) {
+			this.handlers[event] = callback;
+		}
+		return this;
+	}
+
+     async tgSendMessageToBotThread(env:any, text:string): Promise<botResponse> {
           const params = {
                chat_id: env.TG_CHATID,
                message_thread_id: env.TG_THREADBOT,
@@ -77,7 +95,7 @@ export default class TG_BOT {
           const responses = [];
       
           for (const part of parts) {
-              const response:any  = await this.tgSendMessageToBotThread(env, part);
+              const response:botResponse = await this.tgSendMessageToBotThread(env, part);
               responses.push(Number(response.result.message_id));
           }
       
@@ -141,18 +159,15 @@ export default class TG_BOT {
       
           for (let i = 0; i < buttons.length; i += batchSize) {
               const batch = buttons.slice(i, i + batchSize);
-              const response:any = await this.tgSendButton(env, batch, text);
-              console.log("debug rsponse from bot: ", response);
+              const response:botResponse = await TG_API.sendButtonToBotThread(env.SECRET_TELEGRAM_API_TOKEN, env.TG_CHATID, env.TG_THREADBOT, batch, text);
+              //console.log("debug rsponse from bot: ", response);
               responses.push(Number(response.result.message_id));
           }
       
           return responses;
      }
       
-     async tgSendButton(env:any, buttons:any, text:any): Promise<Response> {
-          return await TG_API.sendButtonToBotThread(env.SECRET_TELEGRAM_API_TOKEN, env.TG_CHATID, env.TG_THREADBOT, buttons, text);
-     }
-      
+     
      async tgAnswerCallbackQuery(env:any, callbackQueryId:any, text:string|null = null) {       
           return await TG_API.tgAnswerCallbackQuery(env.SECRET_TELEGRAM_API_TOKEN, callbackQueryId, text);
      }
@@ -170,52 +185,61 @@ export default class TG_BOT {
      async handleUpdate(update: TelegramUpdate) {
           this.update = update;
           
-          let updType = ':message';
+          let handlerName = ':message';
           let args: string[] = [];
           const ctx = new TG_ExecutionContext(this, this.update);
           this.currentContext = ctx;
           console.log('debug ctx update_type: ',ctx.update_type)
           switch (ctx.update_type) {
-               case 'message': {
+               case updType.MESSAGE: {
                     args = this.update.message?.text?.split(' ') ?? [];
           
                     break;
                }
-               case 'edited_message': {
+               case updType.MESSAGE_EDIT: {
                     args = this.update.message?.text?.split(' ') ?? [];
 
                     break;
                }
-               case 'business_message': {
+               case updType.MESSAGE_BUSINESS: {
                     args = this.update.message?.text?.split(' ') ?? [];
                     break;
                }
-               case 'inline': {
+               case updType.INLINE_QUERY: {
                     args = this.update.inline_query?.query.split(' ') ?? [];
                     break;
                }
+               case updType.CALLBACK: {
+                    handlerName = ':callback';
+                    break;
+               }
+               /*
+               case 'edit_thread': {
+                    handlerName = ':edit_thread';
+                    break;
+               }
+               case 'create_thread': {
+                    handlerName = ':create_thread';
+                    break;
+               }
                case 'photo': {
-                    updType = ':photo';
+                    handlerName = ':photo';
                     break;
                }
                case 'document': {
-                    updType = ':document';
+                    handlerName = ':document';
                     break;
-               }
-               case 'callback': {
-                    updType = ':callback';
-                    break;
-               }
+               }*/
                default:
                break;
           }
           if (args.at(0)?.startsWith('/')) {
-               updType = args.at(0)?.slice(1) ?? ':message';
+               handlerName = args.at(0)?.slice(1) ?? ':message';
           }
-          if (!(updType in this.handlers)) {
-               updType = ':message';
+          if (!( handlerName in this.handlers)) {
+               handlerName = ':message';
           }
-          return await this.handlers[updType](this.currentContext);
+          return await this.handlers[handlerName](this.currentContext);
      }
  
 
@@ -305,12 +329,11 @@ export default class TG_BOT {
 	}*/
 
      async handleMessage(ctx:TG_ExecutionContext) {
-          const messageJson:any = ctx.update.message;
-          const message:TG_Message = new Message(messageJson);
-          console.log("operation: ", message.operation);
+         
+          console.log("operation: ", ctx.update_operation);
           console.log("env: ", ctx.bot.env);
           //return new Response("Hello, world!");
-          if (!isValidChat(message,  ctx.bot.env)) {''
+          if (!isValidChat(ctx.update_message,  ctx.bot.env)) {''
               
               //console.log("invalid chat: ");
               //console.log("env: ", env.json());
@@ -318,31 +341,34 @@ export default class TG_BOT {
              return  new Response('Unauthorized', { status: 403 });
           }
       
-          if (message.msg_txt.startsWith('/')) {
-              await ctx.bot.handleBotCommand( ctx.bot.env, message);
+          if (ctx.update_message.msg_txt?.startsWith('/')) {
+              await ctx.bot.handleBotCommand( ctx.bot.env, ctx.update_message);
           }
           
-          switch (message.operation) {
-              case 'create_thread':
-                  await ctx.bot.handleCreateThread(message);
+          switch (ctx.update_operation) {
+              case updOperation.THREAD_EDIT:
+               await ctx.bot.handleEditThread(ctx);
+               break;
+              case updOperation.THREAD_CREATE:
+                  await ctx.bot.handleCreateThread(ctx);
                   break;
-              case 'new_media':
-                  await ctx.bot.handleNewMedia( ctx.bot.env, message);
+              case updOperation.NEW_MEDIA:
+                  await ctx.bot.handleNewMedia( ctx.bot.env, ctx.update_message);
                   break;
-              case 'new_post':
-                  await ctx.bot.handleNewPost( ctx.bot.env, message);
+              case updOperation.NEW_POST:
+                  await ctx.bot.handleNewPost( ctx.bot.env, ctx.update_message);
                   break;
           }
 
-          await DB_API.dbInsertMessage( ctx.bot.env, message);
+          await DB_API.dbInsertMessage( ctx.bot.env, ctx.update_message);
           return new Response('ok');
      }
 
      async handleEditedMessage(ctx:TG_ExecutionContext) {
           const messageJson:any = ctx.update.edited_message
-          const message:TG_Message = new EditedMessage(messageJson);
+          const message:ContextMessage = new ContextMessage(messageJson);
       
-          switch (message.operation) {
+          switch (ctx.update_operation) {
               case 'edit_media':
                   await this.handleEditMedia( ctx.bot.env, message);
                   break;
@@ -366,55 +392,66 @@ export default class TG_BOT {
               await DB_API.dbBatchInsertBot(env, array);
           }
       }
-      
-      async handleCreateThread ( message:TG_Message) {
+
+      async handleEditThread(ctx: TG_ExecutionContext ) {
+          let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
-      
-          await TIOZAO_API.checkDuplicatedThread(this.env, this, message.threadname, message.id_thread);
-          return await this.handleBotResponses(this.env, response_ids);
+          const threadName =  message.message.forum_topic_edited?.name;
+          await TIOZAO_API.checkDuplicatedThread(this.env, this, threadName, message.id_thread);
+          await this.handleBotResponses(this.env, response_ids);
+          return new Response('ok');
       }
       
-      async handleNewMedia(env:any, message:TG_Message) {
+      async handleCreateThread ( ctx: TG_ExecutionContext ) {
+          let message:ContextMessage = ctx.update_message;
+          let response_ids:any[] = [];
+          const threadName =  message.message.forum_topic_created?.name;
+          await TIOZAO_API.checkDuplicatedThread(this.env, this, threadName, message.id_thread);
+          await this.handleBotResponses(this.env, response_ids);
+          return new Response('ok');
+      }
+      
+      async handleNewMedia(env:any, message:ContextMessage) {
           let response_ids:any[] = [];
       
           response_ids.push(await TIOZAO_API.checkHaveCaption(env, message));
           return await this.handleBotResponses(env, response_ids);
       }
       
-      async handleNewPost (env:any, message:TG_Message) {
+      async handleNewPost (env:any, message:ContextMessage) {
           let response_ids:any[] = [];
           //console.log("handleNewPost: ", message.operation);
           if (message.is_td_rp || message.is_td) {
-              response_ids.push(await confirmTD(env,this,  message, 0));
+              response_ids.push(await confirmTD(env,this, message.message, 0));
           }
           return await this.handleBotResponses(env, response_ids);
       }
       
      
       
-      async handleEditMedia (env:any, message:any) {
+      async handleEditMedia (env:any, message:ContextMessage) {
           let response_ids:any[] = [];
       
           response_ids.push(await checkHaveCaption(env, message, true));
           return await this.handleBotResponses(env, response_ids);
       }
       
-      async handleEditPost (env:any, message:TG_Message) {
+      async handleEditPost (env:any, message:ContextMessage) {
           let response_ids:any[] = [];
       
           if (message.is_td_rp || message.is_td) {
-              response_ids.push(await confirmTD(env, this,message, 1));
+              response_ids.push(await confirmTD(env, this, message.message, 1));
           }
           return await this.handleBotResponses(env, response_ids);
       
       }
       
-      async handleBotCommand(env:any, message:TG_Message) {
+      async handleBotCommand(env:any, message:ContextMessage) {
           const message_id = message.message_id;
           const id_thread = message.id_thread;
           const id_user = message.id_user;
-          const msg_txt = message.msg_txt.trim();
-          const command = msg_txt.split(' ')[0];
+          const msg_txt = message.msg_txt?.trim();
+          const command = msg_txt?.split(' ')[0];
           let response_ids:any[] = [];
           
           const commands = {
@@ -431,16 +468,16 @@ export default class TG_BOT {
           };
       
           const commandEntry:any = Object.entries(commands).find(([prefix]) =>
-              msg_txt.startsWith(prefix)
+              msg_txt?.startsWith(prefix)
           );
       
           if (commandEntry) {
               const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
-              const argument = msg_txt.slice(selectedCommand.length).trim();
+              const argument = msg_txt?.slice(selectedCommand.length).trim();
       
               if (requiresArg && argument === '') {
                   response_ids.push(await TIOZAO_BOT_CMDs.botAlert(env, this, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
-              } else if (requiresArg && !msg_txt.startsWith(selectedCommand + ' ')) {
+              } else if (requiresArg && !msg_txt?.startsWith(selectedCommand + ' ')) {
                   response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(env,  this, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
               } else {
                   response_ids = await commandFunction(env, argument);

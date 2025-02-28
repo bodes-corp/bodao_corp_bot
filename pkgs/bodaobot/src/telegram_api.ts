@@ -1,7 +1,7 @@
 import TelegramInlineQueryResultArticle from './types/TelegramInlineQueryResultArticle.js';
 import TelegramInlineQueryResultPhoto from './types/TelegramInlineQueryResultPhoto.js';
 import TelegramInlineQueryResultVideo from './types/TelegramInlineQueryResultVideo.js';
-import { tgRequestMethod, tgRequestMethod_t } from './types/Types.js';
+import { botResponse, tgRequestMethod, tgRequestMethod_t } from './types/Types.js';
 
 /** Class representing the Telegram API and all it's methods */
 export default class TG_API {
@@ -32,7 +32,7 @@ export default class TG_API {
 	 * @param params the params to append to the request
 	 * @returns the params appended to the request JSON formated
 	 */
-	public static async tgSendRequest(method: tgRequestMethod_t, token:string, params:Record<string, string >) {
+	public static async tgSendRequest(method: tgRequestMethod_t, token:string, params:Record<string, string >): Promise<botResponse> {
 			try {
 			    	//const response = await fetch(TG_API.tgApiUrl(method, token, params), {
 				const response = await fetch(TG_API.tgApiUrl(method, token, params), {
@@ -52,7 +52,7 @@ export default class TG_API {
 			}
 	}
 
-	public static async sendButtonToBotThread(token:string, chatID:string, threadID:string, buttons:any, text:any) {
+	public static async sendButtonToBotThread(token:string, chatID:string, threadID:string, buttons:any, text:any) : Promise<botResponse>{
 
           const params = {
                chat_id: chatID,

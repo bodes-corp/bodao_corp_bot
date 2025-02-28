@@ -2,7 +2,8 @@
  // DB inserts/deletes/updates
 
 import { removeAccents, stringToWordsArray } from "./library";
-import TG_Message from "./types/TelegramMessage";
+import { EditedMessage, Message } from "./types/TelegramMessage";
+import { updOperation } from "./types/Types";
 
  
 
@@ -58,7 +59,7 @@ public static async dbBatchInsertBot(env:any, array:any[]) {
      }
 }
  
-public static async dbInsertMessage(env:any, message:TG_Message) {
+public static async dbInsertMessage(env:any, message:Message) {
      if (!env.DB) return Promise.resolve(null);
      if (['update_thread', 'create_thread'].includes(message.operation)) {
          const normalized_threadname = removeAccents(message.threadname);
@@ -71,7 +72,7 @@ public static async dbInsertMessage(env:any, message:TG_Message) {
          await this.executeQuery(env.DB, threadQuery, [message.id_thread, message.threadname, normalized_threadname], false);
      }
      
-     if (message.operation === 'new_media') {
+     if (message.operation === updOperation.NEW_MEDIA) {
          const mediaQuery = `
              INSERT INTO tg_media 
              (message_id, file_id, file_unique_id, msg_date, id_user, id_thread, type, deleted, media_group_id)
@@ -90,7 +91,7 @@ public static async dbInsertMessage(env:any, message:TG_Message) {
          ], false);     
      }
  
-     if (message.operation === 'new_post') {
+     if (message.operation === updOperation.NEW_POST) {
          const messageQuery = `
              INSERT INTO tg_msg (message_id, msg_txt, msg_date, td, id_user, id_thread, deleted) 
              VALUES (?1,?2,?3,?4,?5,?6,0)
@@ -116,9 +117,9 @@ public static async dbInsertMessage(env:any, message:TG_Message) {
      return new Response("DB-Insert-ok");
 }
  
-public static async dbEditMessage(env:any, message:TG_Message) {
+public static async dbEditMessage(env:any, message:EditedMessage) {
      if (!env.DB) return Promise.resolve(null);
-     if (message.operation === 'edit_media') {
+     if (message.operation === updOperation.EDIT_MEDIA) {
          const fileQuery = `
              UPDATE tg_media
              SET file_id = ?1,
@@ -144,7 +145,7 @@ public static async dbEditMessage(env:any, message:TG_Message) {
          ], false);
      }
  
-     if (message.operation === 'edit_post') {
+     if (message.operation === updOperation.EDIT_POST) {
          const messageQuery = `
              UPDATE tg_msg
              SET msg_txt =?1

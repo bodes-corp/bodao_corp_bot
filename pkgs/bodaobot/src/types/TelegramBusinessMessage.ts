@@ -1,10 +1,11 @@
 import TelegramChat from './TelegramChat.js';
 import { TelegramDocument } from './TelegramDocument.js';
 import TelegramFrom from './TelegramFrom.js';
+import { TG_Message } from './TelegramMessage.js';
 import TelegramMessageEntity from './TelegramMessageEntity.js';
 import TelegramPhotoSize from './TelegramPhotoSize.js';
 import TelegramUser from './TelegramUser.js';
-import TG_Message from './TG_Message.js';
+
 
 interface TelegramBusinessMessage {
 	message_id: number;

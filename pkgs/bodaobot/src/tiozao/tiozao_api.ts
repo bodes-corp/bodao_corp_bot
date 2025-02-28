@@ -1,7 +1,7 @@
 import { DB_API } from "../database_api";
 import { formatDate, isValidSearchTerm } from "../library";
 import TG_BOT from "../telegram_bot";
-import TG_Message from "../types/TelegramMessage";
+import { ContextMessage } from "../types/TelegramMessage";
 import { TIOZAO_BOT_CMDs } from "./tiozao_bot_comands";
 
 export default class TIOZAO_API {
@@ -314,9 +314,9 @@ export default class TIOZAO_API {
 	}
  }
  
- public static async checkDuplicatedThread (env:any, bot:  TG_BOT, threadname:string, id_thread:any) {
+ public static async checkDuplicatedThread (env:any, bot:  TG_BOT, threadname:string|undefined, id_thread:any) {
 	let text = '';
- 
+     if (!threadname) return;
 	const result = await DB_API.dbSearchThreadname(env, threadname);
 	
 	if (result.length == 0) {
@@ -331,7 +331,7 @@ export default class TIOZAO_API {
 	return await TIOZAO_BOT_CMDs.botAlert(env, bot,text, id_thread);
  }
  
- public static async confirmTD(env:any,  bot:  TG_BOT,message: TG_Message, edit:any) {
+ public static async confirmTD(env:any,  bot:  TG_BOT, message: ContextMessage, edit:any) {
  
 	const result = await DB_API.dbSearchTDUserThread(env, message.id_user, message.id_thread);
 	const number_rp = result.length;
@@ -361,7 +361,7 @@ export default class TIOZAO_API {
 	}
  }
  
- public static async checkHaveCaption(env:any, message:TG_Message, edit = false) {
+ public static async checkHaveCaption(env:any, message:ContextMessage, edit = false) {
 	const { message_id, media_group_id, caption } = message;
  
 	try {

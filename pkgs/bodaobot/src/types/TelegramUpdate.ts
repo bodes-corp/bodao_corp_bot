@@ -2,7 +2,8 @@ import PartialTelegramUpdate from './PartialTelegramUpdate.js';
 import TelegramBusinessMessage from './TelegramBusinessMessage.js';
 import TelegramCallbackQuery from './TelegramCallbackQuery.js';
 import TelegramInlineQuery from './TelegramInlineQuery.js';
-import TG_Message from './TG_Message.js';
+import { TG_Message } from './TelegramMessage.js';
+
 
 export default class TelegramUpdate {
 	update_id: number;
@@ -10,17 +11,25 @@ export default class TelegramUpdate {
 	edited_message?: TG_Message;
 	channel_post?: TG_Message;
 	edited_channel_post?: TG_Message;
+	//business_connection?
+	business_message?: TelegramBusinessMessage;
+	edited_business_message?:any;
+	//deleted_business_messages?
+	//message_reaction?
+	//message_reaction_count?
 	inline_query?: TelegramInlineQuery;
 	// chosen_inline_result?: TelegramChosenInlineResult;
 	callback_query?: TelegramCallbackQuery;
-	business_message?: TelegramBusinessMessage;
 	// shipping_query?: TelegramShippingQuery;
 	// pre_checkout_query?: TelegramPreCheckoutQuery;
+	// purchased_payd_media
 	// poll?: TelegramPoll;
 	// poll_answer?: TelegramPollAnswer;
 	// my_chat_member?: TelegramChatMemberUpdated;
 	// chat_member?: TelegramChatMemberUpdated;
-	// chat_join_request: TelegramChatJoinRequest;
+	// chat_join_request?: TelegramChatJoinRequest;
+	//chat_boost?
+	//removed_chat_boost?
 	constructor(update: PartialTelegramUpdate) {
 		this.update_id = update.update_id ?? 0;
 		this.message = update.message;

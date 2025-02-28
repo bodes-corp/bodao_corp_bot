@@ -23,12 +23,14 @@ export function splitMessage(text:string, maxLength:number, maxNewlines:number) 
 	return parts;
  }
 
- export function checkTD(msg_txt:string) {
+ export function checkTD(msg_txt:string|undefined) {
+     if(!msg_txt) return 0;
 	const keywords = ["Rosto", "Peitos", "Bunda", "Corpo", "Beij", "Massagem", "Oral", "Transa", "Anal", "Presença", "Valor", "Data"];
 	return keywords.every(keyword => JSON.stringify(msg_txt).includes(keyword)) ? 1 : 0;
  }
  
- export function checkRP(msg_txt:string) {
+ export function checkRP(msg_txt:string|undefined) {
+     if(!msg_txt) return 0;
 	const keywords = ["01) Mudou aparência", "02) Mudou atend", "03) Livre", "04) Valor", "05) Clínica"];
 	return keywords.every(keyword => JSON.stringify(msg_txt).includes(keyword)) ? 1 : 0;
  }
