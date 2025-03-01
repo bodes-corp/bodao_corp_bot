@@ -125,7 +125,27 @@ export default class TG_ExecutionContext {
 			this.update.message = this.update.callback_query?.message;
 			const messageJson:TG_Message|undefined = this.update.callback_query?.message;
 			this.update_message = new ContextMessage(messageJson);
-		}else {
+		}else if (this.update_type === updType.MESSAGE_EDIT){
+			this.update.message = this.update.edited_message;
+			const messageJson:TG_Message|undefined = this.update.edited_message;
+			this.update_message = new ContextMessage(messageJson);
+		}else if (this.update_type === updType.MESSAGE_CHANEL_POST){
+			this.update.message = this.update.channel_post;
+			const messageJson:TG_Message|undefined = this.update.channel_post;
+			this.update_message = new ContextMessage(messageJson);
+		}else if (this.update_type === updType.MESSAGE_CHANEL_POST_EDIT){
+			this.update.message = this.update.edited_channel_post;
+			const messageJson:TG_Message|undefined = this.update.edited_channel_post;
+			this.update_message = new ContextMessage(messageJson);
+		}else if (this.update_type === updType.MESSAGE_BUSINESS){
+			this.update.message = this.update.business_message;
+			const messageJson:TG_Message|undefined = this.update.business_message;
+			this.update_message = new ContextMessage(messageJson);
+		}else if (this.update_type === updType.MESSAGE_BUSINESS_EDIT){
+			this.update.message = this.update.edited_business_message;
+			const messageJson:TG_Message|undefined = this.update.edited_business_message;
+			this.update_message = new ContextMessage(messageJson);
+		}else{
 			const messageJson:TG_Message|undefined = this.update.message;
 			this.update_message = new ContextMessage(messageJson);
 		}
