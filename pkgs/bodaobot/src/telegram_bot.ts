@@ -83,7 +83,7 @@ export default class TG_BOT {
 
            this.on(':message', this.handleMessage)
            .on(':edited_message',this.handleEditedMessage)
-           .on(':callback',this.handleCallbackQuery)
+           .on(':callback',TG_BOT.handleCallbackQuery)
            .on(':edit_thread',this.handleEditThread)
            .on(':create_thread',this.handleCreateThread);
            
@@ -522,19 +522,17 @@ export default class TG_BOT {
           return await this.handleOldMessages();
       }
       
-      async handleCallbackQuery(ctx:TG_ExecutionContext) {
+      public static async handleCallbackQuery(ctx:TG_ExecutionContext) {
           const callbackQuery:any = ctx.update.callback_query
           const { from: user, data: command } = callbackQuery;
           let response_ids:any[] = [];
-      
           
-      
           const commandKey = Object.keys(ctx.bot.commands).find(prefix => command.startsWith(prefix));
       
           if (commandKey) {
               await ctx.bot.tgAnswerCallbackQuery(callbackQuery.id, commandKey);
-              const commandFunction:any = ctx.bot.commands[commandKey];
-              response_ids = await commandFunction(ctx.bot, callbackQuery, command.slice(commandKey.length).trim());
+              const commandFunction:commandFunc = ctx.bot.commands[commandKey];
+              response_ids = await commandFunction.func(ctx.bot, callbackQuery, command.slice(commandKey.length).trim());
           } else {
               return new Response(`Unknown command: ${command}`, { status: 400 });
           }
