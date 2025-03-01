@@ -2,9 +2,9 @@ import { DB_API } from "./database_api";
 import { isValidChat, splitMessage } from "./library";
 import TG_API from "./telegram_api";
 import TG_ExecutionContext from "./telegram_execution_context";
-import TIOZAO_API from "./tiozao/tiozao_api";
+import TIOZAO_CMDS from "./tiozao/tiozao_api";
 import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
-import Environment from "./types/Envirownment";
+import { BOT_INFO, BotINFO } from "./types/BotInfo";
 import { ContextMessage, TG_Message } from "./types/TelegramMessage";
 import TelegramUpdate from "./types/TelegramUpdate";
 import { botResponse, commandFunc, CommandHandler, Handler, handlerFunc, tgRequestMethod, updOperation, updType } from "./types/Types";
@@ -22,12 +22,14 @@ export default class TG_BOT {
 
      /** The telegram token */
      token: string;
+
      /** The telegram api URL */
      api: URL;
 
      /** The telegram handlers record map */
      handlers:Handler  = {};
 
+     /**command handlers record map */
      commands:CommandHandler = {}
 
      /** The telegram update object */
@@ -40,20 +42,37 @@ export default class TG_BOT {
      currentContext!: TG_ExecutionContext;
 
      /** The envirownment variables */
-     env:Environment;
+     //env:Environment;
 
      /** The Bot Thread id */
      botThreadId: string;
+
+     /**information necessary to dentify bot in telegram ans send messages to the 
+      * correct thread and chat
+      */
+     botINFO:BOT_INFO;
+
+     /**webhook secret */
+     secret:string;
+
+     /**Bot Database */
+     DB:any;
 
      /**
 	*	Create a bot
 	*	@param token - the telegram secret token
 	*/
-     constructor(token: string, env:Environment) {
-          this.env = env;
-		this.token = token;
-          this.botThreadId = env.TG_THREADBOT;
-		this.api = new URL('https://api.telegram.org/bot' + token);
+     constructor(info:BOT_INFO,secret:string,database:any=null) {
+          this.secret = secret;
+		this.token = info.TOKEN;
+          this.botThreadId = info.THREADBOT;
+          this.botINFO = new BOT_INFO(
+               info.TOKEN,
+               info.CHATID,
+               info.THREADBOT
+          )
+          this.DB=database;
+		this.api = new URL('https://api.telegram.org/bot' + info.TOKEN);
          /* this.handlers = {
                ':message': this.handleMessage,
                ':edited_message': this.handleEditedMessage,
@@ -69,15 +88,7 @@ export default class TG_BOT {
            .on(':create_thread',this.handleCreateThread);
            
 
-           this.onCommand('/active_gp', { func: TIOZAO_API.listActiveGp, requiresArg: false })
-          .onCommand( '/chat', { func: TIOZAO_API.listChat, requiresArg: false })
-          .onCommand('/gp_td', { func: TIOZAO_API.listTdGp, requiresArg: false })
-          .onCommand('/spa', { func: TIOZAO_API.listSpa, requiresArg: false })
-          .onCommand('/top_gp', { func: TIOZAO_API.listTopGp, requiresArg: false })
-          .onCommand('/top_rp', { func: TIOZAO_API.listTopRp, requiresArg: false })
-          .onCommand('/trend_gp', { func: TIOZAO_API.listTrendGp, requiresArg: false })
-          .onCommand('/user', { func: TIOZAO_API.listMembers, requiresArg: false })
-          .onCommand('/s', {func: TIOZAO_API.searchTerm, requiresArg: true})
+          
           
 	}
 
@@ -106,33 +117,39 @@ export default class TG_BOT {
 		return this;
 	}
 
-     async tgSendMessageToBotThread(env:any, text:string): Promise<botResponse> {
+     async tgSendMessageToBotThread(botInfo:BotINFO, text:string): Promise<botResponse> {
+          if (!botInfo) {
+               return Promise.resolve({
+                    "ok": false,
+                    "result": {} as TG_Message
+               } );
+          }
           const params = {
-               chat_id: env.TG_CHATID,
-               message_thread_id: env.TG_THREADBOT,
+               chat_id: botInfo.CHATID,
+               message_thread_id: botInfo.THREADBOT,
                text,
                parse_mode: 'html',
                disable_notification: 'true'
            };
-          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE, env.SECRET_TELEGRAM_API_TOKEN, params );
+          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE, botInfo.TOKEN, params );
       }
 
-     async tgMessage(env:any, text:string) {
+     async tgMessage(text:string) {
           const parts = splitMessage(text, 4096, 100);
           const responses = [];
       
           for (const part of parts) {
-              const response:botResponse = await this.tgSendMessageToBotThread(env, part);
+              const response:botResponse = await this.tgSendMessageToBotThread(this.botINFO, part);
               responses.push(Number(response.result.message_id));
           }
       
           return responses;
      }
       
-     async tgSendMedia(env:any, media:any) {
+     async tgSendMedia(info:BotINFO, media:any) {
           const params = {
-               chat_id: env.TG_CHATID,
-               message_thread_id: env.TG_THREADBOT,
+               chat_id: info.CHATID,
+               message_thread_id: info.THREADBOT,
                media,
                disable_notification: 'true'
            }
@@ -140,10 +157,10 @@ export default class TG_BOT {
      }
       
      
-     async tgSendMessageThread(env:any, text:string, id_thread:any, message_id:any) {
+     async tgSendMessageThread(info:BotINFO, text:string, id_thread:any, message_id:any) {
           
           const params = {
-               chat_id: env.TG_CHATID,
+               chat_id: info.CHATID,
                message_thread_id: id_thread,
                text,
                parse_mode: 'html',
@@ -154,39 +171,15 @@ export default class TG_BOT {
           return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE,  env.SECRET_TELEGRAM_API_TOKEN,params );
      }
       
-     async tgDeleteMessage(env:any, message_id:any) {
-          const params = {
-               chat_id: env.TG_CHATID,
-               message_id
-          }
-          return await TG_API.tgSendRequest(tgRequestMethod.DELETE_MESSAGE,  env.SECRET_TELEGRAM_API_TOKEN,params);
-     }
-      
-     async tgDeleteMessages(env:any, chunk:any) {
-          try {
-              const deleteParams = { chat_id: env.TG_CHATID, message_ids: chunk };
-              const response = await fetch(TG_API.tgApiUrl(tgRequestMethod.DELETE_MESSAGES, this.token), {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(deleteParams)
-              });
-      
-              const result:any = await response.json();
-              if (!result.ok) {
-                  throw new Error(`Failed to delete messages: ${result.description}`);
-              }
-          } catch (error) {
-              console.error('Error deleting messages:', error);
-          }
-     }
-      
-     async tgButton(env:any, buttons:string[], text:string) {
+       
+     
+     async tgButton(buttons:string[], text:string) {
           const batchSize = 90;
           const responses = [];
       
           for (let i = 0; i < buttons.length; i += batchSize) {
               const batch = buttons.slice(i, i + batchSize);
-              const response:botResponse = await TG_API.sendButtonToBotThread(env.SECRET_TELEGRAM_API_TOKEN, env.TG_CHATID, env.TG_THREADBOT, batch, text);
+              const response:botResponse = await TG_API.sendButtonToBotThread(this.botINFO.TOKEN, this.botINFO.CHATID, this.botINFO.THREADBOT, batch, text);
               //console.log("debug rsponse from bot: ", response);
               responses.push(Number(response.result.message_id));
           }
@@ -281,7 +274,7 @@ export default class TG_BOT {
                handlerName = ':message';
           }
           if (ctx.commandFlag) {
-               await ctx.bot.handleBotCommand( ctx.bot.env, ctx.update_message);
+               await ctx.bot.handleBotCommand(ctx.update_message);
           }
                
           return await this.handlers[handlerName](this.currentContext);
@@ -378,9 +371,9 @@ export default class TG_BOT {
      async handleMessage(ctx:TG_ExecutionContext) {
          
           console.log("operation: ", ctx.update_operation);
-          console.log("env: ", ctx.bot.env);
+          //console.log("env: ", ctx.bot.env);
           //return new Response("Hello, world!");
-          if (!isValidChat(ctx.update_message,  ctx.bot.env)) {''
+          if (!isValidChat(ctx.update_message,  ctx.bot.botINFO.CHATID)) {''
               
               //console.log("invalid chat: ");
               //console.log("env: ", env.json());
@@ -398,14 +391,14 @@ export default class TG_BOT {
                   await ctx.bot.handleCreateThread(ctx);
                   break;
               case updOperation.MEDIA_NEW:
-                  await ctx.bot.handleNewMedia( ctx.bot.env, ctx.update_message);
+                  await ctx.bot.handleNewMedia(ctx.update_message);
                   break;
               case updOperation.POST_NEW:
-                  await ctx.bot.handleNewPost( ctx.bot.env, ctx.update_message);
+                  await ctx.bot.handleNewPost(ctx.update_message);
                   break;
           }
 
-          await DB_API.dbInsertMessage( ctx.bot.env, ctx.update_message);
+          await DB_API.dbInsertMessage(this, ctx.update_message);
           return new Response('ok');
      }
 
@@ -415,26 +408,26 @@ export default class TG_BOT {
       
           switch (ctx.update_operation) {
               case 'edit_media':
-                  await this.handleEditMedia( ctx.bot.env, message);
+                  await this.handleEditMedia(message);
                   break;
               case 'edit_post':
-                  await this.handleEditPost( ctx.bot.env, message);
+                  await this.handleEditPost(message);
                   break;
           }
-          await DB_API.dbEditMessage( ctx.bot.env, message);
+          await DB_API.dbEditMessage( this, message);
           return new Response('ok');
      }
 
       
       
       async handleOldMessages () {
-          await TIOZAO_BOT_CMDs.removeOldMessages(this.env, this);
+          await TIOZAO_BOT_CMDs.removeOldMessages(this);
       }
       
-      async handleBotResponses(env:any, response_ids:any[]) {
+      async handleBotResponses(response_ids:any[]) {
           const array = response_ids.flat();
           if (array.length > 0) {
-              await DB_API.dbBatchInsertBot(env, array);
+              await DB_API.dbBatchInsertBot(this.DB, array);
           }
       }
 
@@ -442,8 +435,8 @@ export default class TG_BOT {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
           const threadName =  message.message.forum_topic_edited?.name;
-          await TIOZAO_API.checkDuplicatedThread(this.env, this, threadName, message.id_thread);
-          await this.handleBotResponses(this.env, response_ids);
+          await TIOZAO_CMDS.checkDuplicatedThread(this, threadName, message.id_thread);
+          await this.handleBotResponses(response_ids);
           return new Response('ok');
       }
       
@@ -451,47 +444,47 @@ export default class TG_BOT {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
           const threadName =  message.message.forum_topic_created?.name;
-          await TIOZAO_API.checkDuplicatedThread(this.env, this, threadName, message.id_thread);
-          await this.handleBotResponses(this.env, response_ids);
+          await TIOZAO_CMDS.checkDuplicatedThread(this, threadName, message.id_thread);
+          await this.handleBotResponses(response_ids);
           return new Response('ok');
       }
       
-      async handleNewMedia(env:any, message:ContextMessage) {
+      async handleNewMedia(message:ContextMessage) {
           let response_ids:any[] = [];
       
-          response_ids.push(await TIOZAO_API.checkHaveCaption(env, message));
-          return await this.handleBotResponses(env, response_ids);
+          response_ids.push(await TIOZAO_CMDS.checkHaveCaption(this, message));
+          return await this.handleBotResponses(response_ids);
       }
       
-      async handleNewPost (env:any, message:ContextMessage) {
+      async handleNewPost (message:ContextMessage) {
           let response_ids:any[] = [];
           //console.log("handleNewPost: ", message.operation);
           if (message.is_td_rp || message.is_td) {
-              response_ids.push(await confirmTD(env,this, message.message, 0));
+              response_ids.push(await TIOZAO_CMDS.confirmTD(this, this.currentContext.update_message, 0));
           }
-          return await this.handleBotResponses(env, response_ids);
+          return await this.handleBotResponses(response_ids);
       }
       
      
       
-      async handleEditMedia (env:any, message:ContextMessage) {
+      async handleEditMedia (message:ContextMessage) {
           let response_ids:any[] = [];
       
-          response_ids.push(await checkHaveCaption(env, message, true));
-          return await this.handleBotResponses(env, response_ids);
+          response_ids.push(await  TIOZAO_CMDS.checkHaveCaption(this, message, true));
+          return await this.handleBotResponses(response_ids);
       }
       
-      async handleEditPost (env:any, message:ContextMessage) {
+      async handleEditPost (message:ContextMessage) {
           let response_ids:any[] = [];
       
           if (message.is_td_rp || message.is_td) {
-              response_ids.push(await confirmTD(env, this, message.message, 1));
+              response_ids.push(await TIOZAO_CMDS.confirmTD(this, this.currentContext.update_message, 1));
           }
-          return await this.handleBotResponses(env, response_ids);
+          return await this.handleBotResponses(response_ids);
       
       }
       
-      async handleBotCommand(env:any, message:ContextMessage) {
+      async handleBotCommand(message:ContextMessage) {
           const message_id = message.message_id;
           const id_thread = message.id_thread;
           const id_user = message.id_user;
@@ -499,7 +492,7 @@ export default class TG_BOT {
           const command = msg_txt?.split(' ')[0];
           let response_ids:any[] = [];
           console.log('debug command:', command);
-          this.onCommand('/info', { func: (env:any, _:any) => TIOZAO_API.listInfo(this, id_user), requiresArg: false });
+          //this.onCommand('/info', { func: (env:any, _:any) => TIOZAO_CMDS.listInfo(this), requiresArg: false });
       
           const commandEntry:any = Object.entries(this.commands).find(([prefix]) =>
               msg_txt?.startsWith(prefix)
@@ -508,24 +501,24 @@ export default class TG_BOT {
           if (commandEntry) {
               const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
               const argument = msg_txt?.slice(selectedCommand.length).trim();
-              await TIOZAO_BOT_CMDs.botAlert(env, this, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
+              await TIOZAO_BOT_CMDs.botAlert(this, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
               
               if (requiresArg && argument === '') {
-                  response_ids.push(await TIOZAO_BOT_CMDs.botAlert(env, this, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
+                  response_ids.push(await TIOZAO_BOT_CMDs.botAlert( this, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
               } else if (requiresArg && !msg_txt?.startsWith(selectedCommand + ' ')) {
                   response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(env,  this, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
               } else {
                   response_ids = await commandFunction(env, argument);
               }
           } else {
-              response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(env,  this, 'Comando desconhecido: ' + command, id_thread, message_id));
+              response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(this, 'Comando desconhecido: ' + command, id_thread, message_id));
           }
       
           if (commandEntry != '/spa') {
-              await TIOZAO_API.showMenu(env, this,response_ids);
+              await TIOZAO_CMDS.showMenu(this,response_ids);
           }
           response_ids.push(message_id);
-          await this.handleBotResponses(env, response_ids);
+          await this.handleBotResponses(response_ids);
           return await this.handleOldMessages();
       }
       
@@ -546,29 +539,21 @@ export default class TG_BOT {
               return new Response(`Unknown command: ${command}`, { status: 400 });
           }
           if (command !== '/spa') {
-              await  TIOZAO_API.showMenu( ctx.bot.env, ctx.bot, response_ids);
+              await  TIOZAO_CMDS.showMenu( ctx.bot.env, ctx.bot, response_ids);
           }
-          await  ctx.bot.handleBotResponses( ctx.bot.env, response_ids);
+          await  ctx.bot.handleBotResponses( response_ids);
           await  ctx.bot.handleOldMessages();
           return new Response('ok');
-      }
+     }
+
+     //Basic BOT Database Handler
+
+     
       
-      async handleSpaCommand(env:any, callbackQuery:any, spa:string) {
-          if (spa === '') {
-              return await TIOZAO_API.listSpa(this);
-          } else {
-              await this.tgAnswerCallbackQuery(env, callbackQuery.id, spa);
-              return await TIOZAO_API.searchSpa(env, this,spa);
-          }
-      }
+      
       
      
 }
 
-function confirmTD(env: any, bot: any, message: TG_Message, arg3: number): any {
-     throw new Error("Function not implemented.");
-}
-function checkHaveCaption(env: any, message: any, arg2: boolean): any {
-     throw new Error("Function not implemented.");
-}
+
 

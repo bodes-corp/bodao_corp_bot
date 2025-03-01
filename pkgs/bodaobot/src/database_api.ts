@@ -2,7 +2,8 @@
  // DB inserts/deletes/updates
 
 import { removeAccents, stringToWordsArray } from "./library";
-import { EditedMessage, Message } from "./types/TelegramMessage";
+import TG_BOT from "./telegram_bot";
+import { ContextMessage } from "./types/TelegramMessage";
 import { updOperation } from "./types/Types";
 
  
@@ -21,105 +22,108 @@ public static async executeQuery(db:any, query:string, params:any[] = [], return
           }
 }
 
-public static async dbInsertBotNotify(env:any, response:any, message_id:any) {
-     if (!env.DB) return Promise.resolve(null);      
+public static async dbInsertBotNotify(db:any, response:any, message_id:any) {
+     if (!db) return Promise.resolve(null);      
      const query = `
          INSERT INTO tg_bot (message_id, id_msg_ref) 
          VALUES (?1,?2)
      `;
-     await this.executeQuery(env.DB, query, [response, message_id], false);
+     await this.executeQuery(db, query, [response, message_id], false);
      return response;
 }
  
-public static async dbDeleteBotNotify(env:any, array:any[]) {
-     if (!env.DB) return Promise.resolve(null);
+public static async dbDeleteBotNotify(db:any, array:any[]) {
+     if (!db) return Promise.resolve(null);
      const query = `
          DELETE FROM tg_bot
          WHERE message_id =?1;
      `;
  
      try {
-         const rows = array.map(message_id => env.DB.prepare(query).bind(message_id));
-         await env.DB.batch(rows);
+         const rows = array.map(message_id => db.prepare(query).bind(message_id));
+         await db.batch(rows);
      } catch (e:any) {
          console.error('Error in batch delete bot messages:', e.message);
      }
  }
  
-public static async dbBatchInsertBot(env:any, array:any[]) {
-     if (!env.DB) return Promise.resolve(null);
+public static async dbBatchInsertBot(db:any, array:any[]) {
+     if (!db) return Promise.resolve(null);
      const msg_date = Math.floor(Date.now() / 1000);
      const query = 'INSERT INTO tg_bot (message_id, msg_date) VALUES (?1, ?2)';
      
      try {
-         const rows = array.map(message_id => env.DB.prepare(query).bind(message_id, msg_date));
-         await env.DB.batch(rows);
+         const rows = array.map(message_id => db.prepare(query).bind(message_id, msg_date));
+         await db.batch(rows);
      } catch (e:any) {
          console.error('Error in batch inserting bot messages:', e.message);
      }
 }
  
-public static async dbInsertMessage(env:any, message:Message) {
-     if (!env.DB) return Promise.resolve(null);
-     if (['update_thread', 'create_thread'].includes(message.operation)) {
-         const normalized_threadname = removeAccents(message.threadname);
-         const threadQuery = `
-             INSERT INTO tg_thread (id_thread, threadname, normalized_threadname) 
-             VALUES (?1, ?2, ?3) 
-             ON CONFLICT (id_thread) 
-             DO UPDATE SET threadname = excluded.threadname, normalized_threadname = excluded.normalized_threadname
-         `;
-         await this.executeQuery(env.DB, threadQuery, [message.id_thread, message.threadname, normalized_threadname], false);
-     }
-     
-     if (message.operation === updOperation.NEW_MEDIA) {
-         const mediaQuery = `
-             INSERT INTO tg_media 
-             (message_id, file_id, file_unique_id, msg_date, id_user, id_thread, type, deleted, media_group_id)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
-         `;
-         await this.executeQuery(env.DB, mediaQuery, [
-             message.message_id, 
-             message.file_id, 
-             message.file_unique_id, 
-             message.msg_date, 
-             message.id_user, 
-             message.id_thread, 
-             message.type, 
-             message.deleted, 
-             message.media_group_id
-         ], false);     
-     }
+public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
+
+	if (!bot.DB) return Promise.resolve(null);
+	const operation = bot.currentContext.update_operation;
+	if (['update_thread', 'create_thread'].includes(operation)) {
+	    const normalized_threadname = removeAccents(message.threadname);
+	    const threadQuery = `
+		   INSERT INTO tg_thread (id_thread, threadname, normalized_threadname) 
+		   VALUES (?1, ?2, ?3) 
+		   ON CONFLICT (id_thread) 
+		   DO UPDATE SET threadname = excluded.threadname, normalized_threadname = excluded.normalized_threadname
+	    `;
+	    await this.executeQuery(bot.DB, threadQuery, [message.id_thread, message.threadname, normalized_threadname], false);
+	}
+	
+	if (operation === updOperation.MEDIA_NEW) {
+	    const mediaQuery = `
+		   INSERT INTO tg_media 
+		   (message_id, file_id, file_unique_id, msg_date, id_user, id_thread, type, deleted, media_group_id)
+		   VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+	    `;
+	    await this.executeQuery(bot.DB, mediaQuery, [
+		   message.message_id, 
+		   message.file_id, 
+		   message.file_unique_id, 
+		   message.msg_date, 
+		   message.id_user, 
+		   message.id_thread, 
+		   message.type, 
+		   message.deleted, 
+		   message.media_group_id
+	    ], false);     
+	}
  
-     if (message.operation === updOperation.NEW_POST) {
-         const messageQuery = `
-             INSERT INTO tg_msg (message_id, msg_txt, msg_date, td, id_user, id_thread, deleted) 
-             VALUES (?1,?2,?3,?4,?5,?6,0)
-         `;
-         await this.executeQuery(env.DB, messageQuery, [
-             message.message_id, 
-             message.msg_txt,
-             message.msg_date,
-             message.is_td,
-             message.id_user,
-             message.id_thread
-         ], false);
-         
-         const userQuery = `
-             INSERT INTO tg_user (id_user, username, first_name)
-             VALUES (?1, ?2, ?3)
-             ON CONFLICT (id_user)
-             DO UPDATE SET username = excluded.username, first_name = excluded.first_name
-         `;
-         await this.executeQuery(env.DB, userQuery, [message.id_user, message.username, message.first_name], false);
-     }
+	if (operation === updOperation.POST_NEW) {
+	    const messageQuery = `
+		   INSERT INTO tg_msg (message_id, msg_txt, msg_date, td, id_user, id_thread, deleted) 
+		   VALUES (?1,?2,?3,?4,?5,?6,0)
+	    `;
+	    await this.executeQuery(bot.DB, messageQuery, [
+		   message.message_id, 
+		   message.msg_txt,
+		   message.msg_date,
+		   message.is_td,
+		   message.id_user,
+		   message.id_thread
+	    ], false);
+	    
+	    const userQuery = `
+		   INSERT INTO tg_user (id_user, username, first_name)
+		   VALUES (?1, ?2, ?3)
+		   ON CONFLICT (id_user)
+		   DO UPDATE SET username = excluded.username, first_name = excluded.first_name
+	    `;
+	    await this.executeQuery(bot.DB, userQuery, [message.id_user, message.username, message.first_name], false);
+	}
  
-     return new Response("DB-Insert-ok");
+	return new Response("DB-Insert-ok");
 }
  
-public static async dbEditMessage(env:any, message:EditedMessage) {
-     if (!env.DB) return Promise.resolve(null);
-     if (message.operation === updOperation.EDIT_MEDIA) {
+public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
+     if (!bot.DB) return Promise.resolve(null);
+	const operation = bot.currentContext.update_operation;
+     if (operation === updOperation.MEDIA_EDIT) {
          const fileQuery = `
              UPDATE tg_media
              SET file_id = ?1,
@@ -127,7 +131,7 @@ public static async dbEditMessage(env:any, message:EditedMessage) {
                  type = ?3
              WHERE message_id = ?4
          `;
-         await this.executeQuery(env.DB, fileQuery, [
+         await this.executeQuery(bot.DB, fileQuery, [
              message.file_id,
              message.file_unique_id,
              message.type,
@@ -139,19 +143,19 @@ public static async dbEditMessage(env:any, message:EditedMessage) {
              SET deleted = ?1
              WHERE media_group_id = ?2
          `;
-         await this.executeQuery(env.DB, groupQuery, [
+         await this.executeQuery(bot.DB, groupQuery, [
              message.deleted,
              message.media_group_id
          ], false);
      }
  
-     if (message.operation === updOperation.EDIT_POST) {
+     if (operation === updOperation.POST_EDIT) {
          const messageQuery = `
              UPDATE tg_msg
              SET msg_txt =?1
              WHERE message_id =?2
          `;
-         await this.executeQuery(env.DB, messageQuery, [
+         await this.executeQuery(bot.DB, messageQuery, [
              message.msg_txt, 
              message.message_id
          ], false);
@@ -160,7 +164,7 @@ public static async dbEditMessage(env:any, message:EditedMessage) {
      return new Response("DB-EDIT-ok");
 }
  
-public static async dbInsertCaption(env:any, media_group_id:any, caption:string) {
+public static async dbInsertCaption(db:any, media_group_id:any, caption:string) {
  
      const normalized_caption:string = removeAccents(caption);
  
@@ -171,17 +175,17 @@ public static async dbInsertCaption(env:any, media_group_id:any, caption:string)
          DO UPDATE SET caption = excluded.caption, normalized_caption = excluded.normalized_caption
      `;
      let params:any[] = [media_group_id, caption, normalized_caption]
-     await this.executeQuery(env.DB, query,params , false);
+     await this.executeQuery(db, query,params , false);
      return caption;
  }
  
-public static async dbDeleteCaption(env:any, media_group_id:any) {
-     if (!env.DB) return Promise.resolve(null);
+public static async dbDeleteCaption(db:any, media_group_id:any) {
+     if (!db) return Promise.resolve(null);
      const query = `
          DELETE FROM tg_caption
          WHERE media_group_id =?1
      `;
-     await this.executeQuery(env.DB, query, [media_group_id], false);
+     await this.executeQuery(db, query, [media_group_id], false);
      return media_group_id;
 }
 
@@ -189,8 +193,8 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
  ///////////////////////////////////////////////////////////////////////////////
  // DB selects
  
- public static async dbSearchThreadname(env:any, threadname:string) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbSearchThreadname(db:any, threadname:string) {
+     if (!db) return Promise.resolve(null);
 	const normalized_threadname = removeAccents(threadname);
  
 	const threadnameArray = stringToWordsArray(normalized_threadname);
@@ -198,7 +202,7 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    .map((_, index) => `normalized_threadname LIKE '%' || ?${index + 1} || '%'`)
 	    .join(' AND ');
  
-	await env.DB.prepare('PRAGMA case_sensitive_like = true;').run();
+	await db.prepare('PRAGMA case_sensitive_like = true;').run();
  
 	const query = `
 	    SELECT t.id_thread, MIN(m.message_id), t.threadname 
@@ -209,11 +213,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    ORDER BY t.threadname COLLATE NOCASE ASC
 	`;
  
-	return await this.executeQuery(env.DB, query, threadnameArray);
+	return await this.executeQuery(db, query, threadnameArray);
  }
  
- public static async dbSearchTerm(env:any, name:string) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbSearchTerm(db:any, name:string) {
+     if (!db) return Promise.resolve(null);
 	const normalized_name = removeAccents(name);
  
 	const query = `
@@ -237,22 +241,22 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    ORDER BY normalized_threadname;
 	`;
  
-	return await this.executeQuery(env.DB, query, [normalized_name]);
+	return await this.executeQuery(db, query, [normalized_name]);
  }
  
- public static async dbSearchCaption(env:any, mediaGroupId:string) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbSearchCaption(db:any, mediaGroupId:string) {
+     if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT caption
 	    FROM tg_caption
 	    WHERE media_group_id = ?1;
 	`;
 	
-	return await this.executeQuery(env.DB, query, [mediaGroupId]);
+	return await this.executeQuery(db, query, [mediaGroupId]);
  }
  
- public static async dbSearchNotify(env:any, id_msg_ref:string) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbSearchNotify(db:any, id_msg_ref:string) {
+     if (!db) return Promise.resolve(null);
  
 	const query = `
 	    WITH MediaGroup AS (
@@ -269,11 +273,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    FROM tg_bot
 	    WHERE id_msg_ref IN (SELECT message_id FROM RelatedMessages)
 	`;
-	return await this.executeQuery(env.DB, query, [id_msg_ref]);
+	return await this.executeQuery(db, query, [id_msg_ref]);
  }
  
- public static async dbSearchTDUserThread(env:any, id_user:string, id_thread:string) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbSearchTDUserThread(db:any, id_user:string, id_thread:string) {
+     if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT message_id
 	    FROM tg_msg
@@ -281,11 +285,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    AND id_user = ?1
 	    AND id_thread = ?2;
 	`;
-	return await this.executeQuery(env.DB, query, [id_user, id_thread]);
+	return await this.executeQuery(db, query, [id_user, id_thread]);
  }
  
- public static async dbListChat(env:any) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbListChat(db:any) {
+     if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT t.id_thread, MAX(m.message_id), t.threadname
 	    FROM tg_thread t
@@ -295,11 +299,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    HAVING NOT MAX(m.td = 1)
 	    ORDER BY t.normalized_threadname;
 	`;
-	return await this.executeQuery(env.DB, query, []);
+	return await this.executeQuery(db, query, []);
  }
  
- public static async dbListMembers(env:any) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbListMembers(db:any) {
+     if (!db) return Promise.resolve(null);
 	const query = `
 	    WITH thread_counts AS (
 		   SELECT id_user, COUNT(*) AS thread_count
@@ -324,11 +328,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    GROUP BY u.first_name, tc.thread_count
 	    ORDER BY desbravamentos DESC, u.first_name COLLATE NOCASE ASC;
 	`;
-	return await this.executeQuery(env.DB, query, []);
+	return await this.executeQuery(db, query, []);
  }
  
- public static async dbListTdGp(env:any) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbListTdGp(db:any) {
+     if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT t.threadname, COUNT(*) AS count, t.id_thread, MIN(m.message_id) AS message_id
 	    FROM tg_msg m, tg_thread t
@@ -338,11 +342,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    GROUP BY t.id_thread
 	    ORDER BY t.normalized_threadname ASC
 	`;
-	return await this.executeQuery(env.DB, query, []);
+	return await this.executeQuery(db, query, []);
  }
  
- public static async dbListTopGp(env:any) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbListTopGp(db:any) {
+     if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT t.id_thread, MIN(m.message_id) AS message_id, t.threadname, COUNT(DISTINCT m.id_user) AS num_distinct_users 
 	    FROM tg_msg m, tg_thread t 
@@ -353,11 +357,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    HAVING num_distinct_users > 3 
 	    ORDER BY num_distinct_users DESC, t.normalized_threadname ASC
 	`;
-	return await this.executeQuery(env.DB, query, []);
+	return await this.executeQuery(db, query, []);
  }
  
- public static async dbListTopRp(env:any) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbListTopRp(db:any) {
+     if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT
 	    id_thread,
@@ -393,11 +397,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 		   count DESC,
 		   normalized_threadname
 	`;
-	return await this.executeQuery(env.DB, query, []);
+	return await this.executeQuery(db, query, []);
  }
  
- public static async dbListActiveGp(env:any) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbListActiveGp(db:any) {
+     if (!db) return Promise.resolve(null);
 	const now = Date.now() / 1000;
 	const dateOld = now - 10368000;
  
@@ -421,11 +425,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    ORDER BY 
 		   t.normalized_threadname ASC
 	`;
-	return await this.executeQuery(env.DB, query, [dateOld]);
+	return await this.executeQuery(db, query, [dateOld]);
  }
  
- public static async dbListTrendGp(env:any) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbListTrendGp(db:any) {
+     if (!db) return Promise.resolve(null);
 	const now = Date.now() / 1000;
 	const dateOld = now - 10368000;
  
@@ -463,11 +467,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    ORDER BY 
 		   sub.threadname
 	`;
-	return await this.executeQuery(env.DB, query, [dateOld]);
+	return await this.executeQuery(db, query, [dateOld]);
  }
  
- public static async dbListSpa(env:any) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbListSpa(db:any) {
+     if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT spa
 	    FROM (
@@ -492,11 +496,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    WHERE spa IS NOT NULL AND spa <> ''
 	    ORDER BY spa COLLATE NOCASE ASC
 	`;
-	return await this.executeQuery(env.DB, query, []);
+	return await this.executeQuery(db, query, []);
  }
  
- public static async dbSearchSpa(env:any, spa:string) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbSearchSpa(db:any, spa:string) {
+     if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT
 		   t.threadname,
@@ -516,11 +520,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    ORDER BY
 		   t.normalized_threadname COLLATE NOCASE ASC
 	`;
-	return await this.executeQuery(env.DB, query, [spa]);
+	return await this.executeQuery(db, query, [spa]);
  }
  
- public static async dbSearchUserData(env:any, id_user:any) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbSearchUserData(DB:any, id_user:any) {
+     if (!DB) return Promise.resolve(null);
 	const query = `
 	    WITH first_msg AS (
 		   SELECT id_thread, 
@@ -573,11 +577,11 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    CROSS JOIN td_counts tc;
 	`;
  
-	return await this.executeQuery(env.DB, query, [id_user]);
+	return await this.executeQuery(DB, query, [id_user]);
  }
  
- public static async dbSearchUserTd (env:any, id_user:any) {
-     if (!env.DB) return Promise.resolve(null);
+ public static async dbSearchUserTd (db:any, id_user:any) {
+     if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT m.id_thread, m.message_id, t.threadname, m.msg_date
 	    FROM tg_msg m, tg_thread t
@@ -587,7 +591,7 @@ public static async dbDeleteCaption(env:any, media_group_id:any) {
 	    AND m.id_user = ?1
 	    ORDER BY m.msg_date DESC
 	`;
-	return await this.executeQuery(env.DB, query, [id_user]);
+	return await this.executeQuery(db, query, [id_user]);
  }
  
 }

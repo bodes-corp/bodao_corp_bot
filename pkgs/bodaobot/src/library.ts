@@ -35,8 +35,8 @@ export function splitMessage(text:string, maxLength:number, maxNewlines:number) 
 	return keywords.every(keyword => JSON.stringify(msg_txt).includes(keyword)) ? 1 : 0;
  }
 
-export function isValidChat(message:any , env:any ) {
-     return message.chat_id === parseInt(env.TG_CHATID);
+export function isValidChat(message:any , chat_id:string ) {
+     return message.chat_id === parseInt(chat_id);
 }
 
 export function isValidSearchTerm(name:any ) {

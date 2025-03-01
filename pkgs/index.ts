@@ -1,12 +1,14 @@
 import TG_BOT from "./bodaobot/src/telegram_bot";
+import TIOZAO_CMDS from "./bodaobot/src/tiozao/tiozao_api";
+import { BOT_INFO } from "./bodaobot/src/types/BotInfo";
 import Environment from "./bodaobot/src/types/Envirownment";
 import TelegramUpdate from "./bodaobot/src/types/TelegramUpdate";
 import Webhook from "./bodaobot/src/webhook";
 
 
 
-function isAuthorized(request:any, env:any) {
-	return request.headers.get('X-Telegram-Bot-Api-Secret-Token') === env.TG_SECRET;
+function isAuthorized(request:any, secret:string) {
+	return request.headers.get('X-Telegram-Bot-Api-Secret-Token') === secret;
 }
 
 export default {
@@ -15,11 +17,26 @@ export default {
 		
 		//const { waitUntil } = context;
 
-		if (!isAuthorized(request, env)) {
+		if (!isAuthorized(request, env.TG_SECRET)) {
 		return new Response('Unauthorized test', { status: 403 });
 		}
-
-		const rafaelBot = new  TG_BOT(env.SECRET_TELEGRAM_API_TOKEN, env);
+		const botINFO = new BOT_INFO(
+			env.SECRET_TELEGRAM_API_TOKEN,
+			env.TG_CHATID,
+			env.TG_THREADBOT
+		)
+		const rafaelBot = new  TG_BOT(botINFO,env.TG_SECRET);
+		rafaelBot.onCommand('/active_gp', { func: TIOZAO_CMDS.listActiveGp, requiresArg: false })
+		.onCommand( '/chat', { func: TIOZAO_CMDS.listChat, requiresArg: false })
+		.onCommand('/gp_td', { func: TIOZAO_CMDS.listTdGp, requiresArg: false })
+		.onCommand('/spa', { func: TIOZAO_CMDS.listSpa, requiresArg: false })
+		.onCommand('/top_gp', { func: TIOZAO_CMDS.listTopGp, requiresArg: false })
+		.onCommand('/top_rp', { func: TIOZAO_CMDS.listTopRp, requiresArg: false })
+		.onCommand('/trend_gp', { func: TIOZAO_CMDS.listTrendGp, requiresArg: false })
+		.onCommand('/user', { func: TIOZAO_CMDS.listMembers, requiresArg: false })
+		.onCommand('/s', {func: TIOZAO_CMDS.searchTerm, requiresArg: true})
+		.onCommand('/info', { func: TIOZAO_CMDS.listInfo, requiresArg: false });
+				
 
 		try {
 
@@ -46,7 +63,9 @@ export default {
 					const update: TelegramUpdate = await request.json();
 					//const clone:Request = await request.clone();
 					//console.log(this.update);
-					context.waitUntil(rafaelBot.handleUpdate( update));
+					
+					
+					context.waitUntil(rafaelBot.handleUpdate(update));
 				}
 				case 'GET': {
 					switch (url.searchParams.get('command')) {

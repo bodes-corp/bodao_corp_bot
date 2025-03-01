@@ -1,164 +1,165 @@
 import { DB_API } from "../database_api";
 import { formatDate, isValidSearchTerm } from "../library";
 import TG_BOT from "../telegram_bot";
+import TG_ExecutionContext from "../telegram_execution_context";
 import { ContextMessage } from "../types/TelegramMessage";
 import { TIOZAO_BOT_CMDs } from "./tiozao_bot_comands";
 
-export default class TIOZAO_API {
+export default class TIOZAO_CMDS {
 
 ///////////////////////////////////////////////////////////////////////////////
  // Main functions
  
  public static async listChat (bot:  TG_BOT) {
-	const env = bot.env;
+	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Bate Papo</b>\n═════════════════════\n`;
  
 	try {
-	    const result = await DB_API.dbListChat(env);
+	    const result = await DB_API.dbListChat(bot.DB);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 	    } else {
 		   for (const row of result) {
-			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
+			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	}
 	return response_ids;
  }
  
  public static async listActiveGp(bot:  TG_BOT) {
-	const env = bot.env
+	//const env = bot.env
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>GPs ativas</b>\nGPs com TDs nos últimos 4 meses\n═════════════════════\n`;
  
 	try {
-	    const result = await DB_API.dbListActiveGp(env);
+	    const result = await DB_API.dbListActiveGp(bot.DB);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 	    } else {
 		   for (const row of result) {
 			  const day = formatDate(row[3]);
-			  text += `${day} - <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
+			  text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
  public static async listTopGp(bot:  TG_BOT) {
-	const env = bot.env;
+	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Top GPs</b>\nGPs com TDs de usuários únicos\n═════════════════════\n`;
  
 	try {
-	    const result = await DB_API.dbListTopGp(env);
+	    const result = await DB_API.dbListTopGp(bot.DB);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 	    } else {
 		   for (const row of result) {
-			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> -> ${row[3]}\n`;
+			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> -> ${row[3]}\n`;
 		   }
 	    }
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
  public static async listTopRp(bot:  TG_BOT) {
-	const env = bot.env;
+	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Top Repetecos</b>\nGPs com repetecos de usuários únicos\n═════════════════════\n`;
  
 	try {
-	    const result = await DB_API.dbListTopRp(env);
+	    const result = await DB_API.dbListTopRp(bot.DB);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 	    } else {
 		   for (const row of result) {
-			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> -> ${row[3]}\n`;
+			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> -> ${row[3]}\n`;
 		   }
 	    }
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
  public static async listTdGp(bot:  TG_BOT) {
-	const env = bot.env;
+	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Lista GPs</b>\nGPs com TDs + repetecos\n═════════════════════\n`;
  
 	try {
-	    const result = await DB_API.dbListTdGp(env);
+	    const result = await DB_API.dbListTdGp(bot.DB);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 	    } else {
 		   for (const row of result) {
-			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[2]}/${row[3]}">${row[0]}</a> -> ${row[1]}\n`;
+			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[2]}/${row[3]}">${row[0]}</a> -> ${row[1]}\n`;
 		   }
 	    }
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	}
 	return response_ids;
  }
  
  public static async listTrendGp(bot:  TG_BOT) {
-	const env = bot.env;
+	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>GPs Tendência</b>\nGPs com TDs nos últimos 4 meses de 2 ou mais usuários diferentes\n═════════════════════\n`;
  
 	try {
-	    const result = await DB_API.dbListTrendGp(env);
+	    const result = await DB_API.dbListTrendGp(bot.DB);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 	    } else {
 		   for (const row of result) {
-			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
+			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await this.sendResponse(env, bot,text, response_ids);
+	    await this.sendResponse(bot,text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot,text, response_ids);
+	    await this.sendResponse(bot,text, response_ids);
 	}
  
 	return response_ids;
  }
  
  public static async listMembers(bot:  TG_BOT) {
-	const env = bot.env;
+	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Membros</b>\n═════════════════════\n`;
  
 	try {
-	    const result = await DB_API.dbListMembers(env);
+	    const result = await DB_API.dbListMembers(bot.DB);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 	    } else {
@@ -167,40 +168,49 @@ export default class TIOZAO_API {
 			  text += `• ${row[0]} -> ${row[1]} / ${row[2]} / ${row[3]} \n`;
 		   }
 	    }
-	    await this.sendResponse(env, bot,text, response_ids);
+	    await this.sendResponse(bot,text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
  public static async listSpa (bot:  TG_BOT) {
-	const env = bot.env;
+	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = '';
  
 	try {
-	    const result = await DB_API.dbListSpa(env);
+	    const result = await DB_API.dbListSpa(bot.DB);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-		   await this.sendResponse(env, bot,text, response_ids);
+		   await this.sendResponse(bot,text, response_ids);
 	    } else {
 		   const spas:any[] = result.map((row: any[]) =>
 			  row.map(buttonText => ({ text: buttonText, callback_data: '/spa ' + buttonText }))
 		   );
-		   response_ids = await  TIOZAO_BOT_CMDs.ResponseButton(env, bot, spas, 'Lista de casas:');
+		   response_ids = await  TIOZAO_BOT_CMDs.ResponseButton(bot, spas, 'Lista de casas:');
 	    }        
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    const errorText = `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot, errorText, response_ids);
+	    await this.sendResponse(bot, errorText, response_ids);
 	}
  
 	return response_ids;
  }
+
+ public static async handleSpaCommand(env:any, bot:  TG_BOT,callbackQuery:any, spa:string) {
+		 if (spa === '') {
+			return await TIOZAO_CMDS.listSpa(bot);
+		 } else {
+			await bot.tgAnswerCallbackQuery(env, callbackQuery.id, spa);
+			return await TIOZAO_CMDS.searchSpa(env, bot,spa);
+		 }
+	  }
  
  public static async searchSpa(env:any,  bot:  TG_BOT, spa:string) {
 	let response_ids: any[] = [];
@@ -215,19 +225,20 @@ export default class TIOZAO_API {
 			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[1]}/${row[2]}">${row[0]}</a> -> ${row[3]}\n`;
 		   }
 	    }
-	    await this.sendResponse(env, bot,text, response_ids);
+	    await this.sendResponse(bot,text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
- public static async listInfo(bot:  TG_BOT, id_user: any) {
-	const env = bot.env;
-	
+ public static async listInfo(bot:  TG_BOT) {
+	//const env = bot.env;
+	const ctx:TG_ExecutionContext = bot.currentContext
+	const id_user = ctx.update_message.id_user;
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>Perfil</b>\n═════════════════════\n`;
 	let first_name = '';
@@ -239,7 +250,7 @@ export default class TIOZAO_API {
 	let td_unique_count = 0;
  
 	try {
-	    const result:any[] = await DB_API.dbSearchUserData(env, id_user);
+	    const result:any[] = await DB_API.dbSearchUserData(bot.DB, id_user);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 	    } else {
@@ -261,51 +272,50 @@ export default class TIOZAO_API {
 		   text += `<b>Desbravamentos</b>: ${td_explorer_count}\n\n`;
 	    }
 	    text += "<b>Lista de TDs:</b>\n";
-	    const result2 = await DB_API.dbSearchUserTd(env, id_user);
+	    const result2 = await DB_API.dbSearchUserTd(bot.DB, id_user);
 	    if (result2.length === 0) {
 		   text += "Nenhum resultado encontrado";
 	    } else {
 		   for (const row of result2) {
 			  const day = formatDate(row[3]);
-			  text += `${day} - <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
+			  text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await this.sendResponse(env,bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
  }
  
  public static async searchTerm(bot:  TG_BOT, name:string) {
-	const env = bot.env;
- 
+	 
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>Busca ${name}</b>\n═════════════════════\n`;
 	
 	// Validate search term
 	if (!isValidSearchTerm(name)) {
 	    const text = `O termo de busca precisa ter ao menos 3 caracteres`;
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	    return response_ids;
 	}
 	try {
-	    const result = await DB_API.dbSearchTerm(env, name);
+	    const result = await DB_API.dbSearchTerm(bot.DB, name);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 	    } else {
 		   for (const row of result) {
-			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> \n`;
+			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> \n`;
 		   }
 	    }
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(env, bot, text, response_ids);
+	    await this.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
@@ -314,21 +324,21 @@ export default class TIOZAO_API {
  ///////////////////////////////////////////////////////////////////////////////
  // 
 
- public static async showMenu(env:any, bot:  TG_BOT, response_ids:any[]) {
-	response_ids.push(await  TIOZAO_BOT_CMDs.botShowMenu(env,bot));
+ public static async showMenu(bot:  TG_BOT, response_ids:any[]) {
+	response_ids.push(await  TIOZAO_BOT_CMDs.botShowMenu(bot));
  }
  
- public static async sendResponse(env:any, bot:  TG_BOT, text:string, response_ids: any[], media = null) {
-	response_ids.push(await TIOZAO_BOT_CMDs.botResponseTxt(env,bot, text));
+ public static async sendResponse(bot:  TG_BOT, text:string, response_ids: any[], media = null) {
+	response_ids.push(await TIOZAO_BOT_CMDs.botResponseTxt(bot, text));
 	if (media) {
-	    response_ids.push(await TIOZAO_BOT_CMDs.botResponseMedia(env, bot, media));
+	    response_ids.push(await TIOZAO_BOT_CMDs.botResponseMedia(bot, media));
 	}
  }
  
- public static async checkDuplicatedThread (env:any, bot:  TG_BOT, threadname:string|undefined, id_thread:any) {
+ public static async checkDuplicatedThread (bot:  TG_BOT, threadname:string|undefined, id_thread:any) {
 	let text = '';
      if (!threadname) return;
-	const result = await DB_API.dbSearchThreadname(env, threadname);
+	const result = await DB_API.dbSearchThreadname(bot.DB, threadname);
 	
 	if (result.length == 0) {
 	    text = 'Seguir o padrão em https://gpsp.xyz/td';
@@ -336,15 +346,15 @@ export default class TIOZAO_API {
 	else {
 	    text = 'Existe(m) outro(s) tópico(s) com título parecido, verifique antes de postar aqui: \n';
 	    for (const row of result) {
-		   text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
+		   text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 	    }
 	}
-	return await TIOZAO_BOT_CMDs.botAlert(env, bot,text, id_thread);
+	return await TIOZAO_BOT_CMDs.botAlert(bot,text, id_thread);
  }
  
- public static async confirmTD(env:any,  bot:  TG_BOT, message: ContextMessage, edit:any) {
+ public static async confirmTD(bot:  TG_BOT, message: ContextMessage, edit:any) {
  
-	const result = await DB_API.dbSearchTDUserThread(env, message.id_user, message.id_thread);
+	const result = await DB_API.dbSearchTDUserThread(bot.DB, message.id_user, message.id_thread);
 	const number_rp = result.length;
 	let text = '';
  
@@ -354,7 +364,7 @@ export default class TIOZAO_API {
 	} else if (message.is_td_rp) {
 	    text = 'Falta o seu primeiro TD nesse tópico.\nSeguir o padrão: https://gpsp.xyz/td\n';
 	    message.is_td = 0;
-	    return await TIOZAO_BOT_CMDs.botAlert(env, bot, text, message.id_thread, message.message_id);
+	    return await TIOZAO_BOT_CMDs.botAlert(bot, text, message.id_thread, message.message_id);
 	}
  
 	// Determine the response text based on the TD status and whether it's an edit
@@ -368,18 +378,18 @@ export default class TIOZAO_API {
  
 	// Send the response if the message has a TD
 	if (message.is_td) {
-	    return await TIOZAO_BOT_CMDs.botAlert(env,bot, text, message.id_thread, message.message_id);
+	    return await TIOZAO_BOT_CMDs.botAlert(bot, text, message.id_thread, message.message_id);
 	}
  }
  
- public static async checkHaveCaption(env:any, message:ContextMessage, edit = false) {
+ public static async checkHaveCaption(bot:TG_BOT, message:ContextMessage, edit = false) {
 	const { message_id, media_group_id, caption } = message;
  
 	try {
 	    if (caption) {
-		   await  DB_API.dbInsertCaption(env, media_group_id, caption);
+		   await  DB_API.dbInsertCaption(bot.DB, media_group_id, caption);
 	    } else if (edit) {
-		   await DB_API.dbDeleteCaption(env, media_group_id);
+		   await DB_API.dbDeleteCaption(bot.DB, media_group_id);
 	    }
 	} catch (error) {
 	    console.error(`Error processing caption for media_group_id: ${media_group_id}`, error);
