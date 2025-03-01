@@ -33,11 +33,8 @@ export default class TG_ExecutionContext {
 	constructor(bot:  TG_BOT, update: TelegramUpdate) {
 		this.bot = bot;
 		this.update = update;
-		const messageJson:TG_Message|undefined = this.update.message;
+
 		
-
-		this.update_message = new ContextMessage(messageJson);
-
           
 		this.update_operation = updOperation.NO_OP;
 
@@ -123,7 +120,16 @@ export default class TG_ExecutionContext {
 				this.update_operation = updOperation.THREAD_EDIT;
 			}
 		}
+
+		if (this.update_type===updType.CALLBACK){
+			const messageJson:TG_Message|undefined = this.update.callback_query?.message;
+			this.update_message = new ContextMessage(messageJson);
+		}else {
+			const messageJson:TG_Message|undefined = this.update.message;
+			this.update_message = new ContextMessage(messageJson);
+		}
 		
+
 		
 	}
 
