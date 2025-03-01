@@ -22,13 +22,13 @@ public static async executeQuery(db:any, query:string, params:any[] = [], return
           }
 }
 
-public static async dbInsertBotNotify(db:any, response:any, message_id:any) {
+public static async dbInsertBotNotify(db:any, response:any, id_msg:any) {
      if (!db) return Promise.resolve(null);      
      const query = `
-         INSERT INTO tg_bot (message_id, id_msg_ref) 
+         INSERT INTO tg_bot (id_msg, id_msg_ref) 
          VALUES (?1,?2)
      `;
-     await this.executeQuery(db, query, [response, message_id], false);
+     await this.executeQuery(db, query, [response, id_msg], false);
      return response;
 }
  
@@ -36,11 +36,11 @@ public static async dbDeleteBotNotify(db:any, array:any[]) {
      if (!db) return Promise.resolve(null);
      const query = `
          DELETE FROM tg_bot
-         WHERE message_id =?1;
+         WHERE id_msg =?1;
      `;
  
      try {
-         const rows = array.map(message_id => db.prepare(query).bind(message_id));
+         const rows = array.map(id_msg => db.prepare(query).bind(id_msg));
          await db.batch(rows);
      } catch (e:any) {
          console.error('Error in batch delete bot messages:', e.message);
@@ -50,10 +50,10 @@ public static async dbDeleteBotNotify(db:any, array:any[]) {
 public static async dbBatchInsertBot(db:any, array:any[]) {
      if (!db) return Promise.resolve(null);
      const msg_date = Math.floor(Date.now() / 1000);
-     const query = 'INSERT INTO tg_bot (message_id, msg_date) VALUES (?1, ?2)';
+     const query = 'INSERT INTO tg_bot (id_msg, msg_date) VALUES (?1, ?2)';
      
      try {
-         const rows = array.map(message_id => db.prepare(query).bind(message_id, msg_date));
+         const rows = array.map(id_msg => db.prepare(query).bind(id_msg, msg_date));
          await db.batch(rows);
      } catch (e:any) {
          console.error('Error in batch inserting bot messages:', e.message);
@@ -78,11 +78,11 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 	if (operation === updOperation.MEDIA_NEW) {
 	    const mediaQuery = `
 		   INSERT INTO tg_media 
-		   (message_id, file_id, file_unique_id, msg_date, id_user, id_thread, type, deleted, media_group_id)
+		   (id_msg, file_id, file_unique_id, msg_date, id_user, id_thread, type, deleted, media_group_id)
 		   VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
 	    `;
 	    await this.executeQuery(bot.DB, mediaQuery, [
-		   message.message_id, 
+		   message.id_msg, 
 		   message.file_id, 
 		   message.file_unique_id, 
 		   message.msg_date, 
@@ -96,11 +96,11 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
  
 	if (operation === updOperation.POST_NEW) {
 	    const messageQuery = `
-		   INSERT INTO tg_msg (message_id, msg_txt, msg_date, td, id_user, id_thread, deleted) 
+		   INSERT INTO tg_msg (id_msg, msg_txt, msg_date, td, id_user, id_thread, deleted) 
 		   VALUES (?1,?2,?3,?4,?5,?6,0)
 	    `;
 	    await this.executeQuery(bot.DB, messageQuery, [
-		   message.message_id, 
+		   message.id_msg, 
 		   message.msg_txt,
 		   message.msg_date,
 		   message.is_td,
@@ -129,13 +129,13 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
              SET file_id = ?1,
                  file_unique_id = ?2,
                  type = ?3
-             WHERE message_id = ?4
+             WHERE id_msg = ?4
          `;
          await this.executeQuery(bot.DB, fileQuery, [
              message.file_id,
              message.file_unique_id,
              message.type,
-             message.message_id
+             message.id_msg
          ], false);
  
          const groupQuery = `
@@ -153,11 +153,11 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
          const messageQuery = `
              UPDATE tg_msg
              SET msg_txt =?1
-             WHERE message_id =?2
+             WHERE id_msg =?2
          `;
          await this.executeQuery(bot.DB, messageQuery, [
              message.msg_txt, 
-             message.message_id
+             message.id_msg
          ], false);
      }
  
@@ -205,7 +205,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	await db.prepare('PRAGMA case_sensitive_like = true;').run();
  
 	const query = `
-	    SELECT t.id_thread, MIN(m.message_id), t.threadname 
+	    SELECT t.id_thread, MIN(m.id_msg), t.threadname 
 	    FROM tg_thread t
 	    JOIN tg_msg m ON t.id_thread = m.id_thread 
 	    WHERE ${likeClauses}
@@ -223,13 +223,13 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	const query = `
 	    SELECT
 		   id_thread,
-		   MIN(message_id),
+		   MIN(id_msg),
 		   threadname,
 		   normalized_threadname
 	    FROM (
 		   SELECT
 			  m.id_thread,
-			  m.message_id,
+			  m.id_msg,
 			  t.threadname,
 			  t.normalized_threadname,
 			  m.msg_date
@@ -262,16 +262,16 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	    WITH MediaGroup AS (
 		   SELECT media_group_id
 		   FROM tg_media
-		   WHERE message_id = ?1
+		   WHERE id_msg = ?1
 	    ),
 	    RelatedMessages AS (
-		   SELECT message_id
+		   SELECT id_msg
 		   FROM tg_media
 		   WHERE media_group_id = (SELECT media_group_id FROM MediaGroup)
 	    )
-	    SELECT message_id
+	    SELECT id_msg
 	    FROM tg_bot
-	    WHERE id_msg_ref IN (SELECT message_id FROM RelatedMessages)
+	    WHERE id_msg_ref IN (SELECT id_msg FROM RelatedMessages)
 	`;
 	return await this.executeQuery(db, query, [id_msg_ref]);
  }
@@ -279,7 +279,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
  public static async dbSearchTDUserThread(db:any, id_user:string, id_thread:string) {
      if (!db) return Promise.resolve(null);
 	const query = `
-	    SELECT message_id
+	    SELECT id_msg
 	    FROM tg_msg
 	    WHERE td = 1
 	    AND id_user = ?1
@@ -291,7 +291,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
  public static async dbListChat(db:any) {
      if (!db) return Promise.resolve(null);
 	const query = `
-	    SELECT t.id_thread, MAX(m.message_id), t.threadname
+	    SELECT t.id_thread, MAX(m.id_msg), t.threadname
 	    FROM tg_thread t
 	    JOIN tg_msg m ON t.id_thread = m.id_thread
 	    WHERE m.deleted = 0
@@ -305,36 +305,36 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
  public static async dbListMembers(db:any) {
      if (!db) return Promise.resolve(null);
 	const query = `
-	    WITH thread_counts AS (
-		   SELECT id_user, COUNT(*) AS thread_count
-		   FROM (
-			  SELECT m.id_user, m.id_thread, MIN(m.message_id) AS message_id
-			  FROM tg_msg m
-			  JOIN tg_thread t ON m.id_thread = t.id_thread
-			  WHERE m.td = 1 AND m.deleted = 0
-			  GROUP BY m.id_thread
-		   ) AS subquery
-		   GROUP BY id_user
-	    )
-	    SELECT 
-		   u.first_name, 
-		   SUM(CASE WHEN m.td = 0 THEN 1 ELSE 0 END) AS posts, 
-		   SUM(CASE WHEN m.td = 1 THEN 1 ELSE 0 END) AS tds, 
-		   COALESCE(tc.thread_count, 0) AS desbravamentos
-	    FROM tg_msg m
-	    JOIN tg_user u ON u.id_user = m.id_user
-	    LEFT JOIN thread_counts tc ON u.id_user = tc.id_user
-	    WHERE u.active = 1 AND m.deleted = 0
-	    GROUP BY u.first_name, tc.thread_count
-	    ORDER BY desbravamentos DESC, u.first_name COLLATE NOCASE ASC;
-	`;
+        WITH thread_counts AS (
+            SELECT id_user, COUNT(*) AS thread_count
+            FROM (
+                SELECT m.id_user, m.id_thread, MIN(m.id_msg) AS id_msg
+                FROM tg_msg m
+                JOIN tg_thread t ON m.id_thread = t.id_thread
+                WHERE m.td = 1 AND m.deleted = 0
+                GROUP BY m.id_thread
+            ) AS subquery
+            GROUP BY id_user
+        )
+        SELECT 
+            u.first_name, 
+            SUM(CASE WHEN m.td = 0 THEN 1 ELSE 0 END) AS posts, 
+            SUM(CASE WHEN m.td = 1 THEN 1 ELSE 0 END) AS tds, 
+            COALESCE(tc.thread_count, 0) AS desbravamentos
+        FROM tg_msg m
+        JOIN tg_user u ON u.id_user = m.id_user
+        LEFT JOIN thread_counts tc ON u.id_user = tc.id_user
+        WHERE u.active = 1 AND m.deleted = 0
+        GROUP BY u.first_name, tc.thread_count
+        ORDER BY desbravamentos DESC, u.first_name COLLATE NOCASE ASC;
+    `;
 	return await this.executeQuery(db, query, []);
  }
  
  public static async dbListTdGp(db:any) {
      if (!db) return Promise.resolve(null);
 	const query = `
-	    SELECT t.threadname, COUNT(*) AS count, t.id_thread, MIN(m.message_id) AS message_id
+	    SELECT t.threadname, COUNT(*) AS count, t.id_thread, MIN(m.id_msg) AS id_msg
 	    FROM tg_msg m, tg_thread t
 	    WHERE m.id_thread = t.id_thread 
 	    AND m.td = 1
@@ -348,7 +348,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
  public static async dbListTopGp(db:any) {
      if (!db) return Promise.resolve(null);
 	const query = `
-	    SELECT t.id_thread, MIN(m.message_id) AS message_id, t.threadname, COUNT(DISTINCT m.id_user) AS num_distinct_users 
+	    SELECT t.id_thread, MIN(m.id_msg) AS id_msg, t.threadname, COUNT(DISTINCT m.id_user) AS num_distinct_users 
 	    FROM tg_msg m, tg_thread t 
 	    WHERE m.id_thread = t.id_thread 
 	    AND m.td = 1 
@@ -365,7 +365,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	const query = `
 	    SELECT
 	    id_thread,
-	    MIN(message_id) AS message_id,
+	    MIN(id_msg) AS id_msg,
 	    threadname,
 	    COUNT(*) AS count
 	    FROM
@@ -374,7 +374,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 				 m.id_thread,
 				 t.threadname,
 				 m.id_user,
-				 MIN(m.message_id) AS message_id
+				 MIN(m.id_msg) AS id_msg
 			  FROM
 				 tg_thread t
 				 JOIN tg_msg m ON m.id_thread = t.id_thread
@@ -408,7 +408,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	const query = `
 	    SELECT 
 		   m.id_thread, 
-		   MAX(m.message_id), 
+		   MAX(m.id_msg), 
 		   t.threadname,
 		   MAX(m.msg_date)
 	    FROM 
@@ -436,12 +436,12 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	const query = `
 	    SELECT 
 		   sub.id_thread,
-		   MAX(sub.message_id) AS message_id,
+		   MAX(sub.id_msg) AS id_msg,
 		   sub.threadname 
 	    FROM 
 		   (
 			  SELECT 
-				 MAX(m.message_id) AS message_id, 
+				 MAX(m.id_msg) AS id_msg, 
 				 m.id_thread, 
 				 t.threadname, 
 				 COUNT(m.id_user) AS count 
@@ -505,7 +505,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	    SELECT
 		   t.threadname,
 		   t.id_thread,
-		   MIN(m.message_id),
+		   MIN(m.id_msg),
 		   COUNT(*)
 	    FROM
 		   tg_thread t,
@@ -528,7 +528,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	const query = `
 	    WITH first_msg AS (
 		   SELECT id_thread, 
-			  min(message_id) AS message_id, 
+			  min(id_msg) AS id_msg, 
 			  id_user 
 		   FROM tg_msg 
 		   WHERE td = 1 
@@ -565,7 +565,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 		   JOIN first_msg fm ON m.id_thread = fm.id_thread
 					    AND m.id_user = fm.id_user
 		   WHERE m.id_user = ?1 
-		   AND m.message_id = fm.message_id
+		   AND m.id_msg = fm.id_msg
 	    )
 	    SELECT u.first_name, u.username, 
 		   fm.first_msg_count,
@@ -583,7 +583,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
  public static async dbSearchUserTd (db:any, id_user:any) {
      if (!db) return Promise.resolve(null);
 	const query = `
-	    SELECT m.id_thread, m.message_id, t.threadname, m.msg_date
+	    SELECT m.id_thread, m.id_msg, t.threadname, m.msg_date
 	    FROM tg_msg m, tg_thread t
 	    WHERE m.id_thread = t.id_thread 
 	    AND m.td = 1 
