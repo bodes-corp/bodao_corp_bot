@@ -64,7 +64,7 @@ public static async removeOldMessages(bot:  TG_BOT,) {
 	try {
 	    const query = 'SELECT id_msg FROM tg_bot WHERE msg_date < ?';
 	    const data = await bot.DB.prepare(query).bind(old).all();
-	    const messageIds = data.results.map((row: any ) => row.message_id);
+	    const messageIds = data.results.map((row: any ) => row.id_msg);
  
 	    if (messageIds.length === 0) return;
  
