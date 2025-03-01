@@ -25,7 +25,7 @@ export default {
 			env.TG_CHATID,
 			env.TG_THREADBOT
 		)
-		const rafaelBot = new  TG_BOT(botINFO,env.TG_SECRET);
+		const rafaelBot = new  TG_BOT(botINFO,env.TG_SECRET,env.DB);
 		rafaelBot.onCommand('/active_gp', { func: TIOZAO_CMDS.listActiveGp, requiresArg: false })
 		.onCommand( '/chat', { func: TIOZAO_CMDS.listChat, requiresArg: false })
 		.onCommand('/gp_td', { func: TIOZAO_CMDS.listTdGp, requiresArg: false })

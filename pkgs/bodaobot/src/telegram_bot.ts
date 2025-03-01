@@ -153,7 +153,7 @@ export default class TG_BOT {
                media,
                disable_notification: 'true'
            }
-          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MEDIA_GROUP,  env.SECRET_TELEGRAM_API_TOKEN, params );
+          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MEDIA_GROUP,  info.TOKEN, params );
      }
       
      
@@ -168,7 +168,7 @@ export default class TG_BOT {
                reply_to_message_id: message_id
           }
           
-          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE,  env.SECRET_TELEGRAM_API_TOKEN,params );
+          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE,  info.TOKEN,params );
      }
       
        
@@ -188,8 +188,8 @@ export default class TG_BOT {
      }
       
      
-     async tgAnswerCallbackQuery(env:any, callbackQueryId:any, text:string|null = null) {       
-          return await TG_API.tgAnswerCallbackQuery(env.SECRET_TELEGRAM_API_TOKEN, callbackQueryId, text);
+     async tgAnswerCallbackQuery(callbackQueryId:any, text:string|null = null) {       
+          return await TG_API.tgAnswerCallbackQuery(this.botINFO.TOKEN, callbackQueryId, text);
      }
 
     
@@ -506,9 +506,9 @@ export default class TG_BOT {
               if (requiresArg && argument === '') {
                   response_ids.push(await TIOZAO_BOT_CMDs.botAlert( this, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
               } else if (requiresArg && !msg_txt?.startsWith(selectedCommand + ' ')) {
-                  response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(env,  this, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
+                  response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(this, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
               } else {
-                  response_ids = await commandFunction(env, argument);
+                  response_ids = await commandFunction(this, argument);
               }
           } else {
               response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(this, 'Comando desconhecido: ' + command, id_thread, message_id));
@@ -532,14 +532,14 @@ export default class TG_BOT {
           const commandKey = Object.keys(this.commands).find(prefix => command.startsWith(prefix));
       
           if (commandKey) {
-              await ctx.bot.tgAnswerCallbackQuery( ctx.bot.env, callbackQuery.id, commandKey);
-              const commandFunction:any = this.commands[commandKey];
-              response_ids = await commandFunction( ctx.bot.env, callbackQuery, command.slice(commandKey.length).trim());
+              await ctx.bot.tgAnswerCallbackQuery(callbackQuery.id, commandKey);
+              const commandFunction:any = ctx.bot.commands[commandKey];
+              response_ids = await commandFunction(ctx.bot, callbackQuery, command.slice(commandKey.length).trim());
           } else {
               return new Response(`Unknown command: ${command}`, { status: 400 });
           }
           if (command !== '/spa') {
-              await  TIOZAO_CMDS.showMenu( ctx.bot.env, ctx.bot, response_ids);
+              await  TIOZAO_CMDS.showMenu( ctx.bot, response_ids);
           }
           await  ctx.bot.handleBotResponses( response_ids);
           await  ctx.bot.handleOldMessages();

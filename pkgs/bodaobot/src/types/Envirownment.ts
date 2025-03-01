@@ -3,5 +3,6 @@ export default interface Environment {
 	TG_THREADBOT:string;
 	TG_SECRET:string;
 	TG_CHATID:string;
+	DB:any;
 
 }
