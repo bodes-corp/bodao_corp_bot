@@ -227,17 +227,21 @@ export default class TG_API {
 
 	public static async tgDeleteMessagesFromChat(token:string, chat_id:number|string, chunk:number[]) {
 	    try {
-		   const deleteParams = { chat_id, message_ids: chunk };
-		   const response = await fetch(TG_API.tgApiUrl(tgRequestMethod.DELETE_MESSAGES, token), {
-			  method: 'POST',
-			  headers: { 'Content-Type': 'application/json' },
-			  body: JSON.stringify(deleteParams)
-		   });
-	
-		   const result:any = await response.json();
-		   if (!result.ok) {
-			  throw new Error(`Failed to delete messages: ${result.description}`);
-		   }
+		
+			if(Array.isArray(chunk) && chunk.length >=0) {
+				const deleteParams = { chat_id, message_ids: chunk };
+				const response = await fetch(TG_API.tgApiUrl(tgRequestMethod.DELETE_MESSAGES, token), {
+				    method: 'POST',
+				    headers: { 'Content-Type': 'application/json' },
+				    body: JSON.stringify(deleteParams)
+				});
+		  
+				const result:any = await response.json();
+				if (!result.ok) {
+				    throw new Error(`Failed to delete messages: ${result.description}`);
+				}
+			}
+		  
 	    } catch (error) {
 		   console.error('Error deleting messages:', error);
 	    }
