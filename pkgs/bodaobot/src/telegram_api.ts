@@ -227,9 +227,11 @@ export default class TG_API {
 
 	public static async tgDeleteMessagesFromChat(token:string, chat_id:number|string, chunk:number[]) {
 	    try {
-		
+
 			if(Array.isArray(chunk) && chunk.length >=0) {
+				
 				const deleteParams = { chat_id, message_ids: chunk };
+				console.log("delete old messages - chunk",  JSON.stringify(deleteParams))
 				const response = await fetch(TG_API.tgApiUrl(tgRequestMethod.DELETE_MESSAGES, token), {
 				    method: 'POST',
 				    headers: { 'Content-Type': 'application/json' },
