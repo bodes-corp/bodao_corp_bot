@@ -239,6 +239,7 @@ export default class TIOZAO_CMDS {
 	//const env = bot.env;
 	const ctx:TG_ExecutionContext = bot.currentContext
 	const id_user = ctx.update_message.id_user;
+	console.log("debug listInfo - user:", id_user)
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>Perfil</b>\n═════════════════════\n`;
 	let first_name = '';
