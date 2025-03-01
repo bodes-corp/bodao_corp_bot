@@ -82,7 +82,7 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 		   VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
 	    `;
 	    await this.executeQuery(bot.DB, mediaQuery, [
-		   message.id_msg, 
+		   message.message_id, 
 		   message.file_id, 
 		   message.file_unique_id, 
 		   message.msg_date, 
@@ -100,7 +100,7 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 		   VALUES (?1,?2,?3,?4,?5,?6,0)
 	    `;
 	    await this.executeQuery(bot.DB, messageQuery, [
-		   message.id_msg, 
+		   message.message_id, 
 		   message.msg_txt,
 		   message.msg_date,
 		   message.is_td,
@@ -135,7 +135,7 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
              message.file_id,
              message.file_unique_id,
              message.type,
-             message.id_msg
+             message.message_id
          ], false);
  
          const groupQuery = `
@@ -157,7 +157,7 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
          `;
          await this.executeQuery(bot.DB, messageQuery, [
              message.msg_txt, 
-             message.id_msg
+             message.message_id
          ], false);
      }
  
