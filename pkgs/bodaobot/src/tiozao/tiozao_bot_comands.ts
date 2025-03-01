@@ -62,7 +62,7 @@ public static async removeOldMessages(bot:  TG_BOT,) {
 	const old = now - 60;
  
 	try {
-	    const query = 'SELECT message_id FROM tg_bot WHERE msg_date < ?';
+	    const query = 'SELECT id_msg FROM tg_bot WHERE msg_date < ?';
 	    const data = await bot.DB.prepare(query).bind(old).all();
 	    const messageIds = data.results.map((row: any ) => row.message_id);
  
@@ -74,7 +74,7 @@ public static async removeOldMessages(bot:  TG_BOT,) {
 		   await TG_API.tgDeleteMessagesFromChat(bot.botINFO.TOKEN,bot.botINFO.CHATID, chunk);
 	    }
  
-	    const deleteQuery = 'DELETE FROM tg_bot WHERE message_id IN (SELECT message_id FROM tg_bot WHERE msg_date < ?)';
+	    const deleteQuery = 'DELETE FROM tg_bot WHERE id_msg IN (SELECT id_msg FROM tg_bot WHERE msg_date < ?)';
 	    await bot.DB.prepare(deleteQuery).bind(old).run();
 	} catch (error) {
 	    console.error('Error during removeOldMessages operation:', error);

@@ -209,10 +209,10 @@ export default class TG_BOT {
           let args: string[] = [];
           const ctx = new TG_ExecutionContext(this, this.update);
           this.currentContext = ctx;
-          console.log('debug ctx update_type: ',ctx.update_type);
-          console.log("debug ctx message:", ctx.update.message);
-          console.log("debug ctx messageuser:", ctx.update?.message?.from.id)
-          console.log("debug ctx message user:",ctx.update_message.id_user);
+          //console.log('debug ctx update_type: ',ctx.update_type);
+          //console.log("debug ctx message:", ctx.update.message);
+          //console.log("debug ctx messageuser:", ctx.update?.message?.from.id)
+          //console.log("debug ctx message user:",ctx.update_message.id_user);
           switch (ctx.update_type) {
                case updType.MESSAGE: {
                     args = this.update.message?.text?.split(' ') ?? [];
