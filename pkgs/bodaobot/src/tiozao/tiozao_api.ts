@@ -24,11 +24,11 @@ export default class TIOZAO_CMDS {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	}
 	return response_ids;
  }
@@ -48,11 +48,11 @@ export default class TIOZAO_CMDS {
 			  text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
@@ -72,11 +72,11 @@ export default class TIOZAO_CMDS {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> -> ${row[3]}\n`;
 		   }
 	    }
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
@@ -96,11 +96,11 @@ export default class TIOZAO_CMDS {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> -> ${row[3]}\n`;
 		   }
 	    }
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
@@ -120,11 +120,11 @@ export default class TIOZAO_CMDS {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[2]}/${row[3]}">${row[0]}</a> -> ${row[1]}\n`;
 		   }
 	    }
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	}
 	return response_ids;
  }
@@ -143,11 +143,11 @@ export default class TIOZAO_CMDS {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await this.sendResponse(bot,text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot,text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot,text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot,text, response_ids);
 	}
  
 	return response_ids;
@@ -168,11 +168,11 @@ export default class TIOZAO_CMDS {
 			  text += `• ${row[0]} -> ${row[1]} / ${row[2]} / ${row[3]} \n`;
 		   }
 	    }
-	    await this.sendResponse(bot,text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot,text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
@@ -187,7 +187,7 @@ export default class TIOZAO_CMDS {
 	    const result = await DB_API.dbListSpa(bot.DB);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-		   await this.sendResponse(bot,text, response_ids);
+		   await TIOZAO_CMDS.sendResponse(bot,text, response_ids);
 	    } else {
 		   const spas:any[] = result.map((row: any[]) =>
 			  row.map(buttonText => ({ text: buttonText, callback_data: '/spa ' + buttonText }))
@@ -197,39 +197,39 @@ export default class TIOZAO_CMDS {
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    const errorText = `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot, errorText, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, errorText, response_ids);
 	}
  
 	return response_ids;
  }
 
- public static async handleSpaCommand(env:any, bot:  TG_BOT,callbackQuery:any, spa:string) {
+ public static async handleSpaCommand(bot:  TG_BOT,callbackQuery:any, spa:string) {
 		 if (spa === '') {
 			return await TIOZAO_CMDS.listSpa(bot);
 		 } else {
-			await bot.tgAnswerCallbackQuery(env, callbackQuery.id, spa);
-			return await TIOZAO_CMDS.searchSpa(env, bot,spa);
+			await bot.tgAnswerCallbackQuery(callbackQuery.id, spa);
+			return await TIOZAO_CMDS.searchSpa(bot,spa);
 		 }
 	  }
  
- public static async searchSpa(env:any,  bot:  TG_BOT, spa:string) {
+ public static async searchSpa(bot:  TG_BOT, spa:string) {
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>GPs ${spa}</b>\n═════════════════════\n`;
  
 	try {
-	    const result = await DB_API.dbSearchSpa(env, spa);
+	    const result = await DB_API.dbSearchSpa(bot.DB, spa);
 	    if (result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 	    } else {
 		   for (const row of result) {
-			  text += `• <a href="t.me/c/${env.TG_CHATID.substring(3)}/${row[1]}/${row[2]}">${row[0]}</a> -> ${row[3]}\n`;
+			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[1]}/${row[2]}">${row[0]}</a> -> ${row[3]}\n`;
 		   }
 	    }
-	    await this.sendResponse(bot,text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot,text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
@@ -281,11 +281,11 @@ export default class TIOZAO_CMDS {
 			  text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
 	    }
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;
@@ -299,7 +299,7 @@ export default class TIOZAO_CMDS {
 	// Validate search term
 	if (!isValidSearchTerm(name)) {
 	    const text = `O termo de busca precisa ter ao menos 3 caracteres`;
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	    return response_ids;
 	}
 	try {
@@ -311,11 +311,11 @@ export default class TIOZAO_CMDS {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> \n`;
 		   }
 	    }
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	} catch (error) {
 	    console.error('Error during search operation:', error);
 	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await this.sendResponse(bot, text, response_ids);
+	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
 	}
  
 	return response_ids;

@@ -1,0 +1,1 @@
+npx wrangler d1 execute rafaelbotdata --remote --file=docs\gpspprd_25.01.2025.sql
