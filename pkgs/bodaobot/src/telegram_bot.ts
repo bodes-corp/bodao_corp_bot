@@ -529,7 +529,7 @@ export default class TG_BOT {
       
           
       
-          const commandKey = Object.keys(this.commands).find(prefix => command.startsWith(prefix));
+          const commandKey = Object.keys(ctx.bot.commands).find(prefix => command.startsWith(prefix));
       
           if (commandKey) {
               await ctx.bot.tgAnswerCallbackQuery(callbackQuery.id, commandKey);
