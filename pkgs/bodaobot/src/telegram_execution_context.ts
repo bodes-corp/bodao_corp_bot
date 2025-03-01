@@ -122,6 +122,7 @@ export default class TG_ExecutionContext {
 		}
 
 		if (this.update_type===updType.CALLBACK){
+			this.update.message = this.update.callback_query?.message;
 			const messageJson:TG_Message|undefined = this.update.callback_query?.message;
 			this.update_message = new ContextMessage(messageJson);
 		}else {
