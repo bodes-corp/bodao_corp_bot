@@ -84,7 +84,7 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 				threadName =  message.message.forum_topic_edited?.name ? message.message.forum_topic_edited.name : '';
 			}
 			
-			//console.log("log from dbInsertMessage- threadname: ", threadName) ;
+			console.log("log from dbInsertMessage- threadname: ", threadName) ;
 			const normalized_threadname =  threadName? removeAccents(threadName):'';
 			const threadQuery = `
 			INSERT INTO tg_thread (id_thread, threadname, normalized_threadname) 
