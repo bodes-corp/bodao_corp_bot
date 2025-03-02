@@ -80,11 +80,13 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 			let threadName = '';
 			if (updOperation.THREAD_CREATE){
 				threadName =  message.message.forum_topic_created?.name ? message.message.forum_topic_created.name : '';
+				console.log("insert topic - threadname: ", threadName) ;
 			}else if (updOperation.THREAD_EDIT){
 				threadName =  message.message.forum_topic_edited?.name ? message.message.forum_topic_edited.name : '';
+				console.log("edit topic - threadname: ", threadName) ;
 			}
 			
-			console.log("log from dbInsertMessage- threadname: ", threadName) ;
+			
 			const normalized_threadname =  threadName? removeAccents(threadName):'';
 			const threadQuery = `
 			INSERT INTO tg_thread (id_thread, threadname, normalized_threadname) 
