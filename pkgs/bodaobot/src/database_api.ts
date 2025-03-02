@@ -78,10 +78,10 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 			
 			//let message:ContextMessage = bot.currentContext.update_message;
 			let threadName = '';
-			if (updOperation.THREAD_CREATE){
+			if (operation === updOperation.THREAD_CREATE){
 				threadName =  message.message.forum_topic_created?.name ? message.message.forum_topic_created.name : '';
 				console.log("insert topic - threadname: ", threadName) ;
-			}else if (updOperation.THREAD_EDIT){
+			}else if (operation === updOperation.THREAD_EDIT){
 				threadName =  message.message.forum_topic_edited?.name ? message.message.forum_topic_edited.name : '';
 				console.log("edit topic - threadname: ", threadName) ;
 			}
