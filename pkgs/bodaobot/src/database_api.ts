@@ -61,10 +61,14 @@ public static async dbBatchInsertBot(db:any, array:any[]) {
 }
  
 public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
-
+	console.log("log from dbInsertMessage")
 	if (!bot.DB) return Promise.resolve(null);
-	const operation = bot.currentContext.update_operation;
-	if (['update_thread', 'create_thread'].includes(operation)) {
+	const operation:any = bot.currentContext.update_operation;
+	console.log("operation: ", operation);
+         
+	//insert new or edit thread in threads database
+	if ([updOperation.THREAD_CREATE, updOperation.THREAD_EDIT].includes(operation)) {
+		console.log("passed include test ") ;
 	    const normalized_threadname = removeAccents(message.threadname);
 	    const threadQuery = `
 		   INSERT INTO tg_thread (id_thread, threadname, normalized_threadname) 

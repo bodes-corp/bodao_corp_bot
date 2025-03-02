@@ -1,0 +1,119 @@
+{
+          "message_id": 331,
+          "from": {
+            "id": 1998627310,
+            "is_bot": false,
+            "first_name": "Salvatore",
+            "username": "SalvatoreGF",
+            "language_code": "pt-br"
+          },
+          "chat": {
+            "id": -1002271335705,
+            "title": "Arls Rafael Loduca",
+            "is_forum": true,
+            "type": "supergroup"
+          },
+          "date": 1740916531,
+          "message_thread_id": 331,
+          "forum_topic_created": {
+            "name": "SEC-ATAS",
+            "icon_color": 7322096
+          },
+          "is_topic_message": true
+        }
+      
+
+
+      //first message from the is_topic_message
+      // when you create a topic is mandatory to send the first message
+      //operation = new post
+              {
+          "message_id": 332,
+          "from": {
+            "id": 1998627310,
+            "is_bot": false,
+            "first_name": "Salvatore",
+            "username": "SalvatoreGF",
+            "language_code": "pt-br"
+          },
+          "chat": {
+            "id": -1002271335705,
+            "title": "Arls Rafael Loduca",
+            "is_forum": true,
+            "type": "supergroup"
+          },
+          "date": 1740916549,
+          "message_thread_id": 331,
+          "reply_to_message": {
+            "message_id": 331,
+            "from": {
+              "id": 1998627310,
+              "is_bot": false,
+              "first_name": "Salvatore",
+              "username": "SalvatoreGF",
+              "language_code": "pt-br"
+            },
+            "chat": {
+              "id": -1002271335705,
+              "title": "Arls Rafael Loduca",
+              "is_forum": true,
+              "type": "supergroup"
+            },
+            "date": 1740916531,
+            "message_thread_id": 331,
+            "forum_topic_created": {
+              "name": "SEC-ATAS",
+              "icon_color": 7322096
+            },
+            "is_topic_message": true
+          },
+          "text": "Secretaria atas",
+          "is_topic_message": true
+        }
+
+        //mesagem no topico
+        //operation new post
+        //thread id identifica o topico
+        {
+          "message_id": 334,
+          "from": {
+            "id": 1998627310,
+            "is_bot": false,
+            "first_name": "Salvatore",
+            "username": "SalvatoreGF",
+            "language_code": "pt-br"
+          },
+          "chat": {
+            "id": -1002271335705,
+            "title": "Arls Rafael Loduca",
+            "is_forum": true,
+            "type": "supergroup"
+          },
+          "date": 1740917252,
+          "message_thread_id": 331,
+          "reply_to_message": {
+            "message_id": 331,
+            "from": {
+              "id": 1998627310,
+              "is_bot": false,
+              "first_name": "Salvatore",
+              "username": "SalvatoreGF",
+              "language_code": "pt-br"
+            },
+            "chat": {
+              "id": -1002271335705,
+              "title": "Arls Rafael Loduca",
+              "is_forum": true,
+              "type": "supergroup"
+            },
+            "date": 1740916531,
+            "message_thread_id": 331,
+            "forum_topic_created": {
+              "name": "SEC-ATAS",
+              "icon_color": 7322096
+            },
+            "is_topic_message": true
+          },
+          "text": "Teste de msg no tópico",
+          "is_topic_message": true
+        }

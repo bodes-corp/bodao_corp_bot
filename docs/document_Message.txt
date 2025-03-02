@@ -1,0 +1,199 @@
+{
+          "message_id": 327,
+          "from": {
+            "id": 1998627310,
+            "is_bot": false,
+            "first_name": "Salvatore",
+            "username": "SalvatoreGF",
+            "language_code": "pt-br"
+          },
+          "chat": {
+            "id": -1002271335705,
+            "title": "Arls Rafael Loduca",
+            "is_forum": true,
+            "type": "supergroup"
+          },
+          "date": 1740914542,
+          "message_thread_id": 2,
+          "reply_to_message": {
+            "message_id": 2,
+            "from": {
+              "id": 1998627310,
+              "is_bot": false,
+              "first_name": "Salvatore",
+              "username": "SalvatoreGF",
+              "language_code": "pt-br"
+            },
+            "chat": {
+              "id": -1002271335705,
+              "title": "Arls Rafael Loduca",
+              "is_forum": true,
+              "type": "supergroup"
+            },
+            "date": 1739752487,
+            "message_thread_id": 2,
+            "forum_topic_created": {
+              "name": "Bodão Bot",
+              "icon_color": 16478047
+            },
+            "is_topic_message": true
+          },
+          "document": {
+            "file_name": "aniversarios.pdf",
+            "mime_type": "application/pdf",
+            "thumbnail": {
+              "file_id": "AAMCAQADIQUABIdh1RkAAgFHZ8Q_bmq-YQ9mrtJLDBsLys7FzdsAAm4FAAL9USFGHzenf5iDZtABAAdtAAM2BA",
+              "file_unique_id": "AQADbgUAAv1RIUZy",
+              "file_size": 23602,
+              "width": 226,
+              "height": 320
+            },
+            "thumb": {
+              "file_id": "AAMCAQADIQUABIdh1RkAAgFHZ8Q_bmq-YQ9mrtJLDBsLys7FzdsAAm4FAAL9USFGHzenf5iDZtABAAdtAAM2BA",
+              "file_unique_id": "AQADbgUAAv1RIUZy",
+              "file_size": 23602,
+              "width": 226,
+              "height": 320
+            },
+            "file_id": "BQACAgEAAyEFAASHYdUZAAIBR2fEP25qvmEPZq7SSwwbC8rOxc3bAAJuBQAC_VEhRh83p3-Yg2bQNgQ",
+            "file_unique_id": "AgADbgUAAv1RIUY",
+            "file_size": 35562
+          },
+          "is_topic_message": true
+        }
+
+
+        //edit the document caption message
+
+                {
+          "message_id": 327,
+          "from": {
+            "id": 1998627310,
+            "is_bot": false,
+            "first_name": "Salvatore",
+            "username": "SalvatoreGF",
+            "language_code": "pt-br"
+          },
+          "chat": {
+            "id": -1002271335705,
+            "title": "Arls Rafael Loduca",
+            "is_forum": true,
+            "type": "supergroup"
+          },
+          "date": 1740914542,
+          "edit_date": 1740916008,
+          "message_thread_id": 2,
+          "reply_to_message": {
+            "message_id": 2,
+            "from": {
+              "id": 1998627310,
+              "is_bot": false,
+              "first_name": "Salvatore",
+              "username": "SalvatoreGF",
+              "language_code": "pt-br"
+            },
+            "chat": {
+              "id": -1002271335705,
+              "title": "Arls Rafael Loduca",
+              "is_forum": true,
+              "type": "supergroup"
+            },
+            "date": 1739752487,
+            "message_thread_id": 2,
+            "forum_topic_created": {
+              "name": "Bodão Bot",
+              "icon_color": 16478047
+            },
+            "is_topic_message": true
+          },
+          "document": {
+            "file_name": "aniversarios.pdf",
+            "mime_type": "application/pdf",
+            "thumbnail": {
+              "file_id": "AAMCAQADIQUABIdh1RkAAgFHZ8Q_bmq-YQ9mrtJLDBsLys7FzdsAAm4FAAL9USFGHzenf5iDZtABAAdtAAM2BA",
+              "file_unique_id": "AQADbgUAAv1RIUZy",
+              "file_size": 23602,
+              "width": 226,
+              "height": 320
+            },
+            "thumb": {
+              "file_id": "AAMCAQADIQUABIdh1RkAAgFHZ8Q_bmq-YQ9mrtJLDBsLys7FzdsAAm4FAAL9USFGHzenf5iDZtABAAdtAAM2BA",
+              "file_unique_id": "AQADbgUAAv1RIUZy",
+              "file_size": 23602,
+              "width": 226,
+              "height": 320
+            },
+            "file_id": "BQACAgEAAyEFAASHYdUZAAIBR2fEP25qvmEPZq7SSwwbC8rOxc3bAAJuBQAC_VEhRh83p3-Yg2bQNgQ",
+            "file_unique_id": "AgADbgUAAv1RIUY",
+            "file_size": 35562
+          },
+          "caption": "Ata de ontem",
+          "is_topic_message": true
+        }
+
+
+        //documento compartilhado (shared)
+
+                {
+          "message_id": 330,
+          "from": {
+            "id": 1998627310,
+            "is_bot": false,
+            "first_name": "Salvatore",
+            "username": "SalvatoreGF",
+            "language_code": "pt-br"
+          },
+          "chat": {
+            "id": -1002271335705,
+            "title": "Arls Rafael Loduca",
+            "is_forum": true,
+            "type": "supergroup"
+          },
+          "date": 1740916430,
+          "message_thread_id": 2,
+          "reply_to_message": {
+            "message_id": 2,
+            "from": {
+              "id": 1998627310,
+              "is_bot": false,
+              "first_name": "Salvatore",
+              "username": "SalvatoreGF",
+              "language_code": "pt-br"
+            },
+            "chat": {
+              "id": -1002271335705,
+              "title": "Arls Rafael Loduca",
+              "is_forum": true,
+              "type": "supergroup"
+            },
+            "date": 1739752487,
+            "message_thread_id": 2,
+            "forum_topic_created": {
+              "name": "Bodão Bot",
+              "icon_color": 16478047
+            },
+            "is_topic_message": true
+          },
+          "document": {
+            "file_name": "aniversarios.pdf",
+            "mime_type": "application/pdf",
+            "thumbnail": {
+              "file_id": "AAMCAQADIQUABIdh1RkAAgFKZ8RGziLXyF7SMp8ZqBQF9sCRst0AAnAFAAL9USFGvA0h8UiG26kBAAdtAAM2BA",
+              "file_unique_id": "AQADcAUAAv1RIUZy",
+              "file_size": 23602,
+              "width": 226,
+              "height": 320
+            },
+            "thumb": {
+              "file_id": "AAMCAQADIQUABIdh1RkAAgFKZ8RGziLXyF7SMp8ZqBQF9sCRst0AAnAFAAL9USFGvA0h8UiG26kBAAdtAAM2BA",
+              "file_unique_id": "AQADcAUAAv1RIUZy",
+              "file_size": 23602,
+              "width": 226,
+              "height": 320
+            },
+            "file_id": "BQACAgEAAyEFAASHYdUZAAIBSmfERs4i18he0jKfGagUBfbAkbLdAAJwBQAC_VEhRrwNIfFIhtupNgQ",
+            "file_unique_id": "AgADcAUAAv1RIUY",
+            "file_size": 35562
+          },
+          "is_topic_message": true
+        }
