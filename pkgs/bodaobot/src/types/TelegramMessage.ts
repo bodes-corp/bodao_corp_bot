@@ -76,7 +76,7 @@ export class ContextMessage {
 	
 	//  renato names
 	chat_id:any;
-	id_thread:any;
+	id_thread:any;  //identify the topic the message is from
 	id_user:any;
 	username:any;
 	caption:any;
