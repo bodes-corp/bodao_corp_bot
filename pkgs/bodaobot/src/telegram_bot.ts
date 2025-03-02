@@ -343,7 +343,7 @@ export default class TG_BOT {
                handlerName = ':message';
           }
           if (ctx.commandFlag) {
-               await ctx.bot.handleBotCommand(ctx.update_message);
+               await ctx.bot.handleBotCommand(ctx);
           }
                
           return await this.handlers[handlerName](this.currentContext);
@@ -463,10 +463,10 @@ export default class TG_BOT {
                   await ctx.bot.handleCreateThread(ctx);
                   break;
               case updOperation.MEDIA_NEW:
-                  await ctx.bot.handleNewMedia(ctx.update_message);
+                  await ctx.bot.handleNewMedia(ctx);
                   break;
               case updOperation.POST_NEW:
-                  await ctx.bot.handleNewPost(ctx.update_message);
+                  await ctx.bot.handleNewPost(ctx);
                   break;
           }
 
@@ -480,10 +480,10 @@ export default class TG_BOT {
       
           switch (ctx.update_operation) {
               case 'edit_media':
-                  await this.handleEditMedia(message);
+                  await this.handleEditMedia(ctx);
                   break;
               case 'edit_post':
-                  await this.handleEditPost(message);
+                  await this.handleEditPost(ctx);
                   break;
           }
           await DB_API.dbEditMessage( this, message);
@@ -507,56 +507,61 @@ export default class TG_BOT {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
           const threadName =  message.message.forum_topic_edited?.name;
-          await TIOZAO_CMDS.checkDuplicatedThread(this, threadName, message.id_thread);
-          await this.handleBotResponses(response_ids);
+          await TIOZAO_CMDS.checkDuplicatedThread(ctx.bot, threadName, message.id_thread);
+          await ctx.bot.handleBotResponses(response_ids);
           return new Response('ok');
       }
       
-      async handleCreateThread ( ctx: TG_ExecutionContext ) {
+      async handleCreateThread (ctx: TG_ExecutionContext ) {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
           const threadName =  message.message.forum_topic_created?.name;
-          await TIOZAO_CMDS.checkDuplicatedThread(this, threadName, message.id_thread);
-          await this.handleBotResponses(response_ids);
+          await TIOZAO_CMDS.checkDuplicatedThread(ctx.bot, threadName, message.id_thread);
+          await ctx.bot.handleBotResponses(response_ids);
           return new Response('ok');
       }
       
-      async handleNewMedia(message:ContextMessage) {
+      async handleNewMedia(ctx: TG_ExecutionContext ) {
+          let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
       
-          response_ids.push(await TIOZAO_CMDS.checkHaveCaption(this, message));
-          return await this.handleBotResponses(response_ids);
+          response_ids.push(await TIOZAO_CMDS.checkHaveCaption(ctx.bot, message));
+          return await ctx.bot.handleBotResponses(response_ids);
       }
       
-      async handleNewPost (message:ContextMessage) {
+      async handleNewPost (ctx: TG_ExecutionContext ) {
+          let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
           //console.log("handleNewPost: ", message.operation);
           if (message.is_td_rp || message.is_td) {
-              response_ids.push(await TIOZAO_CMDS.confirmTD(this, this.currentContext.update_message, 0));
+              response_ids.push(await TIOZAO_CMDS.confirmTD(ctx.bot, this.currentContext.update_message, 0));
           }
-          return await this.handleBotResponses(response_ids);
+          return await ctx.bot.handleBotResponses(response_ids);
       }
       
      
       
-      async handleEditMedia (message:ContextMessage) {
+      async handleEditMedia (ctx: TG_ExecutionContext ) {
+          let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
       
-          response_ids.push(await  TIOZAO_CMDS.checkHaveCaption(this, message, true));
-          return await this.handleBotResponses(response_ids);
+          response_ids.push(await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true));
+          return await ctx.bot.handleBotResponses(response_ids);
       }
       
-      async handleEditPost (message:ContextMessage) {
+      async handleEditPost (ctx: TG_ExecutionContext ) {
+          let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
       
           if (message.is_td_rp || message.is_td) {
-              response_ids.push(await TIOZAO_CMDS.confirmTD(this, this.currentContext.update_message, 1));
+              response_ids.push(await TIOZAO_CMDS.confirmTD(ctx.bot, this.currentContext.update_message, 1));
           }
-          return await this.handleBotResponses(response_ids);
+          return await ctx.bot.handleBotResponses(response_ids);
       
       }
       
-      async handleBotCommand(message:ContextMessage) {
+      async handleBotCommand(ctx: TG_ExecutionContext ) {
+          let message:ContextMessage = ctx.update_message;
           const message_id = message.message_id;
           const id_thread = message.id_thread;
           const id_user = message.id_user;
@@ -564,30 +569,30 @@ export default class TG_BOT {
           const command = msg_txt?.split(' ')[0];
           let response_ids:any[] = [];
           console.log('debug command:', command);
-          //this.onCommand('/info', { func: (env:any, _:any) => TIOZAO_CMDS.listInfo(this), requiresArg: false });
+          //ctx.bot.onCommand('/info', { func: (env:any, _:any) => TIOZAO_CMDS.listInfo(this), requiresArg: false });
       
-          const commandEntry:any = Object.entries(this.commands).find(([prefix]) =>
+          const commandEntry:any = Object.entries(ctx.bot.commands).find(([prefix]) =>
               msg_txt?.startsWith(prefix)
           );
          
           if (commandEntry) {
               const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
               const argument = msg_txt?.slice(selectedCommand.length).trim();
-              await TIOZAO_BOT_CMDs.botAlert(this, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
+              await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
               
               if (requiresArg && argument === '') {
-                  response_ids.push(await TIOZAO_BOT_CMDs.botAlert( this, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
+                  response_ids.push(await TIOZAO_BOT_CMDs.botAlert( ctx.bot, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
               } else if (requiresArg && !msg_txt?.startsWith(selectedCommand + ' ')) {
-                  response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(this, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
+                  response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
               } else {
-                  response_ids = await commandFunction(this, argument);
+                  response_ids = await commandFunction(ctx.bot, argument);
               }
           } else {
-              response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(this, 'Comando desconhecido: ' + command, id_thread, message_id));
+              response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, 'Comando desconhecido: ' + command, id_thread, message_id));
           }
       
           if (commandEntry != '/spa') {
-              await TIOZAO_CMDS.showMenu(this,response_ids);
+              await TIOZAO_CMDS.showMenu(ctx.bot,response_ids);
           }
           response_ids.push(message_id);
           await this.handleBotResponses(response_ids);
