@@ -514,6 +514,7 @@ export default class TG_BOT {
           const threadName =  message.message.forum_topic_edited?.name;
           await TIOZAO_CMDS.checkDuplicatedThread(ctx.bot, threadName, message.id_thread);
           await ctx.bot.handleBotResponses(response_ids);
+          await DB_API.dbInsertMessage(ctx.bot, ctx.update_message);
           return new Response('ok');
       }
       
