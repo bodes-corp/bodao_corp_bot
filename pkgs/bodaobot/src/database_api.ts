@@ -71,24 +71,25 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 	if (!bot.DB) return Promise.resolve(null);
 	const operation:any = bot.currentContext.update_operation;
 	console.log("operation: ", operation);
-         
-	//insert new or edit thread in threads database
-	if ([updOperation.THREAD_CREATE, updOperation.THREAD_EDIT].includes(operation)) {
-		
-		//let message:ContextMessage = bot.currentContext.update_message;
-          const threadName =  message.message.forum_topic_created?.name;
-		console.log("log from dbInsertMessage- threadname: ", threadName) ;
-	    	const normalized_threadname =  threadName? removeAccents(threadName):'';
-	    	const threadQuery = `
-		   INSERT INTO tg_thread (id_thread, threadname, normalized_threadname) 
-		   VALUES (?1, ?2, ?3) 
-		   ON CONFLICT (id_thread) 
-		   DO UPDATE SET threadname = excluded.threadname, normalized_threadname = excluded.normalized_threadname
-	    `;
-	    await this.executeQuery(bot.DB, threadQuery, [message.id_thread, threadName, normalized_threadname], false);
+     if (operation === updOperation.THREAD_CREATE || operation === updOperation.THREAD_EDIT) {    
+		//insert new or edit thread in threads database
+		if ([updOperation.THREAD_CREATE, updOperation.THREAD_EDIT].includes(operation)) {
+			
+			//let message:ContextMessage = bot.currentContext.update_message;
+			const threadName =  message.message.forum_topic_created?.name;
+			console.log("log from dbInsertMessage- threadname: ", threadName) ;
+			const normalized_threadname =  threadName? removeAccents(threadName):'';
+			const threadQuery = `
+			INSERT INTO tg_thread (id_thread, threadname, normalized_threadname) 
+			VALUES (?1, ?2, ?3) 
+			ON CONFLICT (id_thread) 
+			DO UPDATE SET threadname = excluded.threadname, normalized_threadname = excluded.normalized_threadname
+		`;
+		await this.executeQuery(bot.DB, threadQuery, [message.id_thread, threadName, normalized_threadname], false);
+		}
 	}
 	
-	if (operation === updOperation.MEDIA_NEW) {
+	if (operation === updOperation.MEDIA_NEW || operation === updOperation.HANDLE_DOC) {
 	    const mediaQuery = `
 		   INSERT INTO tg_media 
 		   (id_msg, file_id, file_unique_id, msg_date, id_user, id_thread, type, deleted, media_group_id)
