@@ -1,19 +1,22 @@
 import { DB_API } from "../database_api";
-import { chunkArray } from "../library";
 import TG_API from "../telegram_api";
 import TG_BOT from "../telegram_bot";
 import { two_buttons_t } from "../types/Types";
+
+
+
 
 export class TIOZAO_BOT_CMDs {
 
  
      public static async botShowMenu( bot:  TG_BOT ) {
+       
           const menu:two_buttons_t[] = [
-              [{ text: 'Lista GPs', callback_data: '/gp_td'}, { text: 'Top GPs', callback_data: '/top_gp'}],
-              [{ text: 'Top Repetecos', callback_data: '/top_rp'},{ text: 'GPs Ativas', callback_data: '/active_gp'}],
-              [{ text: 'GPs Tendência', callback_data: '/trend_gp'}, { text: 'Clínicas', callback_data: '/spa'}],
-              [{ text: 'Membros', callback_data: '/user' },{ text: 'Bate Papo', callback_data: '/chat' }],
-              [{ text: 'Perfil', callback_data: '/info' }]
+              [{ text: bot.commands['/gp_td'].desc, callback_data: '/'+bot.commands['/gp_td'].name}, { text:  bot.commands['/top_gp'].desc, callback_data: '/'+bot.commands['/top_gp'].name}],
+              [{ text: bot.commands['/top_rp'].desc, callback_data: '/'+bot.commands['/top_rp'].name},{ text:  bot.commands['/active_gp'].desc, callback_data: '/'+bot.commands['/active_gp'].name}],
+              [{ text: bot.commands['/trend_gp'].desc, callback_data: '/'+bot.commands['/trend_gp'].name}, { text:  bot.commands['/spa'].desc, callback_data: '/'+bot.commands['/spa'].name}],
+              [{ text: bot.commands['/user'].desc, callback_data: '/'+bot.commands['/user'].name },{ text:  bot.commands['/chat'].desc, callback_data: '/'+bot.commands['/chat'].name }],
+              [{ text: bot.commands['/info'].desc, callback_data: '/'+bot.commands['/info'].name }]
           ];
           return await bot.sendResponseButtons(menu, 'Menu:');
       }
@@ -52,29 +55,7 @@ export class TIOZAO_BOT_CMDs {
       }
 
        
-public static async removeOldMessages(bot:  TG_BOT,) {
-	const now = Math.floor(Date.now() / 1000);
-	const old = now - 60;
- 
-	try {
-	    const query = 'SELECT id_msg FROM tg_bot WHERE msg_date < ?';
-	    const data = await bot.DB.prepare(query).bind(old).all();
-	    const messageIds = data.results.map((row: any ) => row.id_msg);
- 
-	    if (messageIds.length === 0) return;
- 
-	    const chunks = chunkArray(messageIds, 100);
- 
-	    for (const chunk of chunks) {
-		   await TG_API.tgDeleteMessagesFromChat(bot.botINFO.TOKEN,bot.botINFO.CHATID, chunk);
-	    }
- 
-	    const deleteQuery = 'DELETE FROM tg_bot WHERE id_msg IN (SELECT id_msg FROM tg_bot WHERE msg_date < ?)';
-	    await bot.DB.prepare(deleteQuery).bind(old).run();
-	} catch (error) {
-	    console.error('Error during removeOldMessages operation:', error);
-	}
- }
+
       
 
 }

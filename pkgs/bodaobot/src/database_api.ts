@@ -593,6 +593,17 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	`;
 	return await this.executeQuery(db, query, [id_user]);
  }
+
+ /**
+ * 
+ * @param bot The TG_BOT object
+ * @param old cut date
+ * @returns 
+ */
+ public static async deleteMessagesFromDB(db:any, old:number){
+	const deleteQuery = 'DELETE FROM tg_bot WHERE id_msg IN (SELECT id_msg FROM tg_bot WHERE msg_date < ?)';
+	return await db.prepare(deleteQuery).bind(old).run();
+}
  
 }
  

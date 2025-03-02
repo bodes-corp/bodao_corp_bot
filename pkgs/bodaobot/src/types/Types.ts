@@ -113,6 +113,8 @@ export type botResponse = {
 } 
    
 export type commandFunc = {
+     name: string;
+     desc:string;
      func:(bot:TG_BOT , ...args:any) => Promise<any[]>;
      requiresArg: boolean;
 }

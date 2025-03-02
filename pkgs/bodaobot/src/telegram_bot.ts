@@ -1,5 +1,5 @@
 import { DB_API } from "./database_api";
-import { isValidChat, splitMessage } from "./library";
+import { chunkArray, isValidChat, splitMessage } from "./library";
 import TG_API from "./telegram_api";
 import TG_ExecutionContext from "./telegram_execution_context";
 import TIOZAO_CMDS from "./tiozao/tiozao_api";
@@ -111,7 +111,7 @@ export default class TG_BOT {
 	 * @param callback - the bot context
 	 */
 	onCommand(event: string, callback: commandFunc) {
-		if (!['on', 'handle'].includes(event)) {
+		if (!['onCommand', 'handle'].includes(event)) {
 			this.commands[event] = callback;
 		}
 		return this;
@@ -213,6 +213,51 @@ export default class TG_BOT {
       
      async sendResponseText( text:string) {
           return await this.tgSendMessage(text);
+     }
+
+     async tgDeleteMessagesFromChat (chunks:any)
+     {
+          if(!Array.isArray(chunks)){
+               Promise.resolve()
+          }
+
+          for (const chunk of chunks) {
+               await TG_API.tgDeleteMessagesFromChat(this.botINFO.TOKEN,this.botINFO.CHATID, chunk);
+           }
+     }
+     public static async dbGetBotMessages(bot:  TG_BOT,old:number):Promise<number[]>{
+          
+          const query = 'SELECT id_msg FROM tg_bot WHERE msg_date < ?';
+          const data = await bot.DB.prepare(query).bind(old).all();
+          const messageIds = data.results.map((row: any ) => row.id_msg);
+      
+          if (messageIds.length === 0) return []
+      
+          const chunks = chunkArray(messageIds, 100);
+          return chunks;
+     }
+
+     
+
+
+     public static async removeOldMessages(bot: TG_BOT) {
+
+          
+          const now:number = Math.floor(Date.now() / 1000);
+          const old:number = now - 60;
+      
+          try {
+              
+               const chunks = await TG_BOT.dbGetBotMessages(bot,old);
+               if ((chunks).length>0 ) {
+                     await bot.tgDeleteMessagesFromChat(chunks);
+                     await DB_API.deleteMessagesFromDB(bot.DB,old);
+               }
+      
+             
+          } catch (error) {
+              console.error('Error during removeOldMessages operation:', error);
+          }
      }
 
      /**
@@ -392,6 +437,9 @@ export default class TG_BOT {
 		//return new Response('ok');
 	}*/
 
+
+     //HANDLERS
+
      async handleMessage(ctx:TG_ExecutionContext) {
          
           console.log("operation: ", ctx.update_operation);
@@ -445,7 +493,7 @@ export default class TG_BOT {
       
       
       async handleOldMessages () {
-          await TIOZAO_BOT_CMDs.removeOldMessages(this);
+          await TG_BOT.removeOldMessages(this);
       }
       
       async handleBotResponses(response_ids:any[]) {

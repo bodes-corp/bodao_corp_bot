@@ -26,17 +26,17 @@ export default {
 			env.TG_THREADBOT
 		)
 		const rafaelBot = new  TG_BOT(botINFO,env.TG_SECRET,env.DB);
-		rafaelBot.onCommand('/active_gp', { func: TIOZAO_CMDS.listActiveGp, requiresArg: false })
-		.onCommand( '/chat', { func: TIOZAO_CMDS.listChat, requiresArg: false })
-		.onCommand('/gp_td', { func: TIOZAO_CMDS.listTdGp, requiresArg: false })
-		.onCommand('/spa', { func: TIOZAO_CMDS.listSpa, requiresArg: false })
-		.onCommand('/top_gp', { func: TIOZAO_CMDS.listTopGp, requiresArg: false })
-		.onCommand('/top_rp', { func: TIOZAO_CMDS.listTopRp, requiresArg: false })
-		.onCommand('/trend_gp', { func: TIOZAO_CMDS.listTrendGp, requiresArg: false })
-		.onCommand('/user', { func: TIOZAO_CMDS.listMembers, requiresArg: false })
-		.onCommand('/s', {func: TIOZAO_CMDS.searchTerm, requiresArg: true})
-		.onCommand('/info', { func: TIOZAO_CMDS.listInfo, requiresArg: false });
-				
+		rafaelBot.onCommand('/active_gp', { name: 'active_gp', desc:'GPs Ativas', func: TIOZAO_CMDS.listActiveGp, requiresArg: false })
+		.onCommand( '/chat', { name: 'chat', desc:'Bate Papo',func: TIOZAO_CMDS.listChat, requiresArg: false })
+		.onCommand('/gp_td', { name: 'gp_td', desc:'Lista GPs',func: TIOZAO_CMDS.listTdGp, requiresArg: false })
+		.onCommand('/spa', { name: 'spa', desc:'Clínicas',func: TIOZAO_CMDS.listSpa, requiresArg: false })
+		.onCommand('/top_gp', { name: 'top_gp', desc:'Top GPs',func: TIOZAO_CMDS.listTopGp, requiresArg: false })
+		.onCommand('/top_rp', { name: 'top_rp', desc:'Top Repetecos',func: TIOZAO_CMDS.listTopRp, requiresArg: false })
+		.onCommand('/trend_gp', { name: 'trend_gp', desc:'GPs Tendência',func: TIOZAO_CMDS.listTrendGp, requiresArg: false })
+		.onCommand('/user', { name: 'user', desc:'Membros',func: TIOZAO_CMDS.listMembers, requiresArg: false })
+		.onCommand('/s', {name: 's', desc:'Search',func: TIOZAO_CMDS.searchTerm, requiresArg: true})
+		.onCommand('/info', { name: 'info', desc:'Perfil',func: TIOZAO_CMDS.listInfo, requiresArg: false });
+		
 
 		try {
 
