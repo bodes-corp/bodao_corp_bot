@@ -2,28 +2,23 @@ import { DB_API } from "../database_api";
 import { chunkArray } from "../library";
 import TG_API from "../telegram_api";
 import TG_BOT from "../telegram_bot";
+import { two_buttons_t } from "../types/Types";
 
 export class TIOZAO_BOT_CMDs {
 
  
      public static async botShowMenu( bot:  TG_BOT ) {
-          const menu = [
+          const menu:two_buttons_t[] = [
               [{ text: 'Lista GPs', callback_data: '/gp_td'}, { text: 'Top GPs', callback_data: '/top_gp'}],
               [{ text: 'Top Repetecos', callback_data: '/top_rp'},{ text: 'GPs Ativas', callback_data: '/active_gp'}],
               [{ text: 'GPs Tendência', callback_data: '/trend_gp'}, { text: 'Clínicas', callback_data: '/spa'}],
               [{ text: 'Membros', callback_data: '/user' },{ text: 'Bate Papo', callback_data: '/chat' }],
               [{ text: 'Perfil', callback_data: '/info' }]
           ];
-          return await this.ResponseButton(bot, menu, 'Menu:');
+          return await bot.sendResponseButtons(menu, 'Menu:');
       }
       
-      public static async ResponseButton(bot:  TG_BOT, buttons:any[], text:string) {
-          return await bot.tgButton(buttons, text);
-      }
-      
-      public static async botResponseTxt(bot:  TG_BOT, text:string) {
-          return await bot.tgMessage(text);
-      }
+ 
       
       public static async botResponseMedia(bot:  TG_BOT,  json:any) {
           const response = await bot.tgSendMedia(bot.botINFO, json);

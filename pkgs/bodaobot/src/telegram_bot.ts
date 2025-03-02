@@ -7,7 +7,7 @@ import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
 import { BOT_INFO, BotINFO } from "./types/BotInfo";
 import { ContextMessage, TG_Message } from "./types/TelegramMessage";
 import TelegramUpdate from "./types/TelegramUpdate";
-import { botResponse, commandFunc, CommandHandler, Handler, handlerFunc, tgRequestMethod, updOperation, updType } from "./types/Types";
+import { botResponse, buttons_t, commandFunc, CommandHandler, Handler, handlerFunc, tgRequestMethod, updOperation, updType } from "./types/Types";
 import Webhook from "./webhook";
 
 
@@ -117,29 +117,39 @@ export default class TG_BOT {
 		return this;
 	}
 
-     async tgSendMessageToBotThread(botInfo:BotINFO, text:string): Promise<botResponse> {
-          if (!botInfo) {
+     /**
+      * Send a Text Message to the Bot Thread
+      * @param text message text to send
+      * @returns bot Response
+      */
+     async tgSendMessageToBotThread( text:string): Promise<botResponse> {
+          if (!this.botINFO) {
                return Promise.resolve({
                     "ok": false,
                     "result": {} as TG_Message
                } );
           }
           const params = {
-               chat_id: botInfo.CHATID,
-               message_thread_id: botInfo.THREADBOT,
+               chat_id: this.botINFO.CHATID,
+               message_thread_id: this.botINFO.THREADBOT,
                text,
                parse_mode: 'html',
                disable_notification: 'true'
            };
-          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE, botInfo.TOKEN, params );
+          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE, this.botINFO.TOKEN, params );
       }
 
-     async tgMessage(text:string) {
+      /**
+       * Send a Text Message to the bot thread
+       * @param text text to send
+       * @returns responses
+       */
+     async tgSendMessage(text:string) {
           const parts = splitMessage(text, 4096, 100);
           const responses = [];
       
           for (const part of parts) {
-              const response:botResponse = await this.tgSendMessageToBotThread(this.botINFO, part);
+              const response:botResponse = await this.tgSendMessageToBotThread(part);
               responses.push(Number(response.result.message_id));
           }
       
@@ -168,12 +178,15 @@ export default class TG_BOT {
                reply_to_message_id: message_id
           }
           
-          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE,  info.TOKEN,params );
+          return await TG_API.tgSendRequest(tgRequestMethod.SEND_MESSAGE,  info.TOKEN ,params );
      }
       
        
      
-     async tgButton(buttons:string[], text:string) {
+     async tgButton(buttons:buttons_t, text:string) {
+          if(!Array.isArray(buttons) || !text) {
+               return Promise.resolve([]);
+          }
           const batchSize = 90;
           const responses = [];
       
@@ -192,7 +205,15 @@ export default class TG_BOT {
           return await TG_API.tgAnswerCallbackQuery(this.botINFO.TOKEN, callbackQueryId, text);
      }
 
-    
+     async sendResponseButtons(buttons:buttons_t, text:string) {
+          return await this.tgButton(buttons, text);
+     }
+
+      
+      
+     async sendResponseText( text:string) {
+          return await this.tgSendMessage(text);
+     }
 
      /**
       * This method handles the updates from Telegram.
