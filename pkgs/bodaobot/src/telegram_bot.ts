@@ -454,16 +454,17 @@ export default class TG_BOT {
           }
       
           
-          
+          //only for messages without specif handlers like create and edit thread
           switch (ctx.update_operation) {
-              case updOperation.THREAD_EDIT:
+              /*case updOperation.THREAD_EDIT:
                await ctx.bot.handleEditThread(ctx);
                break;
-              case updOperation.THREAD_CREATE:
+              
+              case updOperation.THREAD_CREATE: //case ther is no specific handler
                console.log('debug from handleMessage- will execute db handleCreteTrhread')
           
                   await ctx.bot.handleCreateThread(ctx);
-                  break;
+                  break;*/
               case updOperation.MEDIA_NEW:
                   await ctx.bot.handleNewMedia(ctx);
                   break;
@@ -472,7 +473,7 @@ export default class TG_BOT {
                   break;
           }
           console.log('debug from handleMessage- returned from handleCreteTrhread and will execute db insert')
-          await DB_API.dbInsertMessage(this, ctx.update_message);
+          await DB_API.dbInsertMessage(ctx.bot, ctx.update_message);
           return new Response('ok');
      }
 
@@ -520,6 +521,8 @@ export default class TG_BOT {
           const threadName =  message.message.forum_topic_created?.name;
           await TIOZAO_CMDS.checkDuplicatedThread(ctx.bot, threadName, message.id_thread);
           await ctx.bot.handleBotResponses(response_ids);
+          console.log('debug from handleCreateThread- returned from checkDuplicatedThread and will execute db insert')
+          await DB_API.dbInsertMessage(ctx.bot, ctx.update_message);
           return new Response('ok');
       }
       
