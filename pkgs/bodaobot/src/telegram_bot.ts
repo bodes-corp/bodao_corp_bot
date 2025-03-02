@@ -519,6 +519,7 @@ export default class TG_BOT {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
           const threadName =  message.message.forum_topic_created?.name;
+          console.log('debug from handleCreateThread- threadName: ',threadName);
           await TIOZAO_CMDS.checkDuplicatedThread(ctx.bot, threadName, message.id_thread);
           await ctx.bot.handleBotResponses(response_ids);
           console.log('debug from handleCreateThread- returned from checkDuplicatedThread and will execute db insert')

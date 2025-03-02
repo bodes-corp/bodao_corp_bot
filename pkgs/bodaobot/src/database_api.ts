@@ -74,9 +74,12 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
          
 	//insert new or edit thread in threads database
 	if ([updOperation.THREAD_CREATE, updOperation.THREAD_EDIT].includes(operation)) {
-		console.log("passed include test ") ;
-	    const normalized_threadname = removeAccents(message.threadname);
-	    const threadQuery = `
+		
+		//let message:ContextMessage = bot.currentContext.update_message;
+          const threadName =  message.message.forum_topic_created?.name;
+		console.log("log from - threadname: ", threadName) ;
+	    	const normalized_threadname =  threadName? removeAccents(threadName):'';
+	    	const threadQuery = `
 		   INSERT INTO tg_thread (id_thread, threadname, normalized_threadname) 
 		   VALUES (?1, ?2, ?3) 
 		   ON CONFLICT (id_thread) 
