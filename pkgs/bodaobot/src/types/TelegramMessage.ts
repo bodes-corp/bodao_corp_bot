@@ -93,6 +93,8 @@ export class ContextMessage {
 	threadname?:any; //forum topic created name
 	media_group_id?:any;
 	chat?:any;
+	Users?:TelegramUser[]; //optional used oonly in operations with user. adding or lefting user in message
+	
 
 	constructor(msgJson?:TG_Message) {
 		this.message = {} as TG_Message;
@@ -106,6 +108,13 @@ export class ContextMessage {
 			this.message_id = msgJson.message_id;
 			this.id_thread = ('is_topic_message' in msgJson) ? msgJson.message_thread_id : "10227";
 			//this.id_thread = msgJson.message_thread_id; //edit message;
+			if('new_chat_members' in msgJson) {
+				this.Users = msgJson.new_chat_members;
+
+			}
+			if(msgJson.left_chat_member) {
+				this.Users?.push(msgJson.left_chat_member);
+			}
 			this.id_user = msgJson.from.id;
 			this.username = ('username' in msgJson.from) ? msgJson.from.username : "Sem usuário";
 			let name = (msgJson.from.first_name || '') + (msgJson.from.last_name ? ' ' + msgJson.from.last_name : '');

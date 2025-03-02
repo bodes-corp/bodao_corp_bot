@@ -4,6 +4,7 @@
 import { removeAccents, stringToWordsArray } from "./library";
 import TG_BOT from "./telegram_bot";
 import { ContextMessage } from "./types/TelegramMessage";
+import TelegramUser from "./types/TelegramUser";
 import { updOperation } from "./types/Types";
 
  
@@ -125,17 +126,51 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 		   message.id_thread
 	    ], false);
 	    
-	    const userQuery = `
-		   INSERT INTO tg_user (id_user, username, first_name)
-		   VALUES (?1, ?2, ?3)
-		   ON CONFLICT (id_user)
-		   DO UPDATE SET username = excluded.username, first_name = excluded.first_name
-	    `;
-	    await this.executeQuery(bot.DB, userQuery, [message.id_user, message.username, message.first_name], false);
+	    await DB_API.dbUpdateUserInfo(bot.DB, message);
 	}
  
 	return new Response("DB-Insert-ok");
 }
+
+
+public static async dbUpdateUserInfo(db:any, message:ContextMessage){
+	const userQuery = `
+	INSERT INTO tg_user (id_user, username, first_name, active)
+	VALUES (?1, ?2, ?3,1)
+	ON CONFLICT (id_user)
+	DO UPDATE SET username = excluded.username, first_name = excluded.first_name, active=1
+ `;
+ await DB_API.executeQuery(db, userQuery, [message.id_user, message.username, message.first_name], false);
+
+}
+public static async dbDeactivateUser(db:any, message:ContextMessage){
+	const userQuery = `
+	 UPDATE tg_user
+             SET active = 0
+             WHERE id_user = ?1
+ `;
+ await DB_API.executeQuery(db, userQuery, [message.id_user], false);
+
+}
+
+
+public static async dbUpdateUsers(db:any, users:TelegramUser[]){
+	if(!Array.isArray(users))  return Promise.resolve()
+	else{
+	users.forEach(async (user)=> {
+		const userQuery = `
+			INSERT INTO tg_user (id_user, username, first_name, active)
+			VALUES (?1, ?2, ?3,1)
+			ON CONFLICT (id_user)
+			DO UPDATE SET username = excluded.username, first_name = excluded.first_name, active=1
+		`;
+		const username = user.username ? user.username : user.first_name;
+ 		await DB_API.executeQuery(db, userQuery, [user.id, username,username], false);
+
+	})
+	}
+
+};
  
 public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
      if (!bot.DB) return Promise.resolve(null);

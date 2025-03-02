@@ -633,9 +633,10 @@ export default class TG_BOT {
           const operation:any = ctx.update_operation;
           console.log("operation: ", operation);
           if (operation === updOperation.MEMBER_JOIN) {
-
+               if(ctx.update_message.Users)
+               await DB_API.dbUpdateUsers(ctx.bot.DB, ctx.update_message.Users);
           } else if (operation === updOperation.MEMBER_LEFT) {
-
+               await DB_API.dbDeactivateUser(ctx.bot.DB, ctx.update_message);
           } 
           return new Response('ok');
      }
