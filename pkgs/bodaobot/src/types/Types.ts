@@ -30,14 +30,22 @@ export const updOperation = {
      //topic messages for supergroups
      THREAD_CREATE: 'create_thread',
      THREAD_EDIT: 'update_thread',
-     THREAD_DELETE: 'delete_thread',
+     THREAD_DELETE: 'delete_thread', //not supported yet
+     MEMBER_JOIN: 'member_join',
+     MEMBER_LEFT:'member_left',
      
      HANDLE_PHOTO: 'photo',
      HANDLE_DOC: 'document',
    } as const;
-
-
-   /*
+/*
+     new_chat_title 	String 	Optional. A chat title was changed to this value
+     new_chat_photo 	Array of PhotoSize 	Optional. A chat photo was change to this value
+     delete_chat_photo 	True 	Optional. Service message: the chat photo was deleted
+     forum_topic_closed 	ForumTopicClosed 	Optional. Service message: forum topic closed
+     forum_topic_reopened 	ForumTopicReopened 	Optional. Service message: forum topic reopened
+     general_forum_topic_hidden 	GeneralForumTopicHidden 	Optional. Service message: the 'General' forum topic hidden
+     general_forum_topic_unhidden 	GeneralForumTopicUnhidden 	Optional. Service message: the 'General' forum topic unhidden
+   
    post: message with text
    without txt: media (photo/video), document
    */

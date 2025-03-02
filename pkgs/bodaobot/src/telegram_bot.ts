@@ -85,7 +85,8 @@ export default class TG_BOT {
            .on(':edited_message',this.handleEditedMessage)
            .on(':callback',TG_BOT.handleCallbackQuery)
            .on(':edit_thread',this.handleEditThread)
-           .on(':create_thread',this.handleCreateThread);
+           .on(':create_thread',this.handleCreateThread)
+           .on(':handle_member',TG_BOT.handleMemberOperation);
            
 
           
@@ -283,19 +284,20 @@ export default class TG_BOT {
                case updType.MESSAGE: {
                     args = this.update.message?.text?.split(' ') ?? [];
                     handlerName = ':message';
-                    switch(ctx.update_operation){
+               switch(ctx.update_operation){
                          case updOperation.THREAD_CREATE:
                               handlerName = ':create_thread';
                               break;
                          case updOperation.THREAD_EDIT:
                               handlerName = ':edit_thread';
                               break;
-                         case updOperation.POST_NEW:
-                              handlerName = ':message';
+                         case updOperation.MEMBER_JOIN:
+                              handlerName = ':handle_member';
                               break;
-                         case updOperation.POST_EDIT:
-                              handlerName = ':edited_message';
+                         case updOperation.MEMBER_LEFT:
+                              handlerName = ':handle_member';
                               break;
+                         
                     }
                     break;
                }
@@ -624,6 +626,17 @@ export default class TG_BOT {
           }
           await  ctx.bot.handleBotResponses( response_ids);
           await  ctx.bot.handleOldMessages();
+          return new Response('ok');
+     }
+
+     public static async handleMemberOperation(ctx:TG_ExecutionContext) {
+          const operation:any = ctx.update_operation;
+          console.log("operation: ", operation);
+          if (operation === updOperation.MEMBER_JOIN) {
+
+          } else if (operation === updOperation.MEMBER_LEFT) {
+
+          } 
           return new Response('ok');
      }
 

@@ -104,6 +104,13 @@ export default class TG_ExecutionContext {
 			
 		}
 		//messages types
+		if (this.update.message?.new_chat_members)	{
+			this.update_operation = updOperation.MEMBER_JOIN;
+		}
+		if (this.update.message?.left_chat_member) {
+			this.update_operation = updOperation.MEMBER_LEFT;
+		}
+		
 		if (this.update.message?.photo) { //check duplicated operation
 			this.update_operation = updOperation.HANDLE_PHOTO;
 		} else if (this.update.message?.document) {
@@ -120,6 +127,7 @@ export default class TG_ExecutionContext {
 				this.update_operation = updOperation.THREAD_EDIT;
 			}
 		}
+		
 
 		if (this.update_type===updType.CALLBACK){
 			this.update.message = this.update.callback_query?.message;

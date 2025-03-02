@@ -77,7 +77,7 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 			
 			//let message:ContextMessage = bot.currentContext.update_message;
 			const threadName =  message.message.forum_topic_created?.name;
-			console.log("log from dbInsertMessage- threadname: ", threadName) ;
+			//console.log("log from dbInsertMessage- threadname: ", threadName) ;
 			const normalized_threadname =  threadName? removeAccents(threadName):'';
 			const threadQuery = `
 			INSERT INTO tg_thread (id_thread, threadname, normalized_threadname) 
@@ -87,6 +87,9 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 		`;
 		await this.executeQuery(bot.DB, threadQuery, [message.id_thread, threadName, normalized_threadname], false);
 		}
+	}
+	if (operation === updOperation.THREAD_DELETE) { //not supported yet
+
 	}
 	
 	if (operation === updOperation.MEDIA_NEW || operation === updOperation.HANDLE_DOC) {
