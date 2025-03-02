@@ -339,18 +339,22 @@ export default class TIOZAO_CMDS {
  public static async checkDuplicatedThread (bot:  TG_BOT, threadname:string|undefined, id_thread:any) {
 	let text = '';
      if (!threadname) return;
-	const result = await DB_API.dbSearchThreadname(bot.DB, threadname);
-	
-	if (result.length == 0) {
-	    text = 'Seguir o padrão em https://gpsp.xyz/td';
-	}
-	else {
-	    text = 'Existe(m) outro(s) tópico(s) com título parecido, verifique antes de postar aqui: \n';
-	    for (const row of result) {
-		   text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
-	    }
-	}
-	return await TIOZAO_BOT_CMDs.botAlert(bot,text, id_thread);
+	try {
+		const result = await DB_API.dbSearchThreadname(bot.DB, threadname);
+		console.log("log from  checkDuplicatedThread - result: ", result)
+		if (result.length == 0) {
+		text = 'Seguir o padrão em https://gpsp.xyz/td';
+		}
+		else {
+		text = 'Existe(m) outro(s) tópico(s) com título parecido, verifique antes de postar aqui: \n';
+		for (const row of result) {
+			text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
+		}
+		}
+		return await TIOZAO_BOT_CMDs.botAlert(bot,text, id_thread);
+	}catch (e:any) {
+		console.error('Error in checkDuplicatedThread:', e.message);
+	 }
  }
  
  public static async confirmTD(bot:  TG_BOT, message: ContextMessage, edit:any) {

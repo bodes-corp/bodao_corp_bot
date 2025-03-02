@@ -199,6 +199,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
  
  public static async dbSearchThreadname(db:any, threadname:string) {
      if (!db) return Promise.resolve(null);
+	console.log('log from dbSearchThreadname');
 	const normalized_threadname = removeAccents(threadname);
  
 	const threadnameArray = stringToWordsArray(normalized_threadname);
