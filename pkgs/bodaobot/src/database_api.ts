@@ -13,13 +13,19 @@ export class DB_API {
 
 public static async executeQuery(db:any, query:string, params:any[] = [], returnResults = true) {
      if (!db) return Promise.resolve(null);     
-     const preparedStatement = db.prepare(query).bind(...params);
+	try {
+		const preparedStatement = db.prepare(query).bind(...params);
       
           if (returnResults) {
               return await preparedStatement.raw(); // For SELECT queries, return the results
           } else {
               return await preparedStatement.run(); // For non-SELECT queries, just execute the query
           }
+	 } catch (e:any) {
+		console.error('Error in DB_API executeQuery:', e.message);
+	 }
+	
+	
 }
 
 public static async dbInsertBotNotify(db:any, response:any, id_msg:any) {
@@ -199,7 +205,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
  
  public static async dbSearchThreadname(db:any, threadname:string) {
      if (!db) return Promise.resolve(null);
-	console.log('log from dbSearchThreadname');
+	//console.log('log from dbSearchThreadname');
 	const normalized_threadname = removeAccents(threadname);
  
 	const threadnameArray = stringToWordsArray(normalized_threadname);

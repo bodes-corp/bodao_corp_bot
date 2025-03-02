@@ -341,7 +341,7 @@ export default class TIOZAO_CMDS {
      if (!threadname) return;
 	try {
 		const result = await DB_API.dbSearchThreadname(bot.DB, threadname);
-		console.log("log from  checkDuplicatedThread - result: ", result)
+		//console.log("log from  checkDuplicatedThread - result: ", result)
 		if (result.length == 0) {
 		text = 'Seguir o padrão em https://gpsp.xyz/td';
 		}

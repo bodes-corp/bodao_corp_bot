@@ -460,6 +460,8 @@ export default class TG_BOT {
                await ctx.bot.handleEditThread(ctx);
                break;
               case updOperation.THREAD_CREATE:
+               console.log('debug from handleMessage- will execute db handleCreteTrhread')
+          
                   await ctx.bot.handleCreateThread(ctx);
                   break;
               case updOperation.MEDIA_NEW:
@@ -469,7 +471,7 @@ export default class TG_BOT {
                   await ctx.bot.handleNewPost(ctx);
                   break;
           }
-
+          console.log('debug from handleMessage- returned from handleCreteTrhread and will execute db insert')
           await DB_API.dbInsertMessage(this, ctx.update_message);
           return new Response('ok');
      }
@@ -595,8 +597,8 @@ export default class TG_BOT {
               await TIOZAO_CMDS.showMenu(ctx.bot,response_ids);
           }
           response_ids.push(message_id);
-          await this.handleBotResponses(response_ids);
-          return await this.handleOldMessages();
+          await ctx.bot.handleBotResponses(response_ids);
+          return await ctx.bot.handleOldMessages();
       }
       
       public static async handleCallbackQuery(ctx:TG_ExecutionContext) {
