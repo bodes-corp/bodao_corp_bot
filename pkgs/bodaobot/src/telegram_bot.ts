@@ -81,11 +81,11 @@ export default class TG_BOT {
                ':create_thread':this.handleCreateThread
            }*/
 
-           this.on(':message', this.handleMessage)
-           .on(':edited_message',this.handleEditedMessage)
+           this.on(':message', TG_BOT.handleMessage)
+           .on(':edited_message',TG_BOT.handleEditedMessage)
            .on(':callback',TG_BOT.handleCallbackQuery)
-           .on(':edit_thread',this.handleEditThread)
-           .on(':create_thread',this.handleCreateThread)
+           .on(':edit_thread',TG_BOT.handleEditThread)
+           .on(':create_thread',TG_BOT.handleCreateThread)
            .on(':handle_member',TG_BOT.handleMemberOperation);
            
 
@@ -349,6 +349,9 @@ export default class TG_BOT {
                await ctx.bot.handleBotCommand(ctx);
           }
                
+          //handlers do not receive the this pointer.
+          //remember to not use them in inside the methods
+          //the best way is to make them static methods
           return await this.handlers[handlerName](this.currentContext);
           
           
@@ -443,7 +446,7 @@ export default class TG_BOT {
 
      //HANDLERS
 
-     async handleMessage(ctx:TG_ExecutionContext) {
+     private static async handleMessage(ctx:TG_ExecutionContext) {
          
           console.log("debug from handleMessage- operation: ", ctx.update_operation);
           //console.log("env: ", ctx.bot.env);
@@ -487,7 +490,7 @@ export default class TG_BOT {
           return new Response('ok');
      }
 
-     async handleEditedMessage(ctx:TG_ExecutionContext) {
+     private static async handleEditedMessage(ctx:TG_ExecutionContext) {
           const messageJson:any = ctx.update.edited_message
           const message:ContextMessage = new ContextMessage(messageJson);
           console.log("debug from handleEditedMessage- operation: ", ctx.update_operation);
@@ -519,7 +522,7 @@ export default class TG_BOT {
           }
       }
 
-      async handleEditThread(ctx: TG_ExecutionContext ) {
+      private static async handleEditThread(ctx: TG_ExecutionContext ) {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
           const threadName =  message.message.forum_topic_edited?.name;
@@ -529,7 +532,7 @@ export default class TG_BOT {
           return new Response('ok');
       }
       
-      async handleCreateThread (ctx: TG_ExecutionContext ) {
+      private static async handleCreateThread (ctx: TG_ExecutionContext ) {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
           const threadName =  message.message.forum_topic_created?.name;
