@@ -183,7 +183,7 @@ public static async dbUpdateUsers(db:any, users:TelegramUser[]){
 public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
      if (!bot.DB) return Promise.resolve(null);
 	const operation = bot.currentContext.update_operation;
-     if (operation === updOperation.MEDIA_EDIT) {
+     if (operation === updOperation.MEDIA_EDIT || operation === updOperation.DOC_EDIT) {
          const fileQuery = `
              UPDATE tg_media
              SET file_id = ?1,

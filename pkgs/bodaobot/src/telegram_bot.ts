@@ -276,9 +276,9 @@ export default class TG_BOT {
           let args: string[] = [];
           const ctx = new TG_ExecutionContext(this, this.update);
           this.currentContext = ctx;
-          console.log('debug ctx update_type: ',ctx.update_type);
-          console.log("debug ctx message:", ctx.update.message);
-          console.log("operation: ",ctx.update_operation)
+          console.log('debug from handleUpdate - debug ctx update_type: ',ctx.update_type);
+          console.log("debug from handleUpdate - debug ctx message:", ctx.update.message);
+          console.log('debug from handleUpdate - operation: ',ctx.update_operation)
           //console.log("debug ctx message user:", ctx.update?.message?.from.id)
           //console.log("debug ctx message user:",ctx.update_message.id_user);
           switch (ctx.update_type) {
@@ -445,7 +445,7 @@ export default class TG_BOT {
 
      async handleMessage(ctx:TG_ExecutionContext) {
          
-          console.log("operation: ", ctx.update_operation);
+          console.log("debug from handleMessage- operation: ", ctx.update_operation);
           //console.log("env: ", ctx.bot.env);
           //return new Response("Hello, world!");
           if (!isValidChat(ctx.update_message,  ctx.bot.botINFO.CHATID)) {''
@@ -490,7 +490,7 @@ export default class TG_BOT {
      async handleEditedMessage(ctx:TG_ExecutionContext) {
           const messageJson:any = ctx.update.edited_message
           const message:ContextMessage = new ContextMessage(messageJson);
-      
+          console.log("debug from handleEditedMessage- operation: ", ctx.update_operation);
           switch (ctx.update_operation) {
               case updOperation.MEDIA_EDIT:
                   await this.handleEditMedia(ctx);

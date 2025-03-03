@@ -389,7 +389,7 @@ export default class TIOZAO_CMDS {
  
  public static async checkHaveCaption(bot:TG_BOT, message:ContextMessage, edit = false) {
 	const { message_id, media_group_id, caption } = message;
- 
+ 	console.log('debug from checkHaveCaption - caption: ', caption)
 	try {
 	    if (caption) {
 		   await  DB_API.dbInsertCaption(bot.DB, media_group_id, caption);
