@@ -278,6 +278,7 @@ export default class TG_BOT {
           this.currentContext = ctx;
           console.log('debug ctx update_type: ',ctx.update_type);
           console.log("debug ctx message:", ctx.update.message);
+          console.log("operation: ",ctx.update_operation)
           //console.log("debug ctx message user:", ctx.update?.message?.from.id)
           //console.log("debug ctx message user:",ctx.update_message.id_user);
           switch (ctx.update_type) {
@@ -473,9 +474,13 @@ export default class TG_BOT {
                case updOperation.MEDIA_NEW:
                   await ctx.bot.handleNewMedia(ctx);
                   break;
+               case updOperation.DOCUMENT_NEW:
+                    await ctx.bot.handleNewDocument(ctx);
+                    break;
               case updOperation.POST_NEW:
                   await ctx.bot.handleNewPost(ctx);
                   break;
+               
           }
           console.log('debug from handleMessage- returned from handleCreteTrhread and will execute db insert')
           await DB_API.dbInsertMessage(ctx.bot, ctx.update_message);
@@ -487,12 +492,15 @@ export default class TG_BOT {
           const message:ContextMessage = new ContextMessage(messageJson);
       
           switch (ctx.update_operation) {
-              case 'edit_media':
+              case updOperation.MEDIA_EDIT:
                   await this.handleEditMedia(ctx);
                   break;
-              case 'edit_post':
+              case updOperation.POST_EDIT:
                   await this.handleEditPost(ctx);
                   break;
+              case updOperation.DOC_EDIT:
+                    await this.handleEditDocument(ctx);
+                    break;
           }
           await DB_API.dbEditMessage( this, message);
           return new Response('ok');
