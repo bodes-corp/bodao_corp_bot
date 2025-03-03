@@ -1,6 +1,6 @@
 import { checkRP, checkTD } from '../library.js';
 import TelegramChat from './TelegramChat.js';
-import { TelegramDocument } from './TelegramDocument.js';
+import { TG_Document } from './TelegramDocument.js';
 import TG_ForumTopicCreated from './TelegramForumTopicCreated.js';
 import TG_ForumTopicEdited from './TelegramForumtopicEdited.js';
 import TelegramFrom from './TelegramFrom.js';
@@ -8,6 +8,7 @@ import TelegramMessageEntity from './TelegramMessageEntity.js';
 import TelegramPhotoSize from './TelegramPhotoSize.js';
 import TelegramUser from './TelegramUser.js';
 import TG_Video from './TelegramVideo.js';
+import { mediaType, mediaType_t } from './Types.js';
 
 export interface TG_Message {
 	message_id: number;
@@ -32,7 +33,7 @@ export interface TG_Message {
 	entities?: TelegramMessageEntity[];
 	// animation?: TelegramAnimation;
 	// audio?: TelegramAudio;
-	document?: TelegramDocument;
+	document?: TG_Document;
 	photo?: TelegramPhotoSize[];
 	// sticker?: TelegramSticker;
 	 video?:TG_Video;
@@ -79,7 +80,7 @@ export class ContextMessage {
 	id_thread:any;  //identify the topic the message is from
 	id_user:any;
 	username:any;
-	caption:any;
+	caption?:string; //Optional. Caption for the animation, audio, document, paid media, photo, video or voice
 	first_name:any;
 	msg_date:any;
 	//operation:updOperation_t = updOperation.UNKNOWN;
@@ -88,13 +89,13 @@ export class ContextMessage {
 	is_td_rp: 0 | 1 = 0; //is repeteco?
 	file_id:any;
 	file_unique_id:any;
-	type:any;
+	media_type:mediaType_t = mediaType.UNKNOWN;
 	deleted?:any;
 	threadname?:any; //forum topic created name
 	media_group_id?:any;
 	chat?:any;
 	Users?:TelegramUser[]; //optional used oonly in operations with user. adding or lefting user in message
-	
+	file_name?:string; //opcional campo usado em documentos
 
 	constructor(msgJson?:TG_Message) {
 		this.message = {} as TG_Message;
@@ -120,7 +121,6 @@ export class ContextMessage {
 			let name = (msgJson.from.first_name || '') + (msgJson.from.last_name ? ' ' + msgJson.from.last_name : '');
 			this.first_name = name.trim();
 			this.msg_date = msgJson.date;
-			//this.operation = updOperation.NO_OP;
 			this.chat = msgJson.chat;
 			
 			this.deleted = 0;
@@ -128,14 +128,12 @@ export class ContextMessage {
 			if ('text' in msgJson || 'video' in msgJson || 'photo' in msgJson || 'document' in msgJson || 'voice' in msgJson || 'poll' in msgJson || 'location' in msgJson) {    
 			this.msg_txt = 'new_post'
 			if ('text' in msgJson) {
-				//this.operation = updOperation.NEW_POST;
 				this.msg_txt = msgJson.text;
 				this.is_td = checkTD(msgJson.text);
 				this.is_td_rp = checkRP(msgJson.text);
 			}
 	
-			if ('photo' in msgJson || 'video' in msgJson) {
-				//this.operation = updOperation.NEW_MEDIA;
+			if ('photo' in msgJson || 'video' in msgJson || 'document'in msgJson) {
 				if ('photo' in msgJson) {
 					const lastPhoto: TelegramPhotoSize = msgJson.photo? msgJson.photo[msgJson.photo.length - 1]:{
 						file_id: 'unknown',
@@ -146,12 +144,19 @@ export class ContextMessage {
 					};
 					this.file_id = lastPhoto.file_id;
 					this.file_unique_id = lastPhoto.file_unique_id;
-					this.type = 1;
+					this.media_type = mediaType.PHOTO;
 				}
 				if ('video' in msgJson) {
 					this.file_id = msgJson.video?.file_id;
 					this.file_unique_id = msgJson.video?.file_unique_id;
-					this.type = 2;
+					this.media_type = mediaType.VIDEO;
+				}
+				if ('document' in msgJson) {
+					this.file_id = msgJson.document?.file_id;
+					this.file_unique_id = msgJson.document?.file_unique_id;
+					this.media_type = mediaType.DOCUMENT;
+					this.file_name =  msgJson.document?.file_name;
+					
 				}
 				if ('caption' in msgJson) {
 					this.caption = msgJson.caption;

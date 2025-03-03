@@ -467,7 +467,10 @@ export default class TG_BOT {
           
                   await ctx.bot.handleCreateThread(ctx);
                   break;*/
-              case updOperation.MEDIA_NEW:
+               case updOperation.MEDIA_NEW:
+                    await ctx.bot.handleNewMedia(ctx);
+                    break;
+               case updOperation.MEDIA_NEW:
                   await ctx.bot.handleNewMedia(ctx);
                   break;
               case updOperation.POST_NEW:
@@ -537,6 +540,14 @@ export default class TG_BOT {
           response_ids.push(await TIOZAO_CMDS.checkHaveCaption(ctx.bot, message));
           return await ctx.bot.handleBotResponses(response_ids);
       }
+
+      async handleNewDocument(ctx: TG_ExecutionContext ) {
+          let message:ContextMessage = ctx.update_message;
+          let response_ids:any[] = [];
+      
+          response_ids.push(await TIOZAO_CMDS.checkHaveCaption(ctx.bot, message));
+          return await ctx.bot.handleBotResponses(response_ids);
+      }
       
       async handleNewPost (ctx: TG_ExecutionContext ) {
           let message:ContextMessage = ctx.update_message;
@@ -551,6 +562,15 @@ export default class TG_BOT {
      
       
       async handleEditMedia (ctx: TG_ExecutionContext ) {
+          let message:ContextMessage = ctx.update_message;
+          let response_ids:any[] = [];
+      
+          response_ids.push(await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true));
+          return await ctx.bot.handleBotResponses(response_ids);
+      }
+
+
+      async handleEditDocument (ctx: TG_ExecutionContext ) {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
       

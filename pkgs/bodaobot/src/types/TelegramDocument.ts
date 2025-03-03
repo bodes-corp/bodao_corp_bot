@@ -1,6 +1,6 @@
 import TelegramPhotoSize from './TelegramPhotoSize.js';
 
-export interface TelegramDocument {
+export interface TG_Document {
 	file_name: string;
 	mime_type: string;
 	thumbnail: TelegramPhotoSize;

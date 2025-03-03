@@ -77,6 +77,9 @@ export default class TG_ExecutionContext {
 				   this.update_operation = updOperation.MEDIA_EDIT;
 				   
 			}
+			if (this.update.message?.document) {
+				this.update_operation = updOperation.DOC_EDIT;
+			}
 		
 		}else if (this.update.channel_post?.message_id) {
 			this.update_type = updType.MESSAGE_CHANEL_POST;
@@ -112,9 +115,9 @@ export default class TG_ExecutionContext {
 		}
 		
 		if (this.update.message?.photo) { //check duplicated operation
-			this.update_operation = updOperation.HANDLE_PHOTO;
+			this.update_operation = updOperation.MEDIA_NEW;
 		} else if (this.update.message?.document) {
-			this.update_operation = updOperation.HANDLE_DOC;
+			this.update_operation = updOperation.DOCUMENT_NEW;
 		}
 		 //for supergroups with topics
 		if (this.update.message?.message_thread_id) {
@@ -127,6 +130,12 @@ export default class TG_ExecutionContext {
 				this.update_operation = updOperation.THREAD_EDIT;
 			}
 		}
+
+		//edited media types
+		//messages types
+		//messages types
+		
+		
 		
 
 		if (this.update_type===updType.CALLBACK){
@@ -207,7 +216,8 @@ export default class TG_ExecutionContext {
 							
 			case updType.MESSAGE:
 				switch (this.update_operation){
-					case updOperation.HANDLE_PHOTO:
+					case updOperation.MEDIA_NEW:
+					case updOperation.MEDIA_EDIT:
 						return await TG_API.sendPhoto(this.bot.api.toString(), {
 							...options,
 							chat_id: this.update.message?.chat.id.toString() ?? '',
@@ -295,7 +305,8 @@ export default class TG_ExecutionContext {
 								parse_mode,
 							});
 
-						case updOperation.HANDLE_PHOTO:
+						case updOperation.MEDIA_NEW:
+						case updOperation.MEDIA_EDIT:
 							return await TG_API.sendMessage(this.bot.api.toString(), {
 								...options,
 								chat_id: this.update.message?.chat.id.toString() ?? '',
@@ -303,7 +314,8 @@ export default class TG_ExecutionContext {
 								text: message,
 								parse_mode,
 							});
-						case updOperation.HANDLE_DOC:
+						case updOperation.DOCUMENT_NEW:
+						case updOperation.DOC_EDIT:
 							return await TG_API.sendMessage(this.bot.api.toString(), {
 								...options,
 								chat_id: this.update.message?.chat.id.toString() ?? '',

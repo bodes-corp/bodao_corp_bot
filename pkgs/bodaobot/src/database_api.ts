@@ -101,7 +101,7 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 
 	}
 	
-	if (operation === updOperation.MEDIA_NEW || operation === updOperation.HANDLE_DOC) {
+	if (operation === updOperation.MEDIA_NEW || operation === updOperation.DOCUMENT_NEW) {
 	    const mediaQuery = `
 		   INSERT INTO tg_media 
 		   (id_msg, file_id, file_unique_id, msg_date, id_user, id_thread, type, deleted, media_group_id)
@@ -114,7 +114,7 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 		   message.msg_date, 
 		   message.id_user, 
 		   message.id_thread, 
-		   message.type, 
+		   message.media_type, 
 		   message.deleted, 
 		   message.media_group_id
 	    ], false);     
@@ -194,7 +194,7 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
          await this.executeQuery(bot.DB, fileQuery, [
              message.file_id,
              message.file_unique_id,
-             message.type,
+             message.media_type,
              message.message_id
          ], false);
  
@@ -224,6 +224,13 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
      return new Response("DB-EDIT-ok");
 }
  
+/**
+ * Insert Caption/text to the media
+ * @param db the bot db
+ * @param media_group_id the media group id to add the caption to
+ * @param caption the caption
+ * @returns 
+ */
 public static async dbInsertCaption(db:any, media_group_id:any, caption:string) {
  
      const normalized_caption:string = removeAccents(caption);

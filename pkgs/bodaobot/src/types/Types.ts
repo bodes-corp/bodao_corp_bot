@@ -24,9 +24,11 @@ export const updOperation = {
      NO_OP: 'no_operation',
      POST_NEW: 'new_post', //message with text
      MEDIA_NEW: 'new_media', //photo or video
-    
+     DOCUMENT_NEW: 'doc_new',
+
      POST_EDIT: 'edit_post',
      MEDIA_EDIT: 'edit_media', //photo or video
+     DOC_EDIT: 'doc_edit',
      //topic messages for supergroups
      THREAD_CREATE: 'create_thread',
      THREAD_EDIT: 'update_thread',
@@ -34,8 +36,6 @@ export const updOperation = {
      MEMBER_JOIN: 'member_join',
      MEMBER_LEFT:'member_left',
      
-     HANDLE_PHOTO: 'photo',
-     HANDLE_DOC: 'document',
    } as const;
 /*
      new_chat_title 	String 	Optional. A chat title was changed to this value
@@ -136,3 +136,12 @@ export type button_t = {
 export type two_buttons_t =  button_t[]
 
 export type buttons_t = two_buttons_t[]|button_t[]
+
+export const mediaType = {
+     UNKNOWN:-1,
+     PHOTO: 1,
+     VIDEO: 2,
+     DOCUMENT:3
+}
+
+export type mediaType_t = typeof mediaType[keyof typeof  mediaType];
