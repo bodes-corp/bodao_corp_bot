@@ -63,19 +63,19 @@ export default class TG_ExecutionContext {
 
 		}else if (this.update.edited_message?.message_id) {
 			this.update_type = updType.MESSAGE_EDIT;
-			console.log('debug from TelegramUpdate constructor/edit message detected - edited_message:', this.update.edited_message)
+			//console.log('debug from TelegramUpdate constructor/edit message detected - edited_message:', this.update.edited_message)
 			this.update_operation= updOperation.NO_OP;
-			if (this.update.message?.text) {
+			if (this.update.edited_message?.text) {
 				   this.update_operation = updOperation.POST_EDIT;
 				   //this.msg_txt = msgJson.text;
 				   //this.is_td = checkTD(msgJson.text);
 				   //this.is_td_rp = checkRP(msgJson.text);
 			}
-			if (this.update.message?.video || this.update.message?.photo) {
+			if (this.update.edited_message?.video || this.update.edited_message?.photo) {
 				   this.update_operation = updOperation.MEDIA_EDIT;
 				   
 			}
-			if (this.update.message?.document) {
+			if (this.update.edited_message?.document) {
 				this.update_operation = updOperation.DOC_EDIT;
 			}
 		
