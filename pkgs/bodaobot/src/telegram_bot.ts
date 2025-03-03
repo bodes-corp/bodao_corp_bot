@@ -499,8 +499,8 @@ export default class TG_BOT {
                   await this.handleEditPost(ctx);
                   break;
               case updOperation.DOC_EDIT:
-                    await this.handleEditDocument(ctx);
-                    break;
+                await this.handleEditDocument(ctx);
+                break;
           }
           await DB_API.dbEditMessage( this, message);
           return new Response('ok');
@@ -581,7 +581,7 @@ export default class TG_BOT {
       async handleEditDocument (ctx: TG_ExecutionContext ) {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
-      
+          console.log('debug from handleEditDocument')
           response_ids.push(await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true));
           return await ctx.bot.handleBotResponses(response_ids);
       }
