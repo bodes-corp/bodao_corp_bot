@@ -502,7 +502,7 @@ export default class TG_BOT {
                 await ctx.bot.handleEditDocument(ctx);
                 break;
           }
-          await DB_API.dbEditMessage( this, message);
+          await DB_API.dbEditMessage( ctx.bot, message);
           return new Response('ok');
      }
 
@@ -562,7 +562,7 @@ export default class TG_BOT {
           let response_ids:any[] = [];
           //console.log("handleNewPost: ", message.operation);
           if (message.is_td_rp || message.is_td) {
-              response_ids.push(await TIOZAO_CMDS.confirmTD(ctx.bot, this.currentContext.update_message, 0));
+              response_ids.push(await TIOZAO_CMDS.confirmTD(ctx.bot, ctx.bot.currentContext.update_message, 0));
           }
           return await ctx.bot.handleBotResponses(response_ids);
       }
@@ -591,7 +591,7 @@ export default class TG_BOT {
           let response_ids:any[] = [];
       
           if (message.is_td_rp || message.is_td) {
-              response_ids.push(await TIOZAO_CMDS.confirmTD(ctx.bot, this.currentContext.update_message, 1));
+              response_ids.push(await TIOZAO_CMDS.confirmTD(ctx.bot, ctx.bot.currentContext.update_message, 1));
           }
           return await ctx.bot.handleBotResponses(response_ids);
       
@@ -606,7 +606,7 @@ export default class TG_BOT {
           const command = msg_txt?.split(' ')[0];
           let response_ids:any[] = [];
           console.log('debug command:', command);
-          //ctx.bot.onCommand('/info', { func: (env:any, _:any) => TIOZAO_CMDS.listInfo(this), requiresArg: false });
+          //ctx.bot.onCommand('/info', { func: (env:any, _:any) => TIOZAO_CMDS.listInfo(ctx.bot), requiresArg: false });
       
           const commandEntry:any = Object.entries(ctx.bot.commands).find(([prefix]) =>
               msg_txt?.startsWith(prefix)
