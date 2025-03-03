@@ -33,9 +33,6 @@ export default class TG_ExecutionContext {
 	constructor(bot:  TG_BOT, update: TelegramUpdate) {
 		this.bot = bot;
 		this.update = update;
-
-		
-          
 		this.update_operation = updOperation.NO_OP;
 
 		if (this.update.message?.message_id) {
@@ -66,6 +63,7 @@ export default class TG_ExecutionContext {
 
 		}else if (this.update.edited_message?.message_id) {
 			this.update_type = updType.MESSAGE_EDIT;
+			console.log('debug from TelegramUpdate constructor/edit message detected - edited_message:', this.update.edited_message)
 			this.update_operation= updOperation.NO_OP;
 			if (this.update.message?.text) {
 				   this.update_operation = updOperation.POST_EDIT;
