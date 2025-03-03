@@ -493,13 +493,13 @@ export default class TG_BOT {
           console.log("debug from handleEditedMessage- operation: ", ctx.update_operation);
           switch (ctx.update_operation) {
               case updOperation.MEDIA_EDIT:
-                  await this.handleEditMedia(ctx);
+                  await ctx.bot.handleEditMedia(ctx);
                   break;
               case updOperation.POST_EDIT:
-                  await this.handleEditPost(ctx);
+                  await ctx.bot.handleEditPost(ctx);
                   break;
               case updOperation.DOC_EDIT:
-                await this.handleEditDocument(ctx);
+                await ctx.bot.handleEditDocument(ctx);
                 break;
           }
           await DB_API.dbEditMessage( this, message);
