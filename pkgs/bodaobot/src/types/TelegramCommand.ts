@@ -1,5 +1,5 @@
-import TelegramBot from '../telegram_bot.js';
-import TelegramUpdate from './TelegramUpdate.js';
+import TG_BOT from '../telegram_bot.js';
 
-type TelegramCommand = (bot: TelegramBot, update: TelegramUpdate, args: string[]) => Promise<Response>;
+
+type TelegramCommand = (bot: TG_BOT, update: tgTypes.Update, args: string[]) => Promise<Response>;
 export default TelegramCommand;

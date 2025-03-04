@@ -4,7 +4,6 @@
 import { removeAccents, stringToWordsArray } from "./library";
 import TG_BOT from "./telegram_bot";
 import { ContextMessage } from "./types/TelegramMessage";
-import TelegramUser from "./types/TelegramUser";
 import { updOperation } from "./types/Types";
 
  
@@ -162,7 +161,7 @@ public static async dbDeactivateUser(db:any, message:ContextMessage){
 }
 
 
-public static async dbUpdateUsers(db:any, users:TelegramUser[]){
+public static async dbUpdateUsers(db:any, users:tgTypes.User[]){
 	if(!Array.isArray(users))  return Promise.resolve()
 	else{
 	users.forEach(async (user)=> {

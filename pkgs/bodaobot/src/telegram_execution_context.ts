@@ -1,10 +1,11 @@
-import TG_API from './telegram_api.js';
+
+import TG_API from './telegram/telegram_api.js';
 import TG_BOT from './telegram_bot.js';
 import TelegramInlineQueryResultArticle from './types/TelegramInlineQueryResultArticle.js';
 import TelegramInlineQueryResultPhoto from './types/TelegramInlineQueryResultPhoto.js';
 import TelegramInlineQueryResultVideo from './types/TelegramInlineQueryResultVideo.js';
-import { ContextMessage, TG_Message } from './types/TelegramMessage.js';
-import TelegramUpdate from './types/TelegramUpdate.js';
+import { ContextMessage } from './types/TelegramMessage.js';
+
 import { updOperation, updOperation_t, updType, updType_t } from './types/Types.js';
 
 /** Class representing the context of execution */
@@ -12,7 +13,7 @@ export default class TG_ExecutionContext {
 	/** an instance of the telegram bot */
 	bot:  TG_BOT;
 	/** an instance of the telegram update */
-	update: TelegramUpdate;
+	update: tgTypes.Update;
 	/** string representing the type of update that was sent */
 	update_type:updType_t = updType.UNKNOWN;
 
@@ -30,7 +31,7 @@ export default class TG_ExecutionContext {
 	 * @param bot - the telegram bot
 	 * @param update - the telegram update
 	 */
-	constructor(bot:  TG_BOT, update: TelegramUpdate) {
+	constructor(bot:  TG_BOT, update: tgTypes.Update) {
 		this.bot = bot;
 		this.update = update;
 		this.update_operation = updOperation.NO_OP;
@@ -103,6 +104,14 @@ export default class TG_ExecutionContext {
 			this.update_type = updType.CALLBACK;
 			this.update_operation= updOperation.NO_OP;
 			
+		}else if (this.update.poll?.id) {
+			this.update_type = updType.POLL;
+			this.update_operation= updOperation.NO_OP;
+			
+		}else if (this.update.poll_answer?.poll_id) {
+			this.update_type = updType.POLL_ANSWER;
+			this.update_operation= updOperation.NO_OP;
+			
 		}
 		//messages types
 		if (this.update.message?.new_chat_members)	{
@@ -138,30 +147,30 @@ export default class TG_ExecutionContext {
 
 		if (this.update_type===updType.CALLBACK){
 			this.update.message = this.update.callback_query?.message;
-			const messageJson:TG_Message|undefined = this.update.callback_query?.message;
+			const messageJson:tgTypes.Message|undefined = this.update.callback_query?.message;
 			this.update_message = new ContextMessage(messageJson);
 		}else if (this.update_type === updType.MESSAGE_EDIT){
 			this.update.message = this.update.edited_message;
-			const messageJson:TG_Message|undefined = this.update.edited_message;
+			const messageJson:tgTypes.Message|undefined = this.update.edited_message;
 			this.update_message = new ContextMessage(messageJson);
 		}else if (this.update_type === updType.MESSAGE_CHANEL_POST){
 			this.update.message = this.update.channel_post;
-			const messageJson:TG_Message|undefined = this.update.channel_post;
+			const messageJson:tgTypes.Message|undefined = this.update.channel_post;
 			this.update_message = new ContextMessage(messageJson);
 		}else if (this.update_type === updType.MESSAGE_CHANEL_POST_EDIT){
 			this.update.message = this.update.edited_channel_post;
-			const messageJson:TG_Message|undefined = this.update.edited_channel_post;
+			const messageJson:tgTypes.Message|undefined = this.update.edited_channel_post;
 			this.update_message = new ContextMessage(messageJson);
 		}else if (this.update_type === updType.MESSAGE_BUSINESS){
 			this.update.message = this.update.business_message;
-			const messageJson:TG_Message|undefined = this.update.business_message;
+			const messageJson:tgTypes.Message|undefined = this.update.business_message;
 			this.update_message = new ContextMessage(messageJson);
 		}else if (this.update_type === updType.MESSAGE_BUSINESS_EDIT){
 			this.update.message = this.update.edited_business_message;
-			const messageJson:TG_Message|undefined = this.update.edited_business_message;
+			const messageJson:tgTypes.Message|undefined = this.update.edited_business_message;
 			this.update_message = new ContextMessage(messageJson);
 		}else{
-			const messageJson:TG_Message|undefined = this.update.message;
+			const messageJson:tgTypes.Message|undefined = this.update.message;
 			this.update_message = new ContextMessage(messageJson);
 		}
 		
@@ -177,14 +186,14 @@ export default class TG_ExecutionContext {
 	async replyVideo(video: string, options: Record<string, number | string | boolean> = {}) {
 		switch (this.update_type) {
 			case updType.MESSAGE:
-				return await TG_API.sendVideo(this.bot.api.toString(), {
+				return await TG_API.sendVideo(TG_BOT.api.toString(), {
 					...options,
 					chat_id: this.update.message?.chat.id.toString() ?? '',
 					reply_to_message_id: this.update.message?.message_id.toString() ?? '',
 					video,
 				});
 			case updType.INLINE_QUERY:
-				return await TG_API.answerInline(this.bot.api.toString(), {
+				return await TG_API.answerInline(TG_BOT.api.toString(), {
 					...options,
 					inline_query_id: this.update.inline_query?.id.toString() ?? '',
 					results: [new TelegramInlineQueryResultVideo(video)],
@@ -200,7 +209,7 @@ export default class TG_ExecutionContext {
 	 * @param file_id - telegram file_id
 	 */
 	async getFile(file_id: string) {
-		return await TG_API.getFile(this.bot.api.toString(), { file_id }, this.bot.token);
+		return await TG_API.getFile(TG_BOT.api.toString(), { file_id }, TG_BOT.token);
 	}
 
 	/**
@@ -216,7 +225,7 @@ export default class TG_ExecutionContext {
 				switch (this.update_operation){
 					case updOperation.MEDIA_NEW:
 					case updOperation.MEDIA_EDIT:
-						return await TG_API.sendPhoto(this.bot.api.toString(), {
+						return await TG_API.sendPhoto(TG_BOT.api.toString(), {
 							...options,
 							chat_id: this.update.message?.chat.id.toString() ?? '',
 							reply_to_message_id: this.update.message?.message_id.toString() ?? '',
@@ -224,7 +233,7 @@ export default class TG_ExecutionContext {
 							caption,
 						});
 					case updOperation.POST_NEW:
-						return await TG_API.sendPhoto(this.bot.api.toString(), {
+						return await TG_API.sendPhoto(TG_BOT.api.toString(), {
 							...options,
 							chat_id: this.update.message?.chat.id.toString() ?? '',
 							reply_to_message_id: this.update.message?.message_id.toString() ?? '',
@@ -234,7 +243,7 @@ export default class TG_ExecutionContext {
 				}
 				
 			case updType.INLINE_QUERY:
-				return await TG_API.answerInline(this.bot.api.toString(), {
+				return await TG_API.answerInline(TG_BOT.api.toString(), {
 					inline_query_id: this.update.inline_query?.id.toString() ?? '',
 					results: [new TelegramInlineQueryResultPhoto(photo)],
 				});
@@ -250,13 +259,13 @@ export default class TG_ExecutionContext {
 	async sendTyping() {
 		switch (this.update_type) {
 			case 'message':
-				return await TG_API.sendChatAction(this.bot.api.toString(), {
+				return await TG_API.sendChatAction(TG_BOT.api.toString(), {
 					chat_id: this.update.message?.chat.id.toString() ?? '',
 					action: 'typing',
 				});
 			case 'business_message':
-				return await TG_API.sendChatAction(this.bot.api.toString(), {
-					business_connection_id: this.update.business_message?.business_connection_id.toString(),
+				return await TG_API.sendChatAction(TG_BOT.api.toString(), {
+					business_connection_id: this.update.business_message?.business_connection_id?.toString(),
 					chat_id: this.update.business_message?.chat.id.toString() ?? '',
 					action: 'typing',
 				});
@@ -274,7 +283,7 @@ export default class TG_ExecutionContext {
 	async replyInline(title: string, message: string, parse_mode = '') {
 		switch (this.update_type) {
 			case updType.INLINE_QUERY:
-				return await TG_API.answerInline(this.bot.api.toString(), {
+				return await TG_API.answerInline(TG_BOT.api.toString(), {
 					inline_query_id: this.update.inline_query?.id.toString() ?? '',
 					results: [new TelegramInlineQueryResultArticle({ content: message, title, parse_mode })],
 				});
@@ -295,7 +304,7 @@ export default class TG_ExecutionContext {
 				{
 					switch (this.update_operation){
 						case updOperation.POST_NEW:
-							return await TG_API.sendMessage(this.bot.api.toString(), {
+							return await TG_API.sendMessage(TG_BOT.api.toString(), {
 								...options,
 								chat_id: this.update.message?.chat.id.toString() ?? '',
 								reply_to_message_id: this.update.message?.message_id.toString() ?? '',
@@ -305,7 +314,7 @@ export default class TG_ExecutionContext {
 
 						case updOperation.MEDIA_NEW:
 						case updOperation.MEDIA_EDIT:
-							return await TG_API.sendMessage(this.bot.api.toString(), {
+							return await TG_API.sendMessage(TG_BOT.api.toString(), {
 								...options,
 								chat_id: this.update.message?.chat.id.toString() ?? '',
 								reply_to_message_id: this.update.message?.message_id.toString() ?? '',
@@ -314,7 +323,7 @@ export default class TG_ExecutionContext {
 							});
 						case updOperation.DOCUMENT_NEW:
 						case updOperation.DOC_EDIT:
-							return await TG_API.sendMessage(this.bot.api.toString(), {
+							return await TG_API.sendMessage(TG_BOT.api.toString(), {
 								...options,
 								chat_id: this.update.message?.chat.id.toString() ?? '',
 								reply_to_message_id: this.update.message?.message_id.toString() ?? '',
@@ -325,15 +334,15 @@ export default class TG_ExecutionContext {
 				}
 				
 			case updType.MESSAGE_BUSINESS:
-				return await TG_API.sendMessage(this.bot.api.toString(), {
+				return await TG_API.sendMessage(TG_BOT.api.toString(), {
 					chat_id: this.update.business_message?.chat.id.toString() ?? '',
 					text: message,
-					business_connection_id: this.update.business_message?.business_connection_id.toString(),
+					business_connection_id: this.update.business_message?.business_connection_id?.toString(),
 					parse_mode,
 				});
 				
 			case updType.INLINE_QUERY:
-				return await TG_API.answerInline(this.bot.api.toString(), {
+				return await TG_API.answerInline(TG_BOT.api.toString(), {
 					inline_query_id: this.update.inline_query?.id.toString() ?? '',
 					results: [new TelegramInlineQueryResultArticle({ title: message, content: message, parse_mode })],
 				});

@@ -2,7 +2,6 @@ import TG_BOT from "./bodaobot/src/telegram_bot";
 import TIOZAO_CMDS from "./bodaobot/src/tiozao/tiozao_api";
 import { BOT_INFO } from "./bodaobot/src/types/BotInfo";
 import Environment from "./bodaobot/src/types/Envirownment";
-import TelegramUpdate from "./bodaobot/src/types/TelegramUpdate";
 import Webhook from "./bodaobot/src/webhook";
 
 
@@ -26,7 +25,14 @@ export default {
 			env.TG_THREADBOT
 		)
 		const rafaelBot = new  TG_BOT(botINFO,env.TG_SECRET,env.DB);
-		rafaelBot.onCommand('/active_gp', { name: 'active_gp', desc:'GPs Ativas', func: TIOZAO_CMDS.listActiveGp, requiresArg: false })
+		
+		rafaelBot.on(':message', TG_BOT.handleMessage)
+           .on(':edited_message',TG_BOT.handleEditedMessage)
+           .on(':callback',TG_BOT.handleCallbackQuery)
+           .on(':edit_thread',TG_BOT.handleEditThread)
+           .on(':create_thread',TG_BOT.handleCreateThread)
+           .on(':handle_member',TG_BOT.handleMemberOperation)
+		 .onCommand('/active_gp', { name: 'active_gp', desc:'GPs Ativas', func: TIOZAO_CMDS.listActiveGp, requiresArg: false })
 		.onCommand( '/chat', { name: 'chat', desc:'Bate Papo',func: TIOZAO_CMDS.listChat, requiresArg: false })
 		.onCommand('/gp_td', { name: 'gp_td', desc:'Lista GPs',func: TIOZAO_CMDS.listTdGp, requiresArg: false })
 		.onCommand('/spa', { name: 'spa', desc:'Clínicas',func: TIOZAO_CMDS.listSpa, requiresArg: false })
@@ -60,7 +66,7 @@ export default {
 			switch (request.method) {
 				case 'POST': {
 							
-					const update: TelegramUpdate = await request.json();
+					const update: tgTypes.Update = await request.json();
 					//const clone:Request = await request.clone();
 					//console.log(this.update);
 					

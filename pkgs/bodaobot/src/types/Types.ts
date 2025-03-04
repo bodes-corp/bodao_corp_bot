@@ -1,6 +1,5 @@
 import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
-import { TG_Message } from "./TelegramMessage";
 
 export const tgRequestMethod = {
      UNKNOWN: 'unknonw',
@@ -13,8 +12,8 @@ export const tgRequestMethod = {
      ANSWER_CALLBACK: 'answerCallbackQuery',
      ANSWER_INLINE: 'answerInlineQuery',
      SEND_CHAT_ACTION: 'sendChatAction',
-     GET_FILE: 'getFile'
-
+     GET_FILE: 'getFile',
+     SEND_POLL: 'sendPoll',
    } as const;
    
 export type tgRequestMethod_t = typeof tgRequestMethod[keyof typeof  tgRequestMethod];
@@ -115,10 +114,12 @@ export type updType_t = typeof updType[keyof typeof  updType];
 
 export type handlerFunc = (ctx:TG_ExecutionContext) => Promise<Response>
 export type Handler = Record<string, handlerFunc>
-export type botResponse = {
-     "ok": boolean,
-     "result": TG_Message
-} 
+
+export interface botResponse {
+     ok: boolean,
+     result: any,
+     description?: string
+ }
    
 export type commandFunc = {
      name: string;
@@ -145,3 +146,5 @@ export const mediaType = {
 }
 
 export type mediaType_t = typeof mediaType[keyof typeof  mediaType];
+
+
