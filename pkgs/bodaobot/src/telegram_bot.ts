@@ -529,7 +529,7 @@ export default class TG_BOT {
               response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, 'Comando desconhecido: ' + command, id_thread, message_id));
           }
 
-          if (commandEntry === '/start') {
+          if (commandEntry === '/end') {
                await TG_API.sendMessage(ctx.bot.botINFO.TOKEN,{
                    text: 'Welcome to my bot! Press the button to accept my rules!',
                    chat_id: ctx.bot.botINFO.CHATID,
