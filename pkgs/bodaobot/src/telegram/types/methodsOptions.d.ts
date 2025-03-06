@@ -20,8 +20,14 @@ declare namespace tgOptions {
            * Yes 	Poll question, 1-300 characters
            */
           question: string; 
-          question_parse_mode?: string;// 	Optional 	Mode for parsing entities in the question. See formatting options for more details. Currently, only custom emoji entities are allowed
-          question_entities?: tgTypes.MessageEntity[];// 	Array of MessageEntity 	Optional 	A JSON-serialized list of special entities that appear in the poll question. It can be specified instead of question_parse_mode
+          /**
+           * Optional 	Mode for parsing entities in the question. See formatting options for more details. Currently, only custom emoji entities are allowed
+           */
+          question_parse_mode?: string;
+          /**
+           * Array of MessageEntity 	Optional 	A JSON-serialized list of special entities that appear in the poll question. It can be specified instead of question_parse_mode
+           */
+          question_entities?: tgTypes.MessageEntity[];
           options: tgTypes.InputPollOption[];// 	Array of InputPollOption 	Yes 	A JSON-serialized list of 2-10 answer options
           is_anonymous?:	boolean;// 	Optional 	True, if the poll needs to be anonymous, defaults to True
           type?: string;// 	Optional 	Poll type, “quiz” or “regular”, defaults to “regular”

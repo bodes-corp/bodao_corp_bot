@@ -39,6 +39,7 @@ export default class TIOZAO_CMDS {
 		await TG_API.sendMessage(bot.botINFO.TOKEN,{
 		    text: 'Welcome to my bot! Press the button to accept my rules!',
 		    chat_id: bot.botINFO.CHATID,
+		    message_thread_id:Number(bot.botINFO.THREADBOT), //without this the message goes to general thread of the chat
 		    reply_markup: {
 			   inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
 		    }
