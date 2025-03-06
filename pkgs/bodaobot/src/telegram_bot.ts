@@ -514,6 +514,15 @@ export default class TG_BOT {
           );
          
           if (commandEntry) {
+               if (commandEntry === '/end') {
+                    await TG_API.sendMessage(ctx.bot.botINFO.TOKEN,{
+                        text: 'Welcome to my bot! Press the button to accept my rules!',
+                        chat_id: ctx.bot.botINFO.CHATID,
+                        reply_markup: {
+                            inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
+                        }
+                    });
+                }
               const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
               const argument = msg_txt?.slice(selectedCommand.length).trim();
               await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
@@ -529,15 +538,7 @@ export default class TG_BOT {
               response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, 'Comando desconhecido: ' + command, id_thread, message_id));
           }
 
-          if (commandEntry === '/end') {
-               await TG_API.sendMessage(ctx.bot.botINFO.TOKEN,{
-                   text: 'Welcome to my bot! Press the button to accept my rules!',
-                   chat_id: ctx.bot.botINFO.CHATID,
-                   reply_markup: {
-                       inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
-                   }
-               });
-           }
+          
       
           if (commandEntry != '/spa') {
               await TIOZAO_CMDS.showMenu(ctx.bot,response_ids);
