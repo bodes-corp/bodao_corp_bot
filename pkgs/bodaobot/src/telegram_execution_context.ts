@@ -186,14 +186,14 @@ export default class TG_ExecutionContext {
 	async replyVideo(video: string, options: Record<string, number | string | boolean> = {}) {
 		switch (this.update_type) {
 			case updType.MESSAGE:
-				return await TG_API.sendVideo(TG_BOT.api.toString(), {
+				return await TG_API.sendVideoEssential(this.bot.token, {
 					...options,
 					chat_id: this.update.message?.chat.id.toString() ?? '',
 					reply_to_message_id: this.update.message?.message_id.toString() ?? '',
 					video,
 				});
 			case updType.INLINE_QUERY:
-				return await TG_API.answerInline(TG_BOT.api.toString(), {
+				return await TG_API.answerInline(this.bot.token, {
 					...options,
 					inline_query_id: this.update.inline_query?.id.toString() ?? '',
 					results: [new TelegramInlineQueryResultVideo(video)],
@@ -209,7 +209,7 @@ export default class TG_ExecutionContext {
 	 * @param file_id - telegram file_id
 	 */
 	async getFile(file_id: string) {
-		return await TG_API.getFile(TG_BOT.api.toString(), { file_id }, TG_BOT.token);
+		return await TG_API.getTheFile(this.bot.token, { file_id } );
 	}
 
 	/**
@@ -225,7 +225,7 @@ export default class TG_ExecutionContext {
 				switch (this.update_operation){
 					case updOperation.MEDIA_NEW:
 					case updOperation.MEDIA_EDIT:
-						return await TG_API.sendPhoto(TG_BOT.api.toString(), {
+						return await TG_API.sendPhotoEssential(this.bot.token, {
 							...options,
 							chat_id: this.update.message?.chat.id.toString() ?? '',
 							reply_to_message_id: this.update.message?.message_id.toString() ?? '',
@@ -233,7 +233,7 @@ export default class TG_ExecutionContext {
 							caption,
 						});
 					case updOperation.POST_NEW:
-						return await TG_API.sendPhoto(TG_BOT.api.toString(), {
+						return await TG_API.sendPhotoEssential(this.bot.token, {
 							...options,
 							chat_id: this.update.message?.chat.id.toString() ?? '',
 							reply_to_message_id: this.update.message?.message_id.toString() ?? '',
@@ -243,7 +243,7 @@ export default class TG_ExecutionContext {
 				}
 				
 			case updType.INLINE_QUERY:
-				return await TG_API.answerInline(TG_BOT.api.toString(), {
+				return await TG_API.answerInline(this.bot.token, {
 					inline_query_id: this.update.inline_query?.id.toString() ?? '',
 					results: [new TelegramInlineQueryResultPhoto(photo)],
 				});
@@ -259,12 +259,12 @@ export default class TG_ExecutionContext {
 	async sendTyping() {
 		switch (this.update_type) {
 			case 'message':
-				return await TG_API.sendChatAction(TG_BOT.api.toString(), {
+				return await TG_API.sendChatAction(this.bot.token, {
 					chat_id: this.update.message?.chat.id.toString() ?? '',
 					action: 'typing',
 				});
 			case 'business_message':
-				return await TG_API.sendChatAction(TG_BOT.api.toString(), {
+				return await TG_API.sendChatAction(this.bot.token, {
 					business_connection_id: this.update.business_message?.business_connection_id?.toString(),
 					chat_id: this.update.business_message?.chat.id.toString() ?? '',
 					action: 'typing',
@@ -283,7 +283,7 @@ export default class TG_ExecutionContext {
 	async replyInline(title: string, message: string, parse_mode = '') {
 		switch (this.update_type) {
 			case updType.INLINE_QUERY:
-				return await TG_API.answerInline(TG_BOT.api.toString(), {
+				return await TG_API.answerInline(this.bot.token, {
 					inline_query_id: this.update.inline_query?.id.toString() ?? '',
 					results: [new TelegramInlineQueryResultArticle({ content: message, title, parse_mode })],
 				});
@@ -304,7 +304,7 @@ export default class TG_ExecutionContext {
 				{
 					switch (this.update_operation){
 						case updOperation.POST_NEW:
-							return await TG_API.sendMessage(TG_BOT.api.toString(), {
+							return await TG_API.sendMessageEssential(this.bot.token, {
 								...options,
 								chat_id: this.update.message?.chat.id.toString() ?? '',
 								reply_to_message_id: this.update.message?.message_id.toString() ?? '',
@@ -314,7 +314,7 @@ export default class TG_ExecutionContext {
 
 						case updOperation.MEDIA_NEW:
 						case updOperation.MEDIA_EDIT:
-							return await TG_API.sendMessage(TG_BOT.api.toString(), {
+							return await TG_API.sendMessageEssential(this.bot.token, {
 								...options,
 								chat_id: this.update.message?.chat.id.toString() ?? '',
 								reply_to_message_id: this.update.message?.message_id.toString() ?? '',
@@ -323,7 +323,7 @@ export default class TG_ExecutionContext {
 							});
 						case updOperation.DOCUMENT_NEW:
 						case updOperation.DOC_EDIT:
-							return await TG_API.sendMessage(TG_BOT.api.toString(), {
+							return await TG_API.sendMessageEssential(this.bot.token, {
 								...options,
 								chat_id: this.update.message?.chat.id.toString() ?? '',
 								reply_to_message_id: this.update.message?.message_id.toString() ?? '',
@@ -334,7 +334,7 @@ export default class TG_ExecutionContext {
 				}
 				
 			case updType.MESSAGE_BUSINESS:
-				return await TG_API.sendMessage(TG_BOT.api.toString(), {
+				return await TG_API.sendMessageEssential(this.bot.token, {
 					chat_id: this.update.business_message?.chat.id.toString() ?? '',
 					text: message,
 					business_connection_id: this.update.business_message?.business_connection_id?.toString(),
@@ -342,7 +342,7 @@ export default class TG_ExecutionContext {
 				});
 				
 			case updType.INLINE_QUERY:
-				return await TG_API.answerInline(TG_BOT.api.toString(), {
+				return await TG_API.answerInline(this.bot.token, {
 					inline_query_id: this.update.inline_query?.id.toString() ?? '',
 					results: [new TelegramInlineQueryResultArticle({ title: message, content: message, parse_mode })],
 				});

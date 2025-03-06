@@ -6,10 +6,10 @@
 /**
  * Use this method to send a native poll. On success, the sent Message is returned.
  */
-interface sendPollOptions {
+export interface sendPollOptions {
      business_connection_id?: string;// 	Optional 	Unique identifier of the business connection on behalf of which the message will be sent
      chat_id: number | string;// 	Yes 	Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-     message_thread_id?: number;// 	Integer 	Optional 	Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+          message_thread_id?: number;// 	Integer 	Optional 	Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
      question: string; // 	Yes 	Poll question, 1-300 characters
      question_parse_mode?: string;// 	Optional 	Mode for parsing entities in the question. See formatting options for more details. Currently, only custom emoji entities are allowed
      question_entities?: tgTypes.MessageEntity[];// 	Array of MessageEntity 	Optional 	A JSON-serialized list of special entities that appear in the poll question. It can be specified instead of question_parse_mode
@@ -29,7 +29,18 @@ interface sendPollOptions {
      allow_paid_broadcast?: boolean;// 	Optional 	Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
      message_effect_id?: string;// 	Optional 	Unique identifier of the message effect to be added to the message; for private chats only
      reply_parameters?: 	tgTypes.ReplyParameters;// 	Optional 	Description of the message to reply to
-     reply_markup?: any;// 	InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply 	Optional 	Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
+     reply_markup?:tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;;// 	InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply 	Optional 	Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
      
 }
-export default sendPollOptions;
+export interface sendDiceOptions {
+            chat_id: number | string;
+            business_connection_id?: string;
+            message_thread_id?: number;
+            emoji?: string;
+            disable_notification?: boolean;
+            protect_content?: boolean;
+            message_effect_id?: string;
+            reply_parameters?: tgTypes.ReplyParameters;
+            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
+};
+

@@ -110,6 +110,8 @@ declare namespace tgTypes {
          */
         removed_chat_boost?: tgTypes.ChatBoostRemoved;
     }
+    export type update_t = typeof Update[keyof Update]
+
 
     /**
      * Describes the current status of a webhook.

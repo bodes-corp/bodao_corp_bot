@@ -1,4 +1,3 @@
-import sendPollOptions from '../types/MethodTelegramSendPool.js';
 import TelegramInlineQueryResultArticle from '../types/TelegramInlineQueryResultArticle.js';
 import TelegramInlineQueryResultPhoto from '../types/TelegramInlineQueryResultPhoto.js';
 import TelegramInlineQueryResultVideo from '../types/TelegramInlineQueryResultVideo.js';
@@ -22,108 +21,9 @@ export default class TG_API {
                disable_notification: 'true'
           }
 
-          return await TG_REQ.tgSendRequest(tgRequestMethod.SEND_MESSAGE, params);
+          return await TG_REQ.tgSendRequest(token,tgRequestMethod.SEND_MESSAGE, params);
      }
 
-	public static async sendChatAction(botApiURL: string, data: { business_connection_id?: string; chat_id: number | string; action: string }) {
-		const url = TG_REQ.getApiUrl( tgRequestMethod.SEND_CHAT_ACTION, data);
-		const response = await fetch(url);
-		return response;
-	}
-
-	/**
-	 * Get a file with a given file_id
-	 * @param botApiURL - full URL to the telegram API without slug
-	 * @param data - data to append to the request
-	 * @param token - bot token
-	 */
-	public static async getFile(botApiURL: string, data: Record<string, number | string | boolean>, token: string) {
-		if (data.file_id === '') {
-			return new Response();
-		}
-		const url = TG_REQ.getApiUrl( tgRequestMethod.GET_FILE, data);
-		const response = await fetch(url);
-		const json: { result: { file_path: string } } = await response.json();
-		let file_path: string;
-		try {
-			file_path = json.result.file_path;
-		} catch (e) {
-			console.log(`Error: ${e as string}`);
-			return new Response('cant read file_path. is the file too large?');
-		}
-		return await fetch(`https://api.telegram.org/file/bot${token}/${file_path}`);
-	}
-
-	/**
-	 * Send a message to a given botApi
-	 * @param botApiURL - full URL to the telegram API without slug
-	 * @param data - data to append to the request
-	 */
-	public static async sendMessage(
-		botApiURL: string,
-		data: {
-			reply_to_message_id?: number | string;
-			chat_id: number | string;
-			text: string;
-			parse_mode: string;
-			business_connection_id?: number | string;
-		},
-	) {
-		const url = TG_REQ.getApiUrl( tgRequestMethod.SEND_MESSAGE, data);
-		console.log(url.url);
-		try {
-			const response = await fetch(url.url, {
-			    method: 'POST',
-			    headers: { 'Content-Type': 'application/json' }
-			});
-	  
-			const data:any = await response.json();
-			if (!data.ok) {
-			    throw new Error(`Telegram API Error: ${data.description}`);
-			}
-	  
-			return data;
-		 } catch (error) {
-			console.error(`Error in sendMessage request:`, error);
-			throw error;
-		 }
-		
-	}
-
-	/**
-	 * Send a video message to a given botApi
-	 * @param botApiURL - full URL to the telegram API without slug
-	 * @param data - data to append to the request
-	 */
-	public static async sendVideo(
-		botApiURL: string,
-		data: {
-			reply_to_message_id: number | string;
-			chat_id: number | string;
-			video: string;
-		},
-	) {
-		const url = TG_REQ.getApiUrl( tgRequestMethod.SEND_VIDEO, data);
-		return await fetch(url);
-	}
-
-	/**
-	 * Send a photo message to a given botApi
-	 * @param botApiURL - full URL to the telegram API without slug
-	 * @param data - data to append to the request
-	 */
-	public static async sendPhoto(
-		botApiURL: string,
-		data: {
-			reply_to_message_id: number | string;
-			chat_id: number | string;
-			photo: string;
-			caption: string;
-		},
-	) {
-		const url = TG_REQ.getApiUrl( tgRequestMethod.SEND_PHOTO, data);
-		return await fetch(url);
-	}
 
 	/**
 	 * Send an inline response to a given botApi
@@ -131,17 +31,17 @@ export default class TG_API {
 	 * @param data - data to append to the request
 	 */
 	public static async answerInline(
-		botApiURL: string,
+		token: string,
 		data: {
 			inline_query_id: number | string;
 			results: TelegramInlineQueryResultArticle[] | TelegramInlineQueryResultPhoto[] | TelegramInlineQueryResultVideo[];
 		},
 	) {
-		const url = TG_REQ.getApiUrl( tgRequestMethod.ANSWER_INLINE, {
+		return await  TG_REQ.tgSendRequest(token, tgRequestMethod.ANSWER_INLINE, {
 			inline_query_id: data.inline_query_id,
 			results: JSON.stringify(data.results),
 		});
-		return await fetch(url);
+		
 	}
 
 	/**
@@ -150,7 +50,7 @@ export default class TG_API {
 	 * @param data - data to append to the request
 	 */
 	public static async answerCallback(
-		botApiURL: string,
+		token: string,
 		data: {
 			callback_query_id: number | string;
 			text?: string;
@@ -159,14 +59,14 @@ export default class TG_API {
 			cache_time?: number;
 		},
 	) {
-		const url = TG_REQ.getApiUrl( tgRequestMethod.ANSWER_CALLBACK, data);
-		return await fetch(url);
+		return await  TG_REQ.tgSendRequest(token,  tgRequestMethod.ANSWER_CALLBACK, data);
+		
 	}
 
 	public static async tgAnswerCallbackQuery(token:string, callbackQueryId:any, text:string|null = null) {
           const params:any = { callback_query_id: callbackQueryId };
           if (text) params.text = text;
-          return await TG_REQ.tgSendRequest(tgRequestMethod.ANSWER_CALLBACK, params);
+          return await TG_REQ.tgSendRequest(token,tgRequestMethod.ANSWER_CALLBACK, params);
      }
 
 
@@ -175,7 +75,7 @@ export default class TG_API {
                chat_id: String( chat_id),
                message_id
           }
-          return await TG_REQ.tgSendRequest(tgRequestMethod.DELETE_MESSAGE, params);
+          return await TG_REQ.tgSendRequest(token,tgRequestMethod.MESSAGE_DELETE, params);
      }
 
 	/**
@@ -192,7 +92,7 @@ export default class TG_API {
 				
 				const deleteParams = { chat_id, message_ids: chunk };
 				console.log("delete old messages - params:",  JSON.stringify(deleteParams))
-				const response = await fetch(TG_REQ.tgApiUrl(tgRequestMethod.DELETE_MESSAGES, {
+				const response = await fetch(TG_REQ.tgApiUrl(token, tgRequestMethod.MESSAGES_DELETE, {
 				    method: 'POST',
 				    headers: { 'Content-Type': 'application/json' },
 				    body: JSON.stringify(deleteParams)
@@ -209,17 +109,8 @@ export default class TG_API {
 	    }
     }
 
-    public static async tgSendPoll(token:string, params:sendPollOptions){
 
-		return await TG_REQ.tgSendRequest(tgRequestMethod.SEND_POLL, params);
-
-
-    }
-}
-
-
-
-export namespace tg {
+    
     /**
      * A simple method for testing your bot's authentication token. Requires no parameters.
      *
@@ -227,10 +118,11 @@ export namespace tg {
      *
      * @returns >- basic information about the bot in form of a [User](https://core.telegram.org/bots/api#user) object.
      */
-    export async function getMe(): Promise<tgTypes.User> {
-        return await TG_REQ.callApi('getMe');
+    public static async getMe(token:string): Promise<tgTypes.User> {
+        return await TG_REQ.callApi(token, 'getMe');
     }
 
+    
     /**
      * Use this method to log out from the cloud Bot API server before launching the bot locally.
      * You **must** log out the bot before running it locally, otherwise there is no guarantee that the bot will receive updates.
@@ -241,8 +133,8 @@ export namespace tg {
      *
      * @returns >- true on success
      */
-    export async function logOut(): Promise<boolean> {
-        return await TG_REQ.callApi('logOut');
+    public static async logOut(token:string): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'logOut');
     }
 
     /**
@@ -254,8 +146,8 @@ export namespace tg {
      *
      * @returns >- true on success
      */
-    export async function close(): Promise<boolean> {
-        return await TG_REQ.callApi('close');
+    public static async close(token:string): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'close');
     }
 
     /**
@@ -294,7 +186,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendMessage(
+    public static async sendMessage(
+        token:string,
         {
             chat_id,
             text,
@@ -308,21 +201,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            text: string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            parse_mode?: string;
-            entities?: tgTypes.MessageEntity[];
-            link_preview_options?: tgTypes.LinkPreviewOptions;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendMessage', {
+        }: tgOptions.sendMessage): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendMessage', {
             chat_id,
             text,
             business_connection_id,
@@ -337,6 +217,25 @@ export namespace tg {
             reply_markup: JSON.stringify(reply_markup),
         });
     }
+    /**
+	 * Send a message to a given botApi
+	 * @param botApiURL - full URL to the telegram API without slug
+	 * @param data - data to append to the request
+	 */
+	public static async sendMessageEssential(
+		token: string,
+		data: {
+			reply_to_message_id?: number | string;
+			chat_id: number | string;
+			text: string;
+			parse_mode: string;
+			business_connection_id?: number | string;
+		},
+	) {
+		
+		return await TG_REQ.tgSendRequest(token,'sendMessage',data)
+		
+	}
 
     /**
      * Use this method to forward messages of any kind. Service messages and messages with protected content can't be forwarded.
@@ -359,7 +258,8 @@ export namespace tg {
      * >- Protects the contents of the forwarded message from forwarding and saving
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned
      */
-    export async function forwardMessage(
+    public static async forwardMessage(
+        token:string,
         {
             chat_id,
             from_chat_id,
@@ -367,15 +267,8 @@ export namespace tg {
             message_thread_id,
             disable_notification,
             protect_content,
-        }: {
-            chat_id: number | string;
-            from_chat_id: number | string;
-            message_id: number;
-            message_thread_id?: number;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('forwardMessage', {
+        }: tgOptions.forwardMessage): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'forwardMessage', {
             chat_id,
             from_chat_id,
             message_id,
@@ -408,7 +301,8 @@ export namespace tg {
      * >- Protects the contents of the forwarded messages from forwarding and saving
      * @returns >- On success, an array of [MessageId](https://core.telegram.org/bots/api#messageid) of the sent messages is returned.
      */
-    export async function forwardMessages(
+    public static async forwardMessages(
+        token:string,
         {
             chat_id,
             from_chat_id,
@@ -416,15 +310,8 @@ export namespace tg {
             message_thread_id,
             disable_notification,
             protect_content,
-        }: {
-            chat_id: number | string;
-            from_chat_id: number | string;
-            message_ids: number[];
-            message_thread_id?: number;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-        }): Promise<tgTypes.MessageId[]> {
-        return await TG_REQ.callApi('forwardMessages', {
+        }: tgOptions.forwardMessages): Promise<tgTypes.MessageId[]> {
+        return await TG_REQ.callApi(token, 'forwardMessages', {
             chat_id,
             from_chat_id,
             message_ids: JSON.stringify(message_ids),
@@ -477,7 +364,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- the [MessageId](https://core.telegram.org/bots/api#messageid) of the sent message on success.
      */
-    export async function copyMessage(
+    public static async copyMessage(
+        token:string,
         {
             chat_id,
             from_chat_id,
@@ -491,22 +379,9 @@ export namespace tg {
             protect_content,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            from_chat_id: number | string;
-            message_id: number;
-            message_thread_id?: number;
-            caption?: string;
-            parse_mode?: string;
-            caption_entities?: tgTypes.MessageEntity[];
-            show_caption_above_media?: boolean;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        },
+        }: tgOptions.copyMessage,
     ): Promise<tgTypes.MessageId> {
-        return await TG_REQ.callApi('copyMessage', {
+        return await TG_REQ.callApi(token, 'copyMessage', {
             chat_id,
             from_chat_id,
             message_id,
@@ -550,7 +425,8 @@ export namespace tg {
      * >- Pass true to copy the messages without their captions
      * @returns >- On success, an array of [MessageId](https://core.telegram.org/bots/api#messageid) of the sent messages is returned.
      */
-    export async function copyMessages(
+    public static async copyMessages(
+        token:string,
         {
             chat_id,
             from_chat_id,
@@ -559,16 +435,8 @@ export namespace tg {
             disable_notification,
             protect_content,
             remove_caption,
-        }: {
-            chat_id: number | string;
-            from_chat_id: number | string;
-            message_ids: number[];
-            message_thread_id?: number;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            remove_caption?: boolean;
-        }): Promise<tgTypes.MessageId[]> {
-        return await TG_REQ.callApi('copyMessages', {
+        }: tgOptions.copyMessages): Promise<tgTypes.MessageId[]> {
+        return await TG_REQ.callApi(token, 'copyMessages', {
             chat_id,
             from_chat_id,
             message_ids: JSON.stringify(message_ids),
@@ -623,7 +491,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendPhoto(
+    public static async sendPhoto(
+        token:string,
         {
             chat_id,
             photo,
@@ -639,23 +508,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            photo: tgTypes.InputFile | string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            caption?: string;
-            parse_mode?: string;
-            caption_entities?: tgTypes.MessageEntity[];
-            show_caption_above_media?: boolean;
-            has_spoiler?: boolean;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendPhoto', {
+        }: tgOptions.sendPhoto): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendPhoto', {
             chat_id,
             photo,
             business_connection_id,
@@ -672,6 +526,23 @@ export namespace tg {
             reply_markup: JSON.stringify(reply_markup),
         });
     }
+    /**
+	 * Send a photo message to a given botApi
+	 * @param token - Bot unique token
+	 * @param data - essential data to append to the request
+	 */
+	public static async sendPhotoEssential(
+		token: string,
+		data: {
+			reply_to_message_id: number | string;
+			chat_id: number | string;
+			photo: string;
+			caption: string;
+		},
+	) {
+		return await  TG_REQ.tgSendRequest(token, tgRequestMethod.SEND_PHOTO, data);
+		
+	}
 
     /**
      * Use this method to send audio files, if you want Telegram clients to display them in the music player.
@@ -726,7 +597,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendAudio(
+    public static async sendAudio(
+        token:string,
         {
             chat_id,
             audio,
@@ -744,25 +616,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            audio: tgTypes.InputFile | string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            caption?: string;
-            parse_mode?: string;
-            caption_entities?: tgTypes.MessageEntity[];
-            duration?: number;
-            performer?: string;
-            title?: string;
-            thumbnail?: tgTypes.InputFile | string;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendAudio', {
+        }: tgOptions.sendAudio): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendAudio', {
             chat_id,
             audio,
             business_connection_id,
@@ -830,7 +685,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendDocument(
+    public static async sendDocument(
+        token:string,
         {
             chat_id,
             document,
@@ -846,23 +702,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            document: tgTypes.InputFile | string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            thumbnail?: tgTypes.InputFile | string;
-            caption?: string;
-            parse_mode?: string;
-            caption_entities?: tgTypes.MessageEntity[];
-            disable_content_type_detection?: boolean;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendDocument', {
+        }: tgOptions.sendDocument): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendDocument', {
             chat_id,
             document,
             business_connection_id,
@@ -939,7 +780,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendVideo(
+    public static async sendVideo(
+        token:string,
         {
             chat_id,
             video,
@@ -960,28 +802,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            video: tgTypes.InputFile | string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            duration?: number;
-            width?: number;
-            height?: number;
-            thumbnail?: tgTypes.InputFile | string;
-            caption?: string;
-            parse_mode?: string;
-            caption_entities?: tgTypes.MessageEntity[];
-            show_caption_above_media?: boolean;
-            has_spoiler?: boolean;
-            supports_streaming?: boolean;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendVideo', {
+        }: tgOptions.sendVideo): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendVideo', {
             chat_id,
             video,
             business_connection_id,
@@ -1003,6 +825,20 @@ export namespace tg {
             reply_markup: JSON.stringify(reply_markup),
         });
     }
+    /**
+	 * Send a video message to a given botApi
+	 * @param data - essential data to append to the request
+	 */
+	public static async sendVideoEssential(
+		token: string,
+		data: {
+			reply_to_message_id: number | string;
+			chat_id: number | string;
+			video: string;
+		},
+	) {
+		return await  TG_REQ.tgSendRequest(token, tgRequestMethod.SEND_VIDEO, data);
+	}
 
     /**
      * Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
@@ -1060,7 +896,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendAnimation(
+    public static async sendAnimation(
+        token:string,
         {
             chat_id,
             animation,
@@ -1080,27 +917,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            animation: tgTypes.InputFile | string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            duration?: number;
-            width?: number;
-            height?: number;
-            thumbnail?: tgTypes.InputFile | string;
-            caption?: string;
-            parse_mode?: string;
-            caption_entities?: tgTypes.MessageEntity[];
-            show_caption_above_media?: boolean;
-            has_spoiler?: boolean;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendAnimation', {
+        }: tgOptions.sendAnimation): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendAnimation', {
             chat_id,
             animation,
             business_connection_id,
@@ -1167,7 +985,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendVoice(
+    public static async sendVoice(
+        token:string,
         {
             chat_id,
             voice,
@@ -1182,22 +1001,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            voice: tgTypes.InputFile | string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            caption?: string;
-            parse_mode?: string;
-            caption_entities?: tgTypes.MessageEntity[];
-            duration?: number;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendVoice', {
+        }: tgOptions.sendVoice): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendVoice', {
             chat_id,
             voice,
             business_connection_id,
@@ -1258,7 +1063,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendVideoNote(
+    public static async sendVideoNote(
+        token:string,
         {
             chat_id,
             video_note,
@@ -1272,21 +1078,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            video_note: tgTypes.InputFile | string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            duration?: number;
-            length?: number;
-            thumbnail?: tgTypes.InputFile | string;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendVideoNote', {
+        }: tgOptions.sendVideoNote): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendVideoNote', {
             chat_id,
             video_note,
             business_connection_id,
@@ -1341,7 +1134,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendPaidMedia(
+    public static async sendPaidMedia(
+        token:string,
         {
             chat_id,
             star_count,
@@ -1355,21 +1149,8 @@ export namespace tg {
             protect_content,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            star_count: number;
-            media: tgTypes.InputPaidMedia[];
-            business_connection_id?: string;
-            caption?: string;
-            parse_mode?: string;
-            caption_entities?: tgTypes.MessageEntity[];
-            show_caption_above_media?: boolean;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendPaidMedia', {
+        }: tgOptions.sendPaidMedia): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendPaidMedia', {
             chat_id,
             star_count,
             media: JSON.stringify(media),
@@ -1410,7 +1191,8 @@ export namespace tg {
      * >- Description of the message to reply to
      * @returns >- On success, an array of [Messages](https://core.telegram.org/bots/api#message) that were sent is returned.
      */
-    export async function sendMediaGroup(
+    public static async sendMediaGroup(
+        token:string,
         {
             chat_id,
             media,
@@ -1420,17 +1202,8 @@ export namespace tg {
             protect_content,
             message_effect_id,
             reply_parameters,
-        }: {
-            chat_id: number | string;
-            media: (tgTypes.InputMediaAudio | tgTypes.InputMediaDocument | tgTypes.InputMediaPhoto | tgTypes.InputMediaVideo)[];
-            business_connection_id?: string;
-            message_thread_id?: number;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-        }): Promise<tgTypes.Message[]> {
-        return await TG_REQ.callApi('sendMediaGroup', {
+        }: tgOptions.sendMediaGroup): Promise<tgTypes.Message[]> {
+        return await TG_REQ.callApi(token, 'sendMediaGroup', {
             chat_id,
             media: JSON.stringify(media),
             business_connection_id,
@@ -1484,7 +1257,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendLocation(
+    public static async sendLocation(
+        token:string,
         {
             chat_id,
             latitude,
@@ -1500,23 +1274,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            latitude: number;
-            longitude: number;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            horizontal_accuracy?: number;
-            live_period?: number;
-            heading?: number;
-            proximity_alert_radius?: number;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendLocation', {
+        }: tgOptions.sendLocation): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendLocation', {
             chat_id,
             latitude,
             longitude,
@@ -1579,7 +1338,8 @@ export namespace tg {
      * instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendVenue(
+    public static async sendVenue(
+        token:string,
         {
             chat_id,
             latitude,
@@ -1597,25 +1357,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            latitude: number;
-            longitude: number;
-            title: string;
-            address: string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            foursquare_id?: string;
-            foursquare_type?: string;
-            google_place_id?: string;
-            google_place_type?: string;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendVenue', {
+        }: tgOptions.sendVenue): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendVenue', {
             chat_id,
             latitude,
             longitude,
@@ -1670,7 +1413,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendContact(
+    public static async sendContact(
+        token:string,
         {
             chat_id,
             phone_number,
@@ -1684,21 +1428,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            phone_number: string;
-            first_name: string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            last_name?: string;
-            vcard?: string;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendContact', {
+        }: tgOptions.sendContact): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendContact', {
             chat_id,
             phone_number,
             first_name,
@@ -1776,7 +1507,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >-  On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendPoll(
+    public static async sendPoll(
+        token:string,
         {
             chat_id,
             question,
@@ -1800,31 +1532,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            question: string;
-            options: tgTypes.InputPollOption[];
-            business_connection_id?: string;
-            message_thread_id?: number;
-            question_parse_mode?: string;
-            question_entities?: tgTypes.MessageEntity[];
-            is_anonymous?: boolean;
-            type?: string;
-            allows_multiple_answers?: boolean;
-            correct_option_id?: number;
-            explanation?: string;
-            explanation_parse_mode?: string;
-            explanation_entities?: tgTypes.MessageEntity[];
-            open_period?: number;
-            close_date?: number;
-            is_closed?: boolean;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendPoll', {
+        }:tgOptions.sendPoll ): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendPoll', {
             chat_id,
             question,
             options: JSON.stringify(options),
@@ -1881,7 +1590,8 @@ export namespace tg {
      * >  - instructions to remove a reply keyboard or to force a reply from the user
      * @returns >- On success, the sent [Message](https://core.telegram.org/bots/api#message) is returned.
      */
-    export async function sendDice(
+    public static async sendDice(
+        token:string,
         {
             chat_id,
             business_connection_id,
@@ -1892,18 +1602,8 @@ export namespace tg {
             message_effect_id,
             reply_parameters,
             reply_markup,
-        }: {
-            chat_id: number | string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-            emoji?: string;
-            disable_notification?: boolean;
-            protect_content?: boolean;
-            message_effect_id?: string;
-            reply_parameters?: tgTypes.ReplyParameters;
-            reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
-        }): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi('sendDice', {
+        }: tgOptions.sendDice): Promise<tgTypes.Message> {
+        return await TG_REQ.callApi(token, 'sendDice', {
             chat_id,
             business_connection_id,
             message_thread_id,
@@ -1946,26 +1646,25 @@ export namespace tg {
      * >- Unique identifier for the target message thread; for supergroups only
      * @returns >- true on success.
      */
-    export async function sendChatAction(
+    public static async sendChatAction(
+        token:string,
         {
             chat_id,
             action,
             business_connection_id,
             message_thread_id,
-        }: {
-            chat_id: number | string;
-            action: string;
-            business_connection_id?: string;
-            message_thread_id?: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('sendChatAction', {
+        }: tgOptions.sendChatAction): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'sendChatAction', {
             chat_id,
             action,
             business_connection_id,
             message_thread_id,
         });
+        //const response =TG_REQ.tgSendRequest(token,tgRequestMethod.SEND_CHAT_ACTION, data)
+		//return response;
     }
-
+    
+   
     /**
      * Use this method to change the chosen reactions on a message. Service messages can't be reacted to.
      * Automatically forwarded messages from a channel to its discussion group have the same available reactions as messages in the channel.
@@ -1987,19 +1686,15 @@ export namespace tg {
      * >- Pass true to set the reaction with a big animation
      * @returns >- true on success.
      */
-    export async function setMessageReaction(
+    public static async setMessageReaction(
+        token:string,
         {
             chat_id,
             message_id,
             reaction,
             is_big,
-        }: {
-            chat_id: number | string;
-            message_id: number;
-            reaction?: tgTypes.ReactionType[];
-            is_big?: boolean;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setMessageReaction', {
+        }: tgOptions.setMessageReaction): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setMessageReaction', {
             chat_id,
             message_id,
             reaction: JSON.stringify(reaction),
@@ -2020,17 +1715,14 @@ export namespace tg {
      * >- Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.
      * @returns >- a [UserProfilePhotos](https://core.telegram.org/bots/api#userprofilephotos) object.
      */
-    export async function getUserProfilePhotos(
+    public static async getUserProfilePhotos(
+        token:string,
         {
             user_id,
             offset,
             limit,
-        }: {
-            user_id: number;
-            offset?: number;
-            limit?: number;
-        }): Promise<tgTypes.UserProfilePhotos> {
-        return await TG_REQ.callApi('getUserProfilePhotos', {
+        }: tgOptions.getUserProfilePhotos): Promise<tgTypes.UserProfilePhotos> {
+        return await TG_REQ.callApi(token, 'getUserProfilePhotos', {
             user_id,
             offset,
             limit,
@@ -2050,16 +1742,38 @@ export namespace tg {
      * >- File identifier to get information about
      * @returns >- On success, a [File](https://core.telegram.org/bots/api#file) object is returned.
      */
-    export async function getFile(
+    public static async getFile(
+        token:string,
         {
             file_id,
-        }: {
-            file_id: string;
-        }): Promise<tgTypes.File> {
-        return await TG_REQ.callApi('getFile', {
+        }: tgOptions.getFile): Promise<tgTypes.File> {
+        return await TG_REQ.callApi(token, 'getFile', {
             file_id,
         });
     }
+
+    /**
+	 * Get a file with a given file_id
+	 * @param botApiURL - full URL to the telegram API without slug
+	 * @param data - data to append to the request
+	 * @param token - bot token
+	 */
+	public static async getTheFile(token: string, data:{file_id:string}) {
+		if (data.file_id === '') {
+			return new Response();
+		}
+        //tg.getFile()
+		const response = await  TG_REQ.tgSendRequest(token, tgRequestMethod.FILE_GET, data);
+		const json: { result: { file_path: string } } = await response.result.json();
+		let file_path: string;
+		try {
+			file_path = json.result.file_path;
+		} catch (e) {
+			console.log(`Error: ${e as string}`);
+			return new Response('cant read file_path. is the file too large?');
+		}
+		return await fetch(`https://api.telegram.org/file/bot${token}/${file_path}`);
+	}
 
     /**
      * Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels,
@@ -2083,19 +1797,15 @@ export namespace tg {
      * Always true for supergroups and channels.
      * @returns >- true on success.
      */
-    export async function banChatMember(
+    public static async banChatMember(
+        token:string,
         {
             chat_id,
             user_id,
             until_date,
             revoke_messages,
-        }: {
-            chat_id: number | string;
-            user_id: number;
-            until_date?: number;
-            revoke_messages?: boolean;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('banChatMember', {
+        }: tgOptions.banChatMember): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'banChatMember', {
             chat_id,
             user_id,
             until_date,
@@ -2121,17 +1831,14 @@ export namespace tg {
      * >- Do nothing if the user is not banned
      * @returns >- true on success.
      */
-    export async function unbanChatMember(
+    public static async unbanChatMember(
+        token:string,
         {
             chat_id,
             user_id,
             only_if_banned,
-        }: {
-            chat_id: number | string;
-            user_id: number;
-            only_if_banned?: boolean;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('unbanChatMember', {
+        }: tgOptions.unbanChatMember): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'unbanChatMember', {
             chat_id,
             user_id,
             only_if_banned,
@@ -2161,27 +1868,10 @@ export namespace tg {
      * If user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever
      * @returns >- true on success.
      */
-    export async function restrictChatMember(
-        {
-            chat_id,
-            user_id,
-            permissions,
-            use_independent_chat_permissions,
-            until_date,
-        }: {
-            chat_id: number | string;
-            user_id: number;
-            permissions: tgTypes.ChatPermissions;
-            use_independent_chat_permissions?: boolean;
-            until_date?: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('restrictChatMember', {
-            chat_id,
-            user_id,
-            permissions: JSON.stringify(permissions),
-            use_independent_chat_permissions,
-            until_date,
-        });
+    public static async restrictChatMember(
+        token:string,
+        params: tgOptions.restrictChatMember): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'restrictChatMember',params);
     }
 
     /**
@@ -2230,7 +1920,8 @@ export namespace tg {
      * >- Pass true if the user is allowed to create, rename, close, and reopen forum topics; for supergroups only
      * @returns >- true on success.
      */
-    export async function promoteChatMember(
+    public static async promoteChatMember(
+        token:string,
         {
             chat_id,
             user_id,
@@ -2249,26 +1940,8 @@ export namespace tg {
             can_edit_messages,
             can_pin_messages,
             can_manage_topics,
-        }: {
-            chat_id: number | string;
-            user_id: number;
-            is_anonymous?: boolean;
-            can_manage_chat?: boolean;
-            can_delete_messages?: boolean;
-            can_manage_video_chats?: boolean;
-            can_restrict_members?: boolean;
-            can_promote_members?: boolean;
-            can_change_info?: boolean;
-            can_invite_users?: boolean;
-            can_post_stories?: boolean;
-            can_edit_stories?: boolean;
-            can_delete_stories?: boolean;
-            can_post_messages?: boolean;
-            can_edit_messages?: boolean;
-            can_pin_messages?: boolean;
-            can_manage_topics?: boolean;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('promoteChatMember', {
+        }: tgOptions.promoteChatMember): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'promoteChatMember', {
             chat_id,
             user_id,
             is_anonymous,
@@ -2302,17 +1975,14 @@ export namespace tg {
      * >- New custom title for the administrator; 0-16 characters, emoji are not allowed
      * @returns >- true on success.
      */
-    export async function setChatAdministratorCustomTitle(
+    public static async setChatAdministratorCustomTitle(
+        token:string,
         {
             chat_id,
             user_id,
             custom_title,
-        }: {
-            chat_id: number | string;
-            user_id: number;
-            custom_title: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setChatAdministratorCustomTitle', {
+        }:tgOptions.setChatAdministratorCustomTitle ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setChatAdministratorCustomTitle', {
             chat_id,
             user_id,
             custom_title,
@@ -2333,15 +2003,13 @@ export namespace tg {
      * >- Unique identifier of the target sender chat
      * @returns >- true on success.
      */
-    export async function banChatSenderChat(
+    public static async banChatSenderChat(
+        token:string,
         {
             chat_id,
             sender_chat_id,
-        }: {
-            chat_id: number | string;
-            sender_chat_id: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('banChatSenderChat', {
+        }:tgOptions.banChatSenderChat ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'banChatSenderChat', {
             chat_id,
             sender_chat_id,
         });
@@ -2359,15 +2027,13 @@ export namespace tg {
      * >- Unique identifier of the target sender chat
      * @returns >- true on success.
      */
-    export async function unbanChatSenderChat(
+    public static async unbanChatSenderChat(
+        token:string,
         {
             chat_id,
             sender_chat_id,
-        }: {
-            chat_id: number | string;
-            sender_chat_id: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('unbanChatSenderChat', {
+        }:tgOptions.unbanChatSenderChat ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'unbanChatSenderChat', {
             chat_id,
             sender_chat_id,
         });
@@ -2390,17 +2056,14 @@ export namespace tg {
      * the can_send_polls permission will imply the can_send_messages permission.
      * @returns >- true on success.
      */
-    export async function setChatPermissions(
+    public static async setChatPermissions(
+        token:string,
         {
             chat_id,
             permissions,
             use_independent_chat_permissions,
-        }: {
-            chat_id: number | string;
-            permissions: tgTypes.ChatPermissions;
-            use_independent_chat_permissions?: boolean;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setChatPermissions', {
+        }: tgOptions.setChatPermissions): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setChatPermissions', {
             chat_id,
             permissions: JSON.stringify(permissions),
             use_independent_chat_permissions,
@@ -2417,13 +2080,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
      * @returns >- the new invite link as string on success.
      */
-    export async function exportChatInviteLink(
+    public static async exportChatInviteLink(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<string> {
-        return await TG_REQ.callApi('exportChatInviteLink', {
+        }: tgOptions.exportChatInviteLink): Promise<string> {
+        return await TG_REQ.callApi(token, 'exportChatInviteLink', {
             chat_id,
         });
     }
@@ -2447,21 +2109,16 @@ export namespace tg {
      * >- true, if users joining the chat via the link need to be approved by chat administrators. If true, member_limit can't be specified
      * @returns >- the new invite link as [ChatInviteLink](https://core.telegram.org/bots/api#chatinvitelink) object.
      */
-    export async function createChatInviteLink(
+    public static async createChatInviteLink(
+        token:string,
         {
             chat_id,
             name,
             expire_date,
             member_limit,
             creates_join_request,
-        }: {
-            chat_id: number | string;
-            name?: string;
-            expire_date?: number;
-            member_limit?: number;
-            creates_join_request?: boolean;
-        }): Promise<tgTypes.ChatInviteLink> {
-        return await TG_REQ.callApi('createChatInviteLink', {
+        }: tgOptions.createChatInviteLink): Promise<tgTypes.ChatInviteLink> {
+        return await TG_REQ.callApi(token, 'createChatInviteLink', {
             chat_id,
             name,
             expire_date,
@@ -2490,7 +2147,8 @@ export namespace tg {
      * >- true, if users joining the chat via the link need to be approved by chat administrators. If true, member_limit can't be specified
      * @returns >- the edited invite link as a [ChatInviteLink](https://core.telegram.org/bots/api#chatinvitelink) object.
      */
-    export async function editChatInviteLink(
+    public static async editChatInviteLink(
+        token:string,
         {
             chat_id,
             invite_link,
@@ -2498,15 +2156,8 @@ export namespace tg {
             expire_date,
             member_limit,
             creates_join_request,
-        }: {
-            chat_id: number | string;
-            invite_link: string;
-            name?: string;
-            expire_date?: number;
-            member_limit?: number;
-            creates_join_request?: boolean;
-        }): Promise<tgTypes.ChatInviteLink> {
-        return await TG_REQ.callApi('editChatInviteLink', {
+        }:tgOptions.editChatInviteLink ): Promise<tgTypes.ChatInviteLink> {
+        return await TG_REQ.callApi(token, 'editChatInviteLink', {
             chat_id,
             invite_link,
             name,
@@ -2535,19 +2186,15 @@ export namespace tg {
      * >- Invite link name; 0-32 characters
      * @returns >- the new invite link as a [ChatInviteLink](https://core.telegram.org/bots/api#chatinvitelink) object.
      */
-    export async function createChatSubscriptionInviteLink(
+    public static async createChatSubscriptionInviteLink(
+        token:string,
         {
             chat_id,
             subscription_period,
             subscription_price,
             name,
-        }: {
-            chat_id: number | string;
-            subscription_period: number;
-            subscription_price: number;
-            name?: string;
-        }): Promise<tgTypes.ChatInviteLink> {
-        return await TG_REQ.callApi('createChatSubscriptionInviteLink', {
+        }: tgOptions.createChatSubscriptionInviteLink): Promise<tgTypes.ChatInviteLink> {
+        return await TG_REQ.callApi(token, 'createChatSubscriptionInviteLink', {
             chat_id,
             subscription_period,
             subscription_price,
@@ -2569,17 +2216,14 @@ export namespace tg {
      * >- Invite link name; 0-32 characters
      * @returns >- the edited invite link as a [ChatInviteLink](https://core.telegram.org/bots/api#chatinvitelink) object.
      */
-    export async function editChatSubscriptionInviteLink(
+    public static async editChatSubscriptionInviteLink(
+        token:string,
         {
             chat_id,
             invite_link,
             name,
-        }: {
-            chat_id: number | string;
-            invite_link: string;
-            name?: string;
-        }): Promise<tgTypes.ChatInviteLink> {
-        return await TG_REQ.callApi('editChatSubscriptionInviteLink', {
+        }: tgOptions.editChatSubscriptionInviteLink): Promise<tgTypes.ChatInviteLink> {
+        return await TG_REQ.callApi(token, 'editChatSubscriptionInviteLink', {
             chat_id,
             invite_link,
             name,
@@ -2598,15 +2242,13 @@ export namespace tg {
      * >- The invite link to revoke
      * @returns >- the revoked invite link as [ChatInviteLink](https://core.telegram.org/bots/api#chatinvitelink) object.
      */
-    export async function revokeChatInviteLink(
+    public static async revokeChatInviteLink(
+        token:string,
         {
             chat_id,
             invite_link,
-        }: {
-            chat_id: number | string;
-            invite_link: string;
-        }): Promise<tgTypes.ChatInviteLink> {
-        return await TG_REQ.callApi('revokeChatInviteLink', {
+        }: tgOptions.revokeChatInviteLink): Promise<tgTypes.ChatInviteLink> {
+        return await TG_REQ.callApi(token, 'revokeChatInviteLink', {
             chat_id,
             invite_link,
         });
@@ -2624,15 +2266,13 @@ export namespace tg {
      * >- Unique identifier of the target user
      * @returns >- true on success.
      */
-    export async function approveChatJoinRequest(
+    public static async approveChatJoinRequest(
+        token:string,
         {
             chat_id,
             user_id,
-        }: {
-            chat_id: number | string;
-            user_id: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('approveChatJoinRequest', {
+        }: tgOptions.approveChatJoinRequest): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'approveChatJoinRequest', {
             chat_id,
             user_id,
         });
@@ -2650,15 +2290,13 @@ export namespace tg {
      * >- Unique identifier of the target user
      * @returns >- true on success.
      */
-    export async function declineChatJoinRequest(
+    public static async declineChatJoinRequest(
+        token:string,
         {
             chat_id,
             user_id,
-        }: {
-            chat_id: number | string;
-            user_id: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('declineChatJoinRequest', {
+        }: tgOptions.declineChatJoinRequest): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'declineChatJoinRequest', {
             chat_id,
             user_id,
         });
@@ -2676,15 +2314,13 @@ export namespace tg {
      * >- New chat photo, uploaded using multipart/form-data
      * @returns >- true on success.
      */
-    export async function setChatPhoto(
+    public static async setChatPhoto(
+        token:string,
         {
             chat_id,
             photo,
-        }: {
-            chat_id: number | string;
-            photo: tgTypes.InputFile;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setChatPhoto', {
+        }: tgOptions.setChatPhoto): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setChatPhoto', {
             chat_id,
             photo: JSON.stringify(photo),
         });
@@ -2700,13 +2336,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
      * @returns >- true on success.
      */
-    export async function deleteChatPhoto(
+    public static async deleteChatPhoto(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('deleteChatPhoto', {
+        }:tgOptions.deleteChatPhoto ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'deleteChatPhoto', {
             chat_id,
         });
     }
@@ -2723,15 +2358,13 @@ export namespace tg {
      * >- New chat title, 1-128 characters
      * @returns >- true on success.
      */
-    export async function setChatTitle(
+    public static async setChatTitle(
+        token:string,
         {
             chat_id,
             title,
-        }: {
-            chat_id: number | string;
-            title: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setChatTitle', {
+        }: tgOptions.setChatTitle): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setChatTitle', {
             chat_id,
             title,
         });
@@ -2749,15 +2382,13 @@ export namespace tg {
      * >- New chat description, 0-255 characters
      * @returns >- true on success.
      */
-    export async function setChatDescription(
+    public static async setChatDescription(
+        token:string,
         {
             chat_id,
             description,
-        }: {
-            chat_id: number | string;
-            description?: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setChatDescription', {
+        }: tgOptions.setChatDescription): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setChatDescription', {
             chat_id,
             description,
         });
@@ -2781,19 +2412,15 @@ export namespace tg {
      * Notifications are always disabled in channels and private chats.
      * @returns >- true on success.
      */
-    export async function pinChatMessage(
+    public static async pinChatMessage(
+        token:string,
         {
             chat_id,
             message_id,
             business_connection_id,
             disable_notification,
-        }: {
-            chat_id: number | string;
-            message_id: number;
-            business_connection_id?: string;
-            disable_notification?: boolean;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('pinChatMessage', {
+        }:tgOptions.pinChatMessage ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'pinChatMessage', {
             chat_id,
             message_id,
             business_connection_id,
@@ -2817,17 +2444,14 @@ export namespace tg {
      * If not specified, the most recent pinned message (by sending date) will be unpinned.
      * @returns >- true on success.
      */
-    export async function unpinChatMessage(
+    public static async unpinChatMessage(
+        token:string,
         {
             chat_id,
             business_connection_id,
             message_id,
-        }: {
-            chat_id: number | string;
-            business_connection_id?: string;
-            message_id?: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('unpinChatMessage', {
+        }: tgOptions.unpinChatMessage): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'unpinChatMessage', {
             chat_id,
             business_connection_id,
             message_id,
@@ -2845,13 +2469,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
      * @returns >- true on success.
      */
-    export async function unpinAllChatMessages(
+    public static async unpinAllChatMessages(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('unpinAllChatMessages', {
+        }: tgOptions.unpinAllChatMessages): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'unpinAllChatMessages', {
             chat_id,
         });
     }
@@ -2865,13 +2488,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target supergroup or channel (in the format `@channelusername`)
      * @returns >- true on success.
      */
-    export async function leaveChat(
+    public static async leaveChat(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('leaveChat', {
+        }: tgOptions.leaveChat): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'leaveChat', {
             chat_id,
         });
     }
@@ -2885,13 +2507,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target supergroup or channel (in the format `@channelusername`)
      * @returns >- a [ChatFullInfo](https://core.telegram.org/bots/api#chatfullinfo) object on success.
      */
-    export async function getChat(
+    public static async getChat(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<tgTypes.ChatFullInfo> {
-        return await TG_REQ.callApi('getChat', {
+        }: tgOptions. getChat): Promise<tgTypes.ChatFullInfo> {
+        return await TG_REQ.callApi(token, 'getChat', {
             chat_id,
         });
     }
@@ -2905,13 +2526,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target supergroup or channel (in the format `@channelusername`)
      * @returns >- an Array of [ChatMember](https://core.telegram.org/bots/api#chatmember) objects.
      */
-    export async function getChatAdministrators(
+    public static async getChatAdministrators(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<tgTypes.ChatMember> {
-        return await TG_REQ.callApi('getChatAdministrators', {
+        }: tgOptions.getChatAdministrators): Promise<tgTypes.ChatMember> {
+        return await TG_REQ.callApi(token, 'getChatAdministrators', {
             chat_id,
         });
     }
@@ -2925,13 +2545,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target supergroup or channel (in the format `@channelusername`)
      * @returns >- the number of members in the chat on success.
      */
-    export async function getChatMemberCount(
+    public static async getChatMemberCount(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<number> {
-        return await TG_REQ.callApi('getChatMemberCount', {
+        }:tgOptions.getChatMemberCount ): Promise<number> {
+        return await TG_REQ.callApi(token, 'getChatMemberCount', {
             chat_id,
         });
     }
@@ -2948,15 +2567,13 @@ export namespace tg {
      * >- Unique identifier of the target user
      * @returns >- a [ChatMember](https://core.telegram.org/bots/api#chatmember) object on success.
      */
-    export async function getChatMember(
+    public static async getChatMember(
+        token:string,
         {
             chat_id,
             user_id,
-        }: {
-            chat_id: number | string;
-            user_id: number;
-        }): Promise<tgTypes.ChatMember> {
-        return await TG_REQ.callApi('getChatMember', {
+        }:tgOptions.getChatMember ): Promise<tgTypes.ChatMember> {
+        return await TG_REQ.callApi(token, 'getChatMember', {
             chat_id,
             user_id,
         });
@@ -2976,15 +2593,13 @@ export namespace tg {
      * >- Name of the sticker set to be set as the group sticker set
      * @returns >- true on success.
      */
-    export async function setChatStickerSet(
+    public static async setChatStickerSet(
+        token:string,
         {
             chat_id,
             sticker_set_name,
-        }: {
-            chat_id: number | string;
-            sticker_set_name: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setChatStickerSet', {
+        }:tgOptions.setChatStickerSet ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setChatStickerSet', {
             chat_id,
             sticker_set_name,
         });
@@ -3002,13 +2617,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target supergroup (in the format `@supergroupusername`)
      * @returns >- true on success.
      */
-    export async function deleteChatStickerSet(
+    public static async deleteChatStickerSet(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('deleteChatStickerSet', {
+        }:tgOptions.deleteChatStickerSet ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'deleteChatStickerSet', {
             chat_id,
         });
     }
@@ -3021,8 +2635,8 @@ export namespace tg {
      *
      * @returns >- an Array of [Sticker](https://core.telegram.org/bots/api#sticker) objects.
      */
-    export async function getForumTopicIconStickers(): Promise<tgTypes.Sticker[]> {
-        return await TG_REQ.callApi('getForumTopicIconStickers');
+    public static async getForumTopicIconStickers(token:string): Promise<tgTypes.Sticker[]> {
+        return await TG_REQ.callApi(token, 'getForumTopicIconStickers');
     }
 
     /**
@@ -3048,19 +2662,15 @@ export namespace tg {
      * Use [getForumTopicIconStickers](https://core.telegram.org/bots/api#getforumtopiciconstickers) to get all allowed custom emoji identifiers.
      * @returns >- information about the created topic as a [ForumTopic](https://core.telegram.org/bots/api#forumtopic) object.
      */
-    export async function createForumTopic(
+    public static async createForumTopic(
+        token:string,
         {
             chat_id,
             name,
             icon_color,
             icon_custom_emoji_id,
-        }: {
-            chat_id: number | string;
-            name: string;
-            icon_color?: number;
-            icon_custom_emoji_id?: string;
-        }): Promise<tgTypes.ForumTopic> {
-        return await TG_REQ.callApi('createForumTopic', {
+        }: tgOptions.createForumTopic): Promise<tgTypes.ForumTopic> {
+        return await TG_REQ.callApi(token, 'createForumTopic', {
             chat_id,
             name,
             icon_color,
@@ -3087,19 +2697,15 @@ export namespace tg {
      * to get all allowed custom emoji identifiers. Pass an empty string to remove the icon. If not specified, the current icon will be kept
      * @returns >- true on success.
      */
-    export async function editForumTopic(
+    public static async editForumTopic(
+        token:string,
         {
             chat_id,
             message_thread_id,
             name,
             icon_custom_emoji_id,
-        }: {
-            chat_id: number | string;
-            message_thread_id: number;
-            name?: string;
-            icon_custom_emoji_id?: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('editForumTopic', {
+        }: tgOptions.editForumTopic): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'editForumTopic', {
             chat_id,
             message_thread_id,
             name,
@@ -3120,15 +2726,13 @@ export namespace tg {
      * >- Unique identifier for the target message thread of the forum topic
      * @returns >- true on success.
      */
-    export async function closeForumTopic(
+    public static async closeForumTopic(
+        token:string,
         {
             chat_id,
             message_thread_id,
-        }: {
-            chat_id: number | string;
-            message_thread_id: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('closeForumTopic', {
+        }: tgOptions.closeForumTopic): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'closeForumTopic', {
             chat_id,
             message_thread_id,
         });
@@ -3147,15 +2751,13 @@ export namespace tg {
      * >- Unique identifier for the target message thread of the forum topic
      * @returns >- true on success.
      */
-    export async function reopenForumTopic(
+    public static async reopenForumTopic(
+        token:string,
         {
             chat_id,
             message_thread_id,
-        }: {
-            chat_id: number | string;
-            message_thread_id: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('reopenForumTopic', {
+        }:tgOptions.reopenForumTopic ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'reopenForumTopic', {
             chat_id,
             message_thread_id,
         });
@@ -3173,15 +2775,13 @@ export namespace tg {
      * >- Unique identifier for the target message thread of the forum topic
      * @returns >- true on success.
      */
-    export async function deleteForumTopic(
+    public static async deleteForumTopic(
+        token:string,
         {
             chat_id,
             message_thread_id,
-        }: {
-            chat_id: number | string;
-            message_thread_id: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('deleteForumTopic', {
+        }:tgOptions.deleteForumTopic ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'deleteForumTopic', {
             chat_id,
             message_thread_id,
         });
@@ -3199,15 +2799,13 @@ export namespace tg {
      * >- Unique identifier for the target message thread of the forum topic
      * @returns >- true on success.
      */
-    export async function unpinAllForumTopicMessages(
+    public static async unpinAllForumTopicMessages(
+        token:string,
         {
             chat_id,
             message_thread_id,
-        }: {
-            chat_id: number | string;
-            message_thread_id: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('unpinAllForumTopicMessages', {
+        }:tgOptions.unpinAllForumTopicMessages ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'unpinAllForumTopicMessages', {
             chat_id,
             message_thread_id,
         });
@@ -3225,15 +2823,13 @@ export namespace tg {
      * >- New topic name, 1-128 characters
      * @returns >- true on success.
      */
-    export async function editGeneralForumTopic(
+    public static async editGeneralForumTopic(
+        token:string,
         {
             chat_id,
             name,
-        }: {
-            chat_id: number | string;
-            name: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('editGeneralForumTopic', {
+        }:tgOptions.editGeneralForumTopic ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'editGeneralForumTopic', {
             chat_id,
             name,
         });
@@ -3249,13 +2845,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target supergroup (in the format `@supergroupusername`)
      * @returns >- true on success.
      */
-    export async function closeGeneralForumTopic(
+    public static async closeGeneralForumTopic(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('closeGeneralForumTopic', {
+        }:tgOptions.closeGeneralForumTopic ): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'closeGeneralForumTopic', {
             chat_id,
         });
     }
@@ -3271,13 +2866,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target supergroup (in the format `@supergroupusername`)
      * @returns >- true on success.
      */
-    export async function reopenGeneralForumTopic(
+    public static async reopenGeneralForumTopic(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('reopenGeneralForumTopic', {
+        }: tgOptions.reopenGeneralForumTopic): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'reopenGeneralForumTopic', {
             chat_id,
         });
     }
@@ -3293,13 +2887,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target supergroup (in the format `@supergroupusername`)
      * @returns >- true on success.
      */
-    export async function hideGeneralForumTopic(
+    public static async hideGeneralForumTopic(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('hideGeneralForumTopic', {
+        }: tgOptions.hideGeneralForumTopic): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'hideGeneralForumTopic', {
             chat_id,
         });
     }
@@ -3314,13 +2907,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target supergroup (in the format `@supergroupusername`)
      * @returns >- true on success.
      */
-    export async function unhideGeneralForumTopic(
+    public static async unhideGeneralForumTopic(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('unhideGeneralForumTopic', {
+        }: tgOptions.unhideGeneralForumTopic): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'unhideGeneralForumTopic', {
             chat_id,
         });
     }
@@ -3335,13 +2927,12 @@ export namespace tg {
      * >- Unique identifier for the target chat or username of the target supergroup (in the format `@supergroupusername`)
      * @returns >- true on success.
      */
-    export async function unpinAllGeneralForumTopicMessages(
+    public static async unpinAllGeneralForumTopicMessages(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id: number | string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('unpinAllGeneralForumTopicMessages', {
+        }: tgOptions.unpinAllGeneralForumTopicMessages): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'unhideGeneralForumTopic', {
             chat_id,
         });
     }
@@ -3369,21 +2960,16 @@ export namespace tg {
      * Telegram apps will support caching starting in version 3.14. Defaults to 0.
      * @returns >- On success, true is returned.
      */
-    export async function answerCallbackQuery(
+    public static async answerCallbackQuery(
+        token:string,
         {
             callback_query_id,
             text,
             show_alert,
             url,
             cache_time,
-        }: {
-            callback_query_id: string;
-            text?: string;
-            show_alert?: boolean;
-            url?: string;
-            cache_time?: number;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('answerCallbackQuery', {
+        }: tgOptions.answerCallbackQuery): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'answerCallbackQuery', {
             callback_query_id,
             text,
             show_alert,
@@ -3403,15 +2989,13 @@ export namespace tg {
      * >- Unique identifier of the target user
      * @returns >- a [UserChatBoosts](https://core.telegram.org/bots/api#userchatboosts) object.
      */
-    export async function getUserChatBoosts(
+    public static async getUserChatBoosts(
+        token:string,
         {
             chat_id,
             user_id,
-        }: {
-            chat_id: number | string;
-            user_id: number;
-        }): Promise<tgTypes.UserChatBoosts> {
-        return await TG_REQ.callApi('getUserChatBoosts', {
+        }: tgOptions.getUserChatBoosts): Promise<tgTypes.UserChatBoosts> {
+        return await TG_REQ.callApi(token, 'getUserChatBoosts', {
             chat_id,
             user_id,
         });
@@ -3426,13 +3010,12 @@ export namespace tg {
      * >- Unique identifier of the business connection
      * @returns >- a [BusinessConnection](https://core.telegram.org/bots/api#businessconnection) object on success.
      */
-    export async function getBusinessConnection(
+    public static async getBusinessConnection(
+        token:string,
         {
             business_connection_id,
-        }: {
-            business_connection_id: string;
-        }): Promise<tgTypes.BusinessConnection> {
-        return await TG_REQ.callApi('getBusinessConnection', {
+        }: tgOptions.getBusinessConnection): Promise<tgTypes.BusinessConnection> {
+        return await TG_REQ.callApi(token, 'getBusinessConnection', {
             business_connection_id,
         });
     }
@@ -3453,17 +3036,14 @@ export namespace tg {
      * for whose language there are no dedicated commands
      * @returns >- true on success.
      */
-    export async function setMyCommands(
+    public static async setMyCommands(
+        token:string,
         {
             commands,
             scope,
             language_code,
-        }: {
-            commands: tgTypes.BotCommand[];
-            scope?: tgTypes.BotCommandScope;
-            language_code?: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setMyCommands', {
+        }: tgOptions.setMyCommands): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setMyCommands', {
             commands: JSON.stringify(commands),
             scope: JSON.stringify(scope),
             language_code,
@@ -3484,15 +3064,13 @@ export namespace tg {
      * for whose language there are no dedicated commands
      * @returns >- true on success.
      */
-    export async function deleteMyCommands(
+    public static async deleteMyCommands(
+        token:string,
         {
             scope,
             language_code,
-        }: {
-            scope?: tgTypes.BotCommandScope;
-            language_code?: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('deleteMyCommands', {
+        }: tgOptions.deleteMyCommands): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'deleteMyCommands', {
             scope: JSON.stringify(scope),
             language_code,
         });
@@ -3510,15 +3088,13 @@ export namespace tg {
      * >- A two-letter ISO 639-1 language code or an empty string
      * @returns >- an Array of [BotCommand](https://core.telegram.org/bots/api#botcommand) objects. If commands aren't set, an empty list is returned.
      */
-    export async function getMyCommands(
+    public static async getMyCommands(
+        token:string,
         {
             scope,
             language_code,
-        }: {
-            scope?: tgTypes.BotCommandScope;
-            language_code?: string;
-        }): Promise<tgTypes.BotCommand[]> {
-        return await TG_REQ.callApi('getMyCommands', {
+        }: tgOptions.getMyCommands): Promise<tgTypes.BotCommand[]> {
+        return await TG_REQ.callApi(token, 'getMyCommands', {
             scope: JSON.stringify(scope),
             language_code,
         });
@@ -3535,15 +3111,13 @@ export namespace tg {
      * >- A two-letter ISO 639-1 language code. If empty, the name will be shown to all users for whose language there is no dedicated name.
      * @returns >- true on success.
      */
-    export async function setMyName(
+    public static async setMyName(
+        token:string,
         {
             name,
             language_code,
-        }: {
-            name?: string;
-            language_code?: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setMyName', {
+        }: tgOptions.setMyName): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setMyName', {
             name,
             language_code,
         });
@@ -3558,13 +3132,12 @@ export namespace tg {
      * >- A two-letter ISO 639-1 language code or an empty string
      * @returns >- [BotName](https://core.telegram.org/bots/api#botname) on success.
      */
-    export async function getMyName(
+    public static async getMyName(
+        token:string,
         {
             language_code,
-        }: {
-            language_code?: string;
-        }): Promise<tgTypes.BotName> {
-        return await TG_REQ.callApi('getMyName', {
+        }: tgOptions.getMyName): Promise<tgTypes.BotName> {
+        return await TG_REQ.callApi(token, 'getMyName', {
             language_code,
         });
     }
@@ -3581,15 +3154,13 @@ export namespace tg {
      * If empty, the description will be applied to all users for whose language there is no dedicated description.
      * @returns >- true on success.
      */
-    export async function setMyDescription(
+    public static async setMyDescription(
+        token:string,
         {
             description,
             language_code,
-        }: {
-            description?: string;
-            language_code?: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setMyDescription', {
+        }: tgOptions.setMyDescription): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setMyDescription', {
             description,
             language_code,
         });
@@ -3604,13 +3175,12 @@ export namespace tg {
      * >- A two-letter ISO 639-1 language code or an empty string
      * @returns >- [BotDescription](https://core.telegram.org/bots/api#botdescription) on success.
      */
-    export async function getMyDescription(
+    public static async getMyDescription(
+        token:string,
         {
             language_code,
-        }: {
-            language_code?: string;
-        }): Promise<tgTypes.BotDescription> {
-        return await TG_REQ.callApi('getMyDescription', {
+        }: tgOptions.getMyDescription): Promise<tgTypes.BotDescription> {
+        return await TG_REQ.callApi(token, 'getMyDescription', {
             language_code,
         });
     }
@@ -3628,15 +3198,13 @@ export namespace tg {
      * If empty, the short description will be applied to all users for whose language there is no dedicated short description.
      * @returns >- true on success.
      */
-    export async function setMyShortDescription(
+    public static async setMyShortDescription(
+        token:string,
         {
             short_description,
             language_code,
-        }: {
-            short_description?: string;
-            language_code?: string;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setMyShortDescription', {
+        }: tgOptions.setMyShortDescription): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setMyShortDescription', {
             short_description,
             language_code,
         });
@@ -3651,13 +3219,12 @@ export namespace tg {
      * >- A two-letter ISO 639-1 language code or an empty string
      * @returns >- [BotShortDescription](https://core.telegram.org/bots/api#botshortdescription) on success.
      */
-    export async function getMyShortDescription(
+    public static async getMyShortDescription(
+        token:string,
         {
             language_code,
-        }: {
-            language_code?: string;
-        }): Promise<tgTypes.BotShortDescription> {
-        return await TG_REQ.callApi('getMyShortDescription', {
+        }: tgOptions.getMyShortDescription): Promise<tgTypes.BotShortDescription> {
+        return await TG_REQ.callApi(token, 'getMyShortDescription', {
             language_code,
         });
     }
@@ -3674,15 +3241,13 @@ export namespace tg {
      * Defaults to [MenuButtonDefault](https://core.telegram.org/bots/api#menubuttondefault)
      * @returns >- true on success.
      */
-    export async function setChatMenuButton(
+    public static async setChatMenuButton(
+        token:string,
         {
             chat_id,
             menu_button,
-        }: {
-            chat_id?: number;
-            menu_button?: tgTypes.MenuButton;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setChatMenuButton', {
+        }: tgOptions.setChatMenuButton): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setChatMenuButton', {
             chat_id,
             menu_button: JSON.stringify(menu_button),
         });
@@ -3697,13 +3262,12 @@ export namespace tg {
      * >- Unique identifier for the target private chat. If not specified, default bot's menu button will be returned
      * @returns >- [MenuButton](https://core.telegram.org/bots/api#menubutton) on success.
      */
-    export async function getChatMenuButton(
+    public static async getChatMenuButton(
+        token:string,
         {
             chat_id,
-        }: {
-            chat_id?: number;
-        }): Promise<tgTypes.MenuButton> {
-        return await TG_REQ.callApi('getChatMenuButton', {
+        }: tgOptions.getChatMenuButton): Promise<tgTypes.MenuButton> {
+        return await TG_REQ.callApi(token, 'getChatMenuButton', {
             chat_id,
         });
     }
@@ -3722,15 +3286,13 @@ export namespace tg {
      * Otherwise, the default administrator rights of the bot for groups and supergroups will be changed.
      * @returns >- true on success.
      */
-    export async function setMyDefaultAdministratorRights(
+    public static async setMyDefaultAdministratorRights(
+        token:string,
         {
             rights,
             for_channels,
-        }: {
-            rights?: tgTypes.ChatAdministratorRights;
-            for_channels?: boolean;
-        }): Promise<boolean> {
-        return await TG_REQ.callApi('setMyDefaultAdministratorRights', {
+        }: tgOptions.setMyDefaultAdministratorRights): Promise<boolean> {
+        return await TG_REQ.callApi(token, 'setMyDefaultAdministratorRights', {
             rights: JSON.stringify(rights),
             for_channels,
         });
@@ -3746,14 +3308,15 @@ export namespace tg {
      * Otherwise, default administrator rights of the bot for groups and supergroups will be returned.
      * @returns >- [ChatAdministratorRights](https://core.telegram.org/bots/api#chatadministratorrights) on success.
      */
-    export async function getMyDefaultAdministratorRights(
+    public static async getMyDefaultAdministratorRights(
+        token:string,
         {
             for_channels,
-        }: {
-            for_channels?: boolean;
-        }): Promise<tgTypes.ChatAdministratorRights> {
-        return await TG_REQ.callApi('getMyDefaultAdministratorRights', {
+        }: tgOptions.getMyDefaultAdministratorRights): Promise<tgTypes.ChatAdministratorRights> {
+        return await TG_REQ.callApi(token, 'getMyDefaultAdministratorRights', {
             for_channels,
         });
     }
+
+
 }

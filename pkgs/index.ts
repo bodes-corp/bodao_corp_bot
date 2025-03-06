@@ -1,3 +1,4 @@
+import { TG_HANDLER } from "./bodaobot/src/handlers/handlers";
 import TG_BOT from "./bodaobot/src/telegram_bot";
 import TIOZAO_CMDS from "./bodaobot/src/tiozao/tiozao_api";
 import { BOT_INFO } from "./bodaobot/src/types/BotInfo";
@@ -26,12 +27,12 @@ export default {
 		)
 		const rafaelBot = new  TG_BOT(botINFO,env.TG_SECRET,env.DB);
 		
-		rafaelBot.on(':message', TG_BOT.handleMessage)
-           .on(':edited_message',TG_BOT.handleEditedMessage)
-           .on(':callback',TG_BOT.handleCallbackQuery)
-           .on(':edit_thread',TG_BOT.handleEditThread)
-           .on(':create_thread',TG_BOT.handleCreateThread)
-           .on(':handle_member',TG_BOT.handleMemberOperation)
+		rafaelBot.on(':message', TG_HANDLER.handleMessage)
+           .on(':edited_message',TG_HANDLER.handleEditedMessage)
+           .on(':callback',TG_HANDLER.handleCallbackQuery)
+           .on(':edit_thread',TG_HANDLER.handleEditThread)
+           .on(':create_thread',TG_HANDLER.handleCreateThread)
+           .on(':handle_member',TG_HANDLER.handleMemberOperation)
 		 .onCommand('/active_gp', { name: 'active_gp', desc:'GPs Ativas', func: TIOZAO_CMDS.listActiveGp, requiresArg: false })
 		.onCommand( '/chat', { name: 'chat', desc:'Bate Papo',func: TIOZAO_CMDS.listChat, requiresArg: false })
 		.onCommand('/gp_td', { name: 'gp_td', desc:'Lista GPs',func: TIOZAO_CMDS.listTdGp, requiresArg: false })

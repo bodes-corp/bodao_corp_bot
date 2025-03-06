@@ -1,14 +1,8 @@
-import TG_BOT from "../telegram_bot";
 import { botResponse, tgRequestMethod_t } from "../types/Types";
 
 
 
 export default class TG_REQ{
-
-private static getToken():string{
-     return TG_BOT.token;
-}
-
 
      /**
       * Get the API URL for a given bot API and slug
@@ -16,8 +10,7 @@ private static getToken():string{
       * @param slug - slug to append to the API URL
       * @param data - data to append to the request
      */
-     public static getApiUrl(slug:tgRequestMethod_t, data: Record<string, number | string | boolean>) {
-          const botApiURL: string = TG_BOT.api.toString();
+     public static getApiUrl(botApiURL :string,slug:tgRequestMethod_t, data: Record<string, number | string | boolean>) {
           const request = new URL(botApiURL + (slug.startsWith('/') || botApiURL.endsWith('/') ? '' : '/') + slug);
           const params = new URLSearchParams();
           for (const i in data) {
@@ -26,15 +19,8 @@ private static getToken():string{
           return new Request(`${request.toString()}?${params.toString()}`);
      } 
 
-     public static apiUrl(methodName: string, params?: Record<string, any>) {
-          const token = TG_REQ.getToken();
-          const query = params ? `?${new URLSearchParams(params).toString()}` : '';
-      
-          return `https://api.telegram.org/bot${token}/${methodName}${query}`;
-     }
-
-     public static tgApiUrl(methodName: tgRequestMethod_t, params: Record<string, any > = {}) {
-          const token:string = TG_REQ.getToken();
+     
+     public static tgApiUrl(token:string, methodName: tgRequestMethod_t, params: Record<string, any > = {}) {
           const api = new URL('https://api.telegram.org/bot' + token);
           const query = params ? `?${new URLSearchParams(params).toString()}` : '';
           return api+`/${methodName}${query}`;
@@ -46,16 +32,16 @@ private static getToken():string{
       * @param params the params to append to the request
       * @returns the params appended to the request JSON formated
       */
-     public static async tgSendRequest(method: tgRequestMethod_t,  params:Record<string, any >  ): Promise<botResponse> {
+     public static async tgSendRequest(token:string, method: tgRequestMethod_t,  params:Record<string, any >  ): Promise<botResponse> {
                try {
-                    const token:string = TG_REQ.getToken();
-                    //const response = await fetch(TG_REQ.tgApiUrl(method, token, params), {
-                    const response = await fetch(TG_REQ.tgApiUrl(method, params), {
+                    
+                    
+                    const response = await fetch(TG_REQ.tgApiUrl(token,method, params), {
                          method: 'POST',
                          headers: { 'Content-Type': 'application/json' }
                     });
            
-                    const data:any = await response.json();
+                    const data:botResponse = await response.json();
                     if (!data.ok) {
                        throw new Error(`Telegram API Error: ${data.description}`);
                     }
@@ -67,16 +53,25 @@ private static getToken():string{
                }
      }
 
-     public static async callApi(methodName: string, params?: Record<string, any>){
-          if (params) {
-              params = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined && v !== null));
-          }
-          const response: botResponse = await (await fetch(TG_REQ.apiUrl(methodName, params))).json();
-          if (!response.ok) {
-              throw new Error('API Call Failed:\n' + JSON.stringify(response, null, 2));
-          } else {
-              return response.result;
-          }
+     public static async callApi(token:string, methodName:tgRequestMethod_t, params?: Record<string, any>){
+          try {
+               if (params) {
+               params = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined && v !== null));
+               }
+               const response = await fetch(TG_REQ.tgApiUrl(token, methodName, params),{
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+               });
+               const data: botResponse = await response.json();
+               if (!data.ok) {
+                    throw new Error('API Call Failed:\n' + JSON.stringify(response, null, 2));
+               } else {
+                    return data.result;
+               }
+          } catch (error) {
+               console.error(`Error in ${methodName} request:`, error);
+               throw error;
+           }
      }
 
 

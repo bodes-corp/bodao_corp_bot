@@ -20,3 +20,4 @@
 /// <reference path="./types/sticker.d.ts" />
 /// <reference path="./types/user.d.ts" />
 /// <reference path="./types/webapp.d.ts" />
+/// <reference path="./types/methodsOptions.d.ts" />

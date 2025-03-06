@@ -1,5 +1,5 @@
 import { DB_API } from "./database_api";
-import { chunkArray, isValidChat, splitMessage } from "./library";
+import { chunkArray, splitMessage } from "./library";
 import TG_REQ from "./telegram/RequestManager";
 import TG_API from "./telegram/telegram_api";
 import TG_ExecutionContext from "./telegram_execution_context";
@@ -21,13 +21,13 @@ import Webhook from "./webhook";
 export default class TG_BOT {
 
      /** The telegram token */
-     static token: string;
+     token: string;
 
      /** The telegram api URL */
-     static api: URL;
+     api: URL;
 
      /** The telegram handlers record map */
-     handlers:Handler  = {};
+     updateHandlers:Handler  = {} as Handler;
 
      /**command handlers record map */
      commands:CommandHandler = {}
@@ -64,7 +64,7 @@ export default class TG_BOT {
 	*/
      constructor(info:BOT_INFO,secret:string,database:any=null) {
           this.secret = secret;
-		TG_BOT.token = info.TOKEN;
+		this.token = info.TOKEN;
           this.botThreadId = info.THREADBOT;
           this.botINFO = new BOT_INFO(
                info.TOKEN,
@@ -72,16 +72,8 @@ export default class TG_BOT {
                info.THREADBOT
           )
           this.DB=database;
-		TG_BOT.api = new URL('https://api.telegram.org/bot' + info.TOKEN);
-         /* this.handlers = {
-               ':message': this.handleMessage,
-               ':edited_message': this.handleEditedMessage,
-               ':callback': this.handleCallbackQuery,
-               ':edit_thread':this.handleEditThread,
-               ':create_thread':this.handleCreateThread
-           }*/
-
-   
+		this.api = new URL('https://api.telegram.org/bot' + info.TOKEN);
+           
           
 	}
 
@@ -92,7 +84,7 @@ export default class TG_BOT {
 	 */
 	on(event: string, callback: handlerFunc) {
 		if (!['on', 'handle'].includes(event)) {
-			this.handlers[event] = callback;
+			this.updateHandlers[event] = callback;
 		}
 		return this;
 	}
@@ -129,7 +121,7 @@ export default class TG_BOT {
                parse_mode: 'html',
                disable_notification: 'true'
            };
-          return await TG_REQ.tgSendRequest(tgRequestMethod.SEND_MESSAGE, params );
+          return await TG_REQ.tgSendRequest(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params );
       }
 
       /**
@@ -156,7 +148,7 @@ export default class TG_BOT {
                media,
                disable_notification: 'true'
            }
-          return await TG_REQ.tgSendRequest(tgRequestMethod.SEND_MEDIA_GROUP,   params );
+          return await TG_REQ.tgSendRequest(info.TOKEN,tgRequestMethod.SEND_MEDIA_GROUP,   params );
      }
       
      
@@ -171,7 +163,7 @@ export default class TG_BOT {
                reply_to_message_id: message_id
           }
           
-          return await TG_REQ.tgSendRequest(tgRequestMethod.SEND_MESSAGE,  params );
+          return await TG_REQ.tgSendRequest(info.TOKEN, tgRequestMethod.SEND_MESSAGE,  params );
      }
       
        
@@ -264,7 +256,7 @@ export default class TG_BOT {
      async handleUpdate(update: tgTypes.Update) {
           this.update = update;
           
-          let handlerName = ':message';
+          let handlerName /*: updType_t*/  = ':message';
           let args: string[] = [];
           const ctx = new TG_ExecutionContext(this, this.update);
           this.currentContext = ctx;
@@ -331,20 +323,21 @@ export default class TG_BOT {
                default:
                break;
           }
+          
           if (args.at(0)?.startsWith('/')) { //check replication
-               handlerName = args.at(0)?.slice(1) ?? ':message';
+               handlerName= args.at(0)?.slice(1) ?? ':message';
           }
-          if (!( handlerName in this.handlers)) {
+          if (!( handlerName in this.updateHandlers)) {
                handlerName = ':message';
           }
           if (ctx.commandFlag) {
                await ctx.bot.handleBotCommand(ctx);
           }
                
-          //handlers do not receive the this pointer.
+          //updateHandlers do not receive the this pointer.
           //remember to not use them in inside the methods
           //the best way is to make them static methods
-          return await this.handlers[handlerName](this.currentContext);
+          return await this.updateHandlers[handlerName](this.currentContext);
           
           
      }
@@ -535,143 +528,30 @@ export default class TG_BOT {
           } else {
               response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, 'Comando desconhecido: ' + command, id_thread, message_id));
           }
+
+          if (commandEntry === '/start') {
+               await TG_API.sendMessage(ctx.bot.botINFO.TOKEN,{
+                   text: 'Welcome to my bot! Press the button to accept my rules!',
+                   chat_id: ctx.bot.botINFO.CHATID,
+                   reply_markup: {
+                       inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
+                   }
+               });
+           }
       
           if (commandEntry != '/spa') {
               await TIOZAO_CMDS.showMenu(ctx.bot,response_ids);
           }
+
+       
+      
+
           response_ids.push(message_id);
           await ctx.bot.handleBotResponses(response_ids);
           return await ctx.bot.handleOldMessages();
      }
       
-      //update Handlers
-
-     public static async handleEditThread(ctx: TG_ExecutionContext ) {
-          let message:ContextMessage = ctx.update_message;
-          let response_ids:any[] = [];
-          const threadName =  message.message.forum_topic_edited?.name;
-          await TIOZAO_CMDS.checkDuplicatedThread(ctx.bot, threadName, message.id_thread);
-          await ctx.bot.handleBotResponses(response_ids);
-          await DB_API.dbInsertMessage(ctx.bot, ctx.update_message);
-          return new Response('ok');
-     }
       
-     public static async handleCreateThread (ctx: TG_ExecutionContext ) {
-          let message:ContextMessage = ctx.update_message;
-          let response_ids:any[] = [];
-          const threadName =  message.message.forum_topic_created?.name;
-          console.log('debug from handleCreateThread- threadName: ',threadName);
-          await TIOZAO_CMDS.checkDuplicatedThread(ctx.bot, threadName, message.id_thread);
-          await ctx.bot.handleBotResponses(response_ids);
-          console.log('debug from handleCreateThread- returned from checkDuplicatedThread and will execute db insert')
-          await DB_API.dbInsertMessage(ctx.bot, ctx.update_message);
-          return new Response('ok');
-     }
-
-     public static async handleMessage(ctx:TG_ExecutionContext) {
-         
-          console.log("debug from handleMessage- operation: ", ctx.update_operation);
-          //console.log("env: ", ctx.bot.env);
-          //return new Response("Hello, world!");
-          if (!isValidChat(ctx.update_message,  ctx.bot.botINFO.CHATID)) {''
-              
-              //console.log("invalid chat: ");
-              //console.log("env: ", env.json());
-              //return new Response("Hello, world!");
-             return  new Response('Unauthorized', { status: 403 });
-          }
-      
-          
-          //only for messages without specif handlers like create and edit thread
-          switch (ctx.update_operation) {
-              /*case updOperation.THREAD_EDIT:
-               await ctx.bot.handleEditThread(ctx);
-               break;
-              
-              case updOperation.THREAD_CREATE: //case ther is no specific handler
-               console.log('debug from handleMessage- will execute db handleCreteTrhread')
-          
-                  await ctx.bot.handleCreateThread(ctx);
-                  break;*/
-               case updOperation.MEDIA_NEW:
-                    await ctx.bot.handleNewMedia(ctx);
-                    break;
-               case updOperation.MEDIA_NEW:
-                  await ctx.bot.handleNewMedia(ctx);
-                  break;
-               case updOperation.DOCUMENT_NEW:
-                    await ctx.bot.handleNewDocument(ctx);
-                    break;
-              case updOperation.POST_NEW:
-                  await ctx.bot.handleNewPost(ctx);
-                  break;
-               
-          }
-          console.log('debug from handleMessage- returned from handleCreteTrhread and will execute db insert')
-          await DB_API.dbInsertMessage(ctx.bot, ctx.update_message);
-          return new Response('ok');
-     }
-
-     public static async handleEditedMessage(ctx:TG_ExecutionContext) {
-          const messageJson:any = ctx.update.edited_message
-          const message:ContextMessage = new ContextMessage(messageJson);
-          console.log("debug from handleEditedMessage- operation: ", ctx.update_operation);
-          switch (ctx.update_operation) {
-              case updOperation.MEDIA_EDIT:
-                  await ctx.bot.handleEditMedia(ctx);
-                  break;
-              case updOperation.POST_EDIT:
-                  await ctx.bot.handleEditPost(ctx);
-                  break;
-              case updOperation.DOC_EDIT:
-                await ctx.bot.handleEditDocument(ctx);
-                break;
-          }
-          await DB_API.dbEditMessage( ctx.bot, message);
-          return new Response('ok');
-     }
-
-      public static async handleCallbackQuery(ctx:TG_ExecutionContext) {
-          const callbackQuery:any = ctx.update.callback_query
-          const { from: user, data: command } = callbackQuery;
-          let response_ids:any[] = [];
-          
-          const commandKey = Object.keys(ctx.bot.commands).find(prefix => command.startsWith(prefix));
-      
-          if (commandKey) {
-              await ctx.bot.tgAnswerCallbackQuery(callbackQuery.id, commandKey);
-              const commandFunction:commandFunc = ctx.bot.commands[commandKey];
-              response_ids = await commandFunction.func(ctx.bot, callbackQuery, command.slice(commandKey.length).trim());
-          } else {
-              return new Response(`Unknown command: ${command}`, { status: 400 });
-          }
-          if (command !== '/spa') {
-              await  TIOZAO_CMDS.showMenu( ctx.bot, response_ids);
-          }
-          await  ctx.bot.handleBotResponses( response_ids);
-          await  ctx.bot.handleOldMessages();
-          return new Response('ok');
-     }
-
-     public static async handleMemberOperation(ctx:TG_ExecutionContext) {
-          const operation:any = ctx.update_operation;
-          console.log("operation: ", operation);
-          if (operation === updOperation.MEMBER_JOIN) {
-               if(ctx.update_message.Users)
-               await DB_API.dbUpdateUsers(ctx.bot.DB, ctx.update_message.Users);
-          } else if (operation === updOperation.MEMBER_LEFT) {
-               await DB_API.dbDeactivateUser(ctx.bot.DB, ctx.update_message);
-          } 
-          return new Response('ok');
-     }
-
-     
-
-     
-      
-      
-      
-     
 }
 
 
