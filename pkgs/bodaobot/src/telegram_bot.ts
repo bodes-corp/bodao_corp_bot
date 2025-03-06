@@ -151,20 +151,11 @@ export default class TG_BOT {
           return await TG_REQ.tgSendRequest(info.TOKEN,tgRequestMethod.SEND_MEDIA_GROUP,   params );
      }
       
+      
      
-     async tgSendMessageThread(info:BotINFO, text:string, id_thread:any, message_id:any) {
-          
-          const params = {
-               chat_id: info.CHATID,
-               message_thread_id: id_thread,
-               text,
-               parse_mode: 'html',
-               disable_notification: 'true',
-               reply_to_message_id: message_id
-          }
-          
-          return await TG_REQ.tgSendRequest(info.TOKEN, tgRequestMethod.SEND_MESSAGE,  params );
-     }
+     //async tgSendMessageThread(info:BotINFO, text:string, id_thread:any, message_id:any) {  
+     //     return await TG_REQ.tgSendRequest(info.TOKEN, tgRequestMethod.SEND_MESSAGE,  params );
+     //}
       
        
      

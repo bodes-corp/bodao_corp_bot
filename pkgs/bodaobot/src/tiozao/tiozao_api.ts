@@ -1,5 +1,6 @@
 import { DB_API } from "../database_api";
 import { formatDate, isValidSearchTerm } from "../library";
+import { Requests } from "../requests/";
 import TG_API from "../telegram/telegram_api";
 import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
@@ -36,15 +37,12 @@ export default class TIOZAO_CMDS {
  public static async testeEnd(bot: TG_BOT){
 
 	let response_ids:any[] = [];
-		await TG_API.sendMessage(bot.botINFO.TOKEN,{
-		    text: 'Welcome to my bot! Press the button to accept my rules!',
-		    chat_id: bot.botINFO.CHATID,
-		    message_thread_id:Number(bot.botINFO.THREADBOT), //without this the message goes to general thread of the chat
-		    reply_markup: {
-			   inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
-		    }
-		});
-		return response_ids;
+	const markup = {
+		inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
+	}
+	const params = Requests.MessageToBotTopicWithMarkup(bot,'Welcome to my bot! Press the button to accept my rules!', markup)
+	await TG_API.sendMessage(bot.botINFO.TOKEN,params);
+	return response_ids;
  }
  
  public static async listActiveGp(bot:  TG_BOT) {

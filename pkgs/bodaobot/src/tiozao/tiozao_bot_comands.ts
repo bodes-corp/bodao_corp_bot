@@ -1,8 +1,9 @@
 import { DB_API } from "../database_api";
+import { Requests } from "../requests/";
+import TG_REQ from "../telegram/RequestManager";
 import TG_API from "../telegram/telegram_api";
 import TG_BOT from "../telegram_bot";
-import { two_buttons_t } from "../types/Types";
-
+import { tgRequestMethod, two_buttons_t } from "../types/Types";
 
 
 
@@ -29,12 +30,16 @@ export class TIOZAO_BOT_CMDs {
       }
       
       public static async botAlert(bot:  TG_BOT,  text:string, id_thread:any, message_id:any|null = null) {
-          const response = await bot.tgSendMessageThread(bot.botINFO, text, id_thread, message_id);
-          return Number(response.result.message_id);
+        const params = Requests.MessageThreadRequest(bot,text, id_thread, message_id);
+        const response =  await TG_REQ.tgSendRequest(bot.botINFO.TOKEN, tgRequestMethod.SEND_MESSAGE,  params );
+          //await bot.tgSendMessageThread(bot.botINFO, text, id_thread, message_id);
+        return Number(response.result.message_id);
       }
       
       public static async botSendNotify(bot:  TG_BOT, notify:string, id_thread:any, message_id:any) {
-          const response = await bot.tgSendMessageThread(bot.botINFO, notify, id_thread, message_id);
+        const params = Requests.MessageThreadRequest(bot,notify, id_thread, message_id);
+        const response =  await TG_REQ.tgSendRequest(bot.botINFO.TOKEN, tgRequestMethod.SEND_MESSAGE,  params );
+        //const response = await bot.tgSendMessageThread(bot.botINFO, notify, id_thread, message_id);
           return await DB_API.dbInsertBotNotify(bot.DB, Number(response.result.message_id), message_id);  
       }
       
