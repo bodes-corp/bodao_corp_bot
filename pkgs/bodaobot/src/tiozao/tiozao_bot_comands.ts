@@ -1,5 +1,5 @@
 import { DB_API } from "../database_api";
-import TG_API from "../telegram_api";
+import TG_API from "../telegram/telegram_api";
 import TG_BOT from "../telegram_bot";
 import { two_buttons_t } from "../types/Types";
 
