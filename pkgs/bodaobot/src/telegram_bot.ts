@@ -514,15 +514,7 @@ export default class TG_BOT {
           );
          
           if (commandEntry) {
-               if (commandEntry === '/end') {
-                    await TG_API.sendMessage(ctx.bot.botINFO.TOKEN,{
-                        text: 'Welcome to my bot! Press the button to accept my rules!',
-                        chat_id: ctx.bot.botINFO.CHATID,
-                        reply_markup: {
-                            inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
-                        }
-                    });
-                }
+              
               const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
               const argument = msg_txt?.slice(selectedCommand.length).trim();
               await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);

@@ -42,8 +42,8 @@ export default {
 		.onCommand('/trend_gp', { name: 'trend_gp', desc:'GPs Tendência',func: TIOZAO_CMDS.listTrendGp, requiresArg: false })
 		.onCommand('/user', { name: 'user', desc:'Membros',func: TIOZAO_CMDS.listMembers, requiresArg: false })
 		.onCommand('/s', {name: 's', desc:'Search',func: TIOZAO_CMDS.searchTerm, requiresArg: true})
-		.onCommand('/info', { name: 'info', desc:'Perfil',func: TIOZAO_CMDS.listInfo, requiresArg: false });
-		
+		.onCommand('/info', { name: 'info', desc:'Perfil',func: TIOZAO_CMDS.listInfo, requiresArg: false })
+		.onCommand('/end', { name: 'end', desc:'teste end',func: TIOZAO_CMDS.testeEnd, requiresArg: false });
 
 		try {
 
