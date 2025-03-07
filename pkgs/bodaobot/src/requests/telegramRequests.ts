@@ -42,11 +42,11 @@ export function MediaGroup(bot:TG_BOT,media:(tgTypes.InputMediaAudio | tgTypes.I
  
 }
 
-export function sendButtonToBotThread(bot: TG_BOT,text:string, buttonsMarkup:any):tgOptions.sendMessage {
+export function sendButtonToBotThread(bot: TG_BOT,text:string, buttonsMarkup:any) {
      const param = {
           chat_id: bot.botINFO.CHATID,
           message_thread_id: Number(bot.botINFO.THREADBOT),
-          reply_markup: { inline_keyboard: buttonsMarkup },
+          reply_markup:JSON.stringify( { inline_keyboard: buttonsMarkup }),
           text,
           disable_notification: true
      }
