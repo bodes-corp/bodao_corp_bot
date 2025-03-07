@@ -12,14 +12,14 @@ export class TIOZAO_BOT_CMDs {
  
      public static async botShowMenu( bot:  TG_BOT ) {
        
-          const menu:two_buttons_t[] = [
+          const menuButtons:two_buttons_t[] = [
               [{ text: bot.commands['/gp_td'].desc, callback_data: '/'+bot.commands['/gp_td'].name}, { text:  bot.commands['/top_gp'].desc, callback_data: '/'+bot.commands['/top_gp'].name}],
               [{ text: bot.commands['/top_rp'].desc, callback_data: '/'+bot.commands['/top_rp'].name},{ text:  bot.commands['/active_gp'].desc, callback_data: '/'+bot.commands['/active_gp'].name}],
               [{ text: bot.commands['/trend_gp'].desc, callback_data: '/'+bot.commands['/trend_gp'].name}, { text:  bot.commands['/spa'].desc, callback_data: '/'+bot.commands['/spa'].name}],
               [{ text: bot.commands['/user'].desc, callback_data: '/'+bot.commands['/user'].name },{ text:  bot.commands['/chat'].desc, callback_data: '/'+bot.commands['/chat'].name }],
               [{ text: bot.commands['/info'].desc, callback_data: '/'+bot.commands['/info'].name }]
           ];
-          return await bot.sendResponseButtons(menu, 'Menu:');
+          return await bot.tgSendButtons(menuButtons, 'Menu:');
       }
       
  
@@ -31,14 +31,14 @@ export class TIOZAO_BOT_CMDs {
       }
       
       public static async botAlert(bot:  TG_BOT,  text:string, id_thread:any, message_id:any|null = null) {
-        const params = Requests.MessageThreadRequest(bot,text, id_thread, message_id);
+        const params = Requests.MessageReplyThreadRequest(bot,text, id_thread, message_id);
         const response =  await TG_REQ.tgSendRequest(bot.botINFO.TOKEN, tgRequestMethod.SEND_MESSAGE,  params );
           //await bot.tgSendMessageThread(bot.botINFO, text, id_thread, message_id);
         return Number(response.result.message_id);
       }
       
       public static async botSendNotify(bot:  TG_BOT, notify:string, id_thread:any, message_id:any) {
-        const params = Requests.MessageThreadRequest(bot,notify, id_thread, message_id);
+        const params = Requests.MessageReplyThreadRequest(bot,notify, id_thread, message_id);
         const response =  await TG_REQ.tgSendRequest(bot.botINFO.TOKEN, tgRequestMethod.SEND_MESSAGE,  params );
         //const response = await bot.tgSendMessageThread(bot.botINFO, notify, id_thread, message_id);
           return await DB_API.dbInsertBotNotify(bot.DB, Number(response.result.message_id), message_id);  

@@ -8,7 +8,7 @@ import TIOZAO_CMDS from "./tiozao/tiozao_api";
 import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
 import { BOT_INFO } from "./types/BotInfo";
 import { ContextMessage } from "./types/TelegramMessage";
-import { botResponse, buttons_t, commandFunc, CommandHandler, Handler, handlerFunc, tgRequestMethod, updOperation, updType } from "./types/Types";
+import { buttons_t, commandFunc, CommandHandler, Handler, handlerFunc, tgRequestMethod, updOperation, updType } from "./types/Types";
 import Webhook from "./webhook";
 
 
@@ -103,31 +103,9 @@ export default class TG_BOT {
 		return this;
 	}
 
-     /**
-      * Send a Text Message to the Bot Thread
-      * @param text message text to send
-      * @returns bot Response
-      */
-     async tgSendMessageToBotThread( text:string): Promise<botResponse> {
-          if (!this.botINFO) {
-               return Promise.resolve({
-                    "ok": false,
-                    "result": {} as tgTypes.Message
-               } );
-          }
-          const params = {
-               chat_id: this.botINFO.CHATID,
-               message_thread_id: this.botINFO.THREADBOT,
-               text,
-               parse_mode: 'html',
-               disable_notification: 'true'
-           };
-          return await TG_REQ.tgSendRequest(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params );
-      }
-
       /**
        * Send a Text Message to the bot thread
-       * @param text text to send
+       * @param text text to send, if it is a lont text, then it is splitted
        * @returns responses
        */
      async tgSendMessage(text:string) {
@@ -135,15 +113,24 @@ export default class TG_BOT {
           const responses = [];
       
           for (const part of parts) {
-              const response:botResponse = await this.tgSendMessageToBotThread(part);
-              responses.push(Number(response.result.message_id));
+               const params = Requests.MessageToBotTopic(this,part);
+               const response = await TG_REQ.callApi(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params );
+               console.log("debug from: tgSendMessage / response from bot: ", response);
+               //const response:botResponse = await this.tgSendMessageToBotThread(part);
+               responses.push(Number(response.message_id));
           }
       
           return responses;
      }
      
-     async tgButton(buttons:buttons_t, text:string) {
-          if(!Array.isArray(buttons) || !text) {
+     /**
+      * Send Buttons with caption
+      * @param buttons buttons Markup to send
+      * @param caption text caption to appent to buttons
+      * @returns message_id[]
+      */
+     async tgSendButtons(buttons:buttons_t, caption:string) {
+          if(!Array.isArray(buttons) || !caption) {
                return Promise.resolve([]);
           }
           const batchSize = 90;
@@ -152,12 +139,10 @@ export default class TG_BOT {
           for (let i = 0; i < buttons.length; i += batchSize) {
               const batch = buttons.slice(i, i + batchSize);
                
-              const params = Requests.sendButtonToBotThread(this, text, batch);
+              const params = Requests.sendButtonToBotThread(this, caption, batch);
 
                const response = await TG_REQ.callApi(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params);
-
-               // const response:botResponse = await TG_API.sendButtonToBotThread(this.botINFO.TOKEN, this.botINFO.CHATID, this.botINFO.THREADBOT, batch, text);
-               //console.log("debug rsponse from bot: ", response);
+               console.log("debug from: tgButton / response from bot: ", response);
                responses.push(Number(response.message_id));
           }
       
@@ -167,16 +152,6 @@ export default class TG_BOT {
      
      async tgAnswerCallbackQuery(callbackQueryId:any, text:string|null = null) {       
           return await TG_API.tgAnswerCallbackQuery(this.botINFO.TOKEN, callbackQueryId, text);
-     }
-
-     async sendResponseButtons(buttons:buttons_t, text:string) {
-          return await this.tgButton(buttons, text);
-     }
-
-      
-      
-     async sendResponseText( text:string) {
-          return await this.tgSendMessage(text);
      }
 
      async tgDeleteMessagesFromChat (chunks:any)

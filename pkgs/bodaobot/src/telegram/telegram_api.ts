@@ -1,7 +1,7 @@
 import TelegramInlineQueryResultArticle from '../types/TelegramInlineQueryResultArticle.js';
 import TelegramInlineQueryResultPhoto from '../types/TelegramInlineQueryResultPhoto.js';
 import TelegramInlineQueryResultVideo from '../types/TelegramInlineQueryResultVideo.js';
-import { botResponse, tgRequestMethod } from '../types/Types.js';
+import { tgRequestMethod } from '../types/Types.js';
 import TG_REQ from './RequestManager.js';
 
 
@@ -9,20 +9,6 @@ import TG_REQ from './RequestManager.js';
 
 /** Class representing the Telegram API and all it's methods */
 export default class TG_API {
-
-
-	public static async sendButtonToBotThread(token:string, chatID:string, threadID:string, buttons:any, text:any) : Promise<botResponse>{
-
-          const params = {
-               chat_id: chatID,
-               message_thread_id: threadID,
-               reply_markup: JSON.stringify({ inline_keyboard: buttons }),
-               text,
-               disable_notification: 'true'
-          }
-
-          return await TG_REQ.tgSendRequest(token,tgRequestMethod.SEND_MESSAGE, params);
-     }
 
 
 	/**

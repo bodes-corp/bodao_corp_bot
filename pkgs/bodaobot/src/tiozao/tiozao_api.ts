@@ -201,10 +201,10 @@ export default class TIOZAO_CMDS {
 		   text += `Nenhum resultado encontrado`;
 		   await TIOZAO_CMDS.sendResponse(bot,text, response_ids);
 	    } else {
-		   const spas:any[] = result.map((row: any[]) =>
+		   const spasButtons:any[] = result.map((row: any[]) =>
 			  row.map(buttonText => ({ text: buttonText, callback_data: '/spa ' + buttonText }))
 		   );
-		   response_ids = await  bot.sendResponseButtons( spas, 'Lista de casas:');
+		   response_ids = await  bot.tgSendButtons( spasButtons, 'Lista de casas:');
 	    }        
 	} catch (error) {
 	    console.error('Error during search operation:', error);
@@ -342,7 +342,7 @@ export default class TIOZAO_CMDS {
  }
  
  public static async sendResponse(bot:  TG_BOT, text:string, response_ids: any[], media = null) {
-	response_ids.push(await bot.sendResponseText(text));
+	response_ids.push(await bot.tgSendMessage(text));
 	if (media) {
 	    response_ids.push(await TIOZAO_BOT_CMDs.botResponseMedia(bot, media));
 	}

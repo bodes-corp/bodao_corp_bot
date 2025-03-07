@@ -360,6 +360,36 @@ declare namespace tgOptions {
                  reply_parameters?: tgTypes.ReplyParameters;
                  reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
      }
+    
+     export class stringMessage {
+         chat_id: number | string;
+         text: string;
+         business_connection_id?: string;
+         message_thread_id?: number;
+         parse_mode?: string;
+         entities?: string;
+         link_preview_options?: string;
+         disable_notification?: boolean;
+         protect_content?: boolean;
+         message_effect_id?: string;
+         reply_parameters?: string;
+         reply_markup?: string;
+         construtor(d:tgOptions.sendMessage) {
+              this.chat_id= d.chat_id;
+              this.text= d.text;
+              this.business_connection_id= d.business_connection_id;
+              this.message_thread_id= d.message_thread_id;
+              this.parse_mode=d.parse_mode;
+              this.entities= JSON.stringify(d.entities);
+              this.link_preview_options= JSON.stringify(d.link_preview_options);
+              this.disable_notification=d.disable_notification;
+              this.protect_content=d.protect_content;
+              this.message_effect_id=d.message_effect_id;
+              this.reply_parameters= JSON.stringify(d.reply_parameters);
+              this.reply_markup= JSON.stringify(d.reply_markup);
+     
+         }
+     }
      interface forwardMessage {
                  chat_id: number | string;
                  from_chat_id: number | string;
