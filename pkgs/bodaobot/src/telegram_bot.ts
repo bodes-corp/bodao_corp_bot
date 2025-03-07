@@ -154,11 +154,11 @@ export default class TG_BOT {
                
               const params = Requests.sendButtonToBotThread(this, text, batch);
 
-               const response:botResponse = await TG_REQ.tgSendRequest(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params);
+               const response = await TG_REQ.callApi(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params);
 
                // const response:botResponse = await TG_API.sendButtonToBotThread(this.botINFO.TOKEN, this.botINFO.CHATID, this.botINFO.THREADBOT, batch, text);
                //console.log("debug rsponse from bot: ", response);
-               responses.push(Number(response.result.message_id));
+               responses.push(Number(response.message_id));
           }
       
           return responses;
