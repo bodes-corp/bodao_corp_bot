@@ -30,3 +30,25 @@ export function MessageToBotTopicWithMarkup(bot:TG_BOT,text: string,markup:any):
       }
       return params;
 }
+
+export function MediaGroup(bot:TG_BOT,media:(tgTypes.InputMediaAudio | tgTypes.InputMediaDocument | tgTypes.InputMediaPhoto | tgTypes.InputMediaVideo)[]): tgOptions.sendMediaGroup{
+     const params = {
+          chat_id: bot.botINFO.CHATID,
+          message_thread_id: Number(bot.botINFO.THREADBOT),
+          media,
+          disable_notification: true
+     }
+     return params;
+ 
+}
+
+export function sendButtonToBotThread(bot: TG_BOT,text:string, buttonsMarkup:any):tgOptions.sendMessage {
+     const param = {
+          chat_id: bot.botINFO.CHATID,
+          message_thread_id: Number(bot.botINFO.THREADBOT),
+          reply_markup: { inline_keyboard: buttonsMarkup },
+          text,
+          disable_notification: true
+     }
+     return param
+}

@@ -1,11 +1,12 @@
 import { DB_API } from "./database_api";
 import { chunkArray, splitMessage } from "./library";
+import { Requests } from "./requests";
 import TG_REQ from "./telegram/RequestManager";
 import TG_API from "./telegram/telegram_api";
 import TG_ExecutionContext from "./telegram_execution_context";
 import TIOZAO_CMDS from "./tiozao/tiozao_api";
 import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
-import { BOT_INFO, BotINFO } from "./types/BotInfo";
+import { BOT_INFO } from "./types/BotInfo";
 import { ContextMessage } from "./types/TelegramMessage";
 import { botResponse, buttons_t, commandFunc, CommandHandler, Handler, handlerFunc, tgRequestMethod, updOperation, updType } from "./types/Types";
 import Webhook from "./webhook";
@@ -140,24 +141,6 @@ export default class TG_BOT {
       
           return responses;
      }
-      
-     async tgSendMedia(info:BotINFO, media:any) {
-          const params = {
-               chat_id: info.CHATID,
-               message_thread_id: info.THREADBOT,
-               media,
-               disable_notification: 'true'
-           }
-          return await TG_REQ.tgSendRequest(info.TOKEN,tgRequestMethod.SEND_MEDIA_GROUP,   params );
-     }
-      
-      
-     
-     //async tgSendMessageThread(info:BotINFO, text:string, id_thread:any, message_id:any) {  
-     //     return await TG_REQ.tgSendRequest(info.TOKEN, tgRequestMethod.SEND_MESSAGE,  params );
-     //}
-      
-       
      
      async tgButton(buttons:buttons_t, text:string) {
           if(!Array.isArray(buttons) || !text) {
@@ -168,9 +151,14 @@ export default class TG_BOT {
       
           for (let i = 0; i < buttons.length; i += batchSize) {
               const batch = buttons.slice(i, i + batchSize);
-              const response:botResponse = await TG_API.sendButtonToBotThread(this.botINFO.TOKEN, this.botINFO.CHATID, this.botINFO.THREADBOT, batch, text);
-              //console.log("debug rsponse from bot: ", response);
-              responses.push(Number(response.result.message_id));
+               
+              const params = Requests.sendButtonToBotThread(this, text, batch);
+
+               const response:botResponse = await TG_REQ.callApi(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params);
+
+               // const response:botResponse = await TG_API.sendButtonToBotThread(this.botINFO.TOKEN, this.botINFO.CHATID, this.botINFO.THREADBOT, batch, text);
+               //console.log("debug rsponse from bot: ", response);
+               responses.push(Number(response.result.message_id));
           }
       
           return responses;

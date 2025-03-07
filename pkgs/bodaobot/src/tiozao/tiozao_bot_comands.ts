@@ -25,8 +25,9 @@ export class TIOZAO_BOT_CMDs {
  
       
       public static async botResponseMedia(bot:  TG_BOT,  json:any) {
-          const response = await bot.tgSendMedia(bot.botINFO, json);
-          return response.result.map((media: { message_id: any; }) => Number(media.message_id));
+            const params = Requests.MediaGroup(bot,json)
+            const response = await TG_REQ.tgSendRequest(bot.botINFO.TOKEN,tgRequestMethod.SEND_MEDIA_GROUP,   params );
+            return response.result.map((media: { message_id: any; }) => Number(media.message_id));
       }
       
       public static async botAlert(bot:  TG_BOT,  text:string, id_thread:any, message_id:any|null = null) {
