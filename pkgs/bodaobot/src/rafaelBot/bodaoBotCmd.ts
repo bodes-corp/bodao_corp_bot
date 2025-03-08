@@ -7,8 +7,15 @@ export default class BODAO_CMDS {
       
         if (!ctx) return Promise.resolve(false);
   
-        const msg_txt = ctx.update.message?.text
+        const msg_caption = ctx.update.message?.caption
 
-        return Promise.resolve(true);
+        if(msg_caption){
+            const keywords = ["Ata"];
+	        const result =  keywords.every(keyword => JSON.stringify(msg_caption.toLowerCase()).includes(keyword.toLowerCase())) ? true : false;
+            console.log('debug from confirmATA: result: ', result)
+            return Promise.resolve(result);
+        }
+
+        return Promise.resolve(false);
       }
 }
