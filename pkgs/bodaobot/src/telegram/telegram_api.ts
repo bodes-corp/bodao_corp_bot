@@ -54,8 +54,8 @@ export default class TG_API {
 	    try {
 
 			if(Array.isArray(chunk) && chunk.length >=0) {
-				
-				const deleteParams = { chat_id, message_ids: chunk };
+				const ChunkString = JSON.stringify(chunk);
+				const deleteParams = { chat_id, message_ids: ChunkString };
 				console.log("delete old messages - params:",  JSON.stringify(deleteParams))
 				const response = await fetch(TG_REQ.tgApiUrl(token, tgRequestMethod.MESSAGES_DELETE, {
 				    method: 'POST',

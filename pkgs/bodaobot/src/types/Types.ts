@@ -91,7 +91,13 @@ export const tgRequestMethod = {
      COMMANDS_SET: 'setMyCommands',
      BUSINESS_CONN_GET: 'getBusinessConnection',
      USER_CHAT_BOOTS_GET: 'getUserChatBoosts',
-
+     POLL_STOP: 'stopPoll',
+     MESSAGE_REPLYMARKUP_EDIT: 'editMessageReplyMarkup',
+     MESSAGE_LIVE_LOCATION_STOP: 'stopMessageLiveLocation',
+     MESSAGE_LIVE_LOCATION_EDIT: 'editMessageLiveLocation',
+     MESSAGE_MEDIA_EDIT: 'editMessageMedia',
+     MESSAGE_CAPTION_EDIT: 'editMessageCaption',
+     MESSAGE_TEXT_EDIT: 'editMessageText'
 
    } as const;
    

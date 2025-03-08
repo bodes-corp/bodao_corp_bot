@@ -1,4 +1,5 @@
-import { callApi } from '../utils/apiManager';
+import TG_REQ from "./RequestManager";
+
 
 export namespace tg {
     /**
@@ -32,6 +33,7 @@ export namespace tg {
      * the edited [Message](https://core.telegram.org/bots/api#message) is returned, otherwise true is returned.
      */
     export async function editMessageText(
+        token:string,
         {
             text,
             business_connection_id,
@@ -53,7 +55,7 @@ export namespace tg {
             link_preview_options?: tgTypes.LinkPreviewOptions;
             reply_markup?: tgTypes.InlineKeyboardMarkup;
         }): Promise<tgTypes.Message | boolean> {
-        return await callApi('editMessageText', {
+        return await TG_REQ.callApi(token, 'editMessageText', {
             text,
             business_connection_id,
             chat_id,
@@ -96,6 +98,7 @@ export namespace tg {
      * the edited [Message](https://core.telegram.org/bots/api#message) is returned, otherwise true is returned.
      */
     export async function editMessageCaption(
+        token:string,
         {
             business_connection_id,
             chat_id,
@@ -117,7 +120,7 @@ export namespace tg {
             show_caption_above_media?: boolean;
             reply_markup?: tgTypes.InlineKeyboardMarkup;
         }): Promise<tgTypes.Message | boolean> {
-        return await callApi('editMessageCaption', {
+        return await TG_REQ.callApi(token, 'editMessageCaption', {
             business_connection_id,
             chat_id,
             message_id,
@@ -158,6 +161,7 @@ export namespace tg {
      * the edited [Message](https://core.telegram.org/bots/api#message) is returned, otherwise true is returned.
      */
     export async function editMessageMedia(
+        token:string,
         {
             media,
             business_connection_id,
@@ -173,7 +177,7 @@ export namespace tg {
             inline_message_id?: string;
             reply_markup?: tgTypes.InlineKeyboardMarkup;
         }): Promise<tgTypes.Message | boolean> {
-        return await callApi('editMessageMedia', {
+        return await TG_REQ.callApi(token, 'editMessageMedia', {
             media: JSON.stringify(media),
             business_connection_id,
             chat_id,
@@ -219,6 +223,7 @@ export namespace tg {
      * the edited [Message](https://core.telegram.org/bots/api#message) is returned, otherwise true is returned.
      */
     export async function editMessageLiveLocation(
+        token:string,
         {
             latitude,
             longitude,
@@ -244,7 +249,7 @@ export namespace tg {
             proximity_alert_radius?: number;
             reply_markup?: tgTypes.InlineKeyboardMarkup;
         }): Promise<tgTypes.Message | boolean> {
-        return await callApi('editMessageLiveLocation', {
+        return await TG_REQ.callApi(token, 'editMessageLiveLocation', {
             latitude,
             longitude,
             business_connection_id,
@@ -279,6 +284,7 @@ export namespace tg {
      * the edited [Message](https://core.telegram.org/bots/api#message) is returned, otherwise true is returned.
      */
     export async function stopMessageLiveLocation(
+        token:string,
         {
             business_connection_id,
             chat_id,
@@ -292,7 +298,7 @@ export namespace tg {
             inline_message_id?: string;
             reply_markup?: tgTypes.InlineKeyboardMarkup;
         }): Promise<tgTypes.Message | boolean> {
-        return await callApi('stopMessageLiveLocation', {
+        return await TG_REQ.callApi(token, 'stopMessageLiveLocation', {
             business_connection_id,
             chat_id,
             message_id,
@@ -323,6 +329,7 @@ export namespace tg {
      * the edited [Message](https://core.telegram.org/bots/api#message) is returned, otherwise true is returned.
      */
     export async function editMessageReplyMarkup(
+        token:string,
         {
             business_connection_id,
             chat_id,
@@ -336,7 +343,7 @@ export namespace tg {
             inline_message_id?: string;
             reply_markup?: tgTypes.InlineKeyboardMarkup;
         }): Promise<tgTypes.Message | boolean> {
-        return await callApi('editMessageReplyMarkup', {
+        return await TG_REQ.callApi(token, 'editMessageReplyMarkup', {
             business_connection_id,
             chat_id,
             message_id,
@@ -361,6 +368,7 @@ export namespace tg {
      * @returns >- On success, the stopped [Poll](https://core.telegram.org/bots/api#poll) is returned.
      */
     export async function stopPoll(
+        token:string,
         {
             chat_id,
             message_id,
@@ -372,7 +380,7 @@ export namespace tg {
             business_connection_id?: string;
             reply_markup?: tgTypes.InlineKeyboardMarkup;
         }): Promise<tgTypes.Poll> {
-        return await callApi('stopPoll', {
+        return await TG_REQ.callApi(token, 'stopPoll', {
             chat_id,
             message_id,
             business_connection_id,
@@ -400,6 +408,7 @@ export namespace tg {
      * @returns >- true on success.
      */
     export async function deleteMessage(
+        token:string,
         {
             chat_id,
             message_id,
@@ -407,7 +416,7 @@ export namespace tg {
             chat_id: number | string;
             message_id: number;
         }): Promise<boolean> {
-        return await callApi('deleteMessage', {
+        return await TG_REQ.callApi(token, 'deleteMessage', {
             chat_id,
             message_id,
         });
@@ -427,6 +436,7 @@ export namespace tg {
      * @returns >- true on success.
      */
     export async function deleteMessages(
+        token:string,
         {
             chat_id,
             message_ids,
@@ -434,9 +444,10 @@ export namespace tg {
             chat_id: number | string;
             message_ids: number[];
         }): Promise<boolean> {
-        return await callApi('deleteMessages', {
+        return await TG_REQ.callApi(token, 'deleteMessages', {
             chat_id,
             message_ids: JSON.stringify(message_ids),
         });
     }
 }
+
