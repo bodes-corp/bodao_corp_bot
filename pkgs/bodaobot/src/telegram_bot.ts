@@ -211,14 +211,17 @@ export default class TG_BOT {
           
           const now:number = Math.floor(Date.now() / 1000);
           const old:number = now - 60;
-      
+          const id_msg_array:number[] = [];
           try {
               
                const chunks = await TG_BOT.dbGetBotMessages(bot,old);
-               
-               if (Array.isArray(chunks) && (chunks).length > 0 ) {
+               for (const row of chunks) {
+                    const message_id = chunks[0];
+                    id_msg_array.push(message_id);
+                }
+               if (Array.isArray(id_msg_array) && ( id_msg_array).length > 0 ) {
                     //const response = await TG_API.tgDeleteMessagesFromChat(bot.botINFO.TOKEN,bot.botINFO.CHATID, chunks);
-                    const message_ids: number [] = chunks;
+                    const message_ids: number [] = id_msg_array;
                     const  chat_id = bot.botINFO.CHATID;
                     console.log("delete from removeOldMessages - params:",  JSON.stringify({chat_id,message_ids}));
                     const response = await tg.deleteMessages(bot.botINFO.TOKEN,{chat_id, message_ids});

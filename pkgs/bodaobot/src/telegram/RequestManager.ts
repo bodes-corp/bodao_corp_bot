@@ -64,7 +64,7 @@ export default class TG_REQ{
                });
                const data: botResponse = await response.json();
                if (!data.ok) {
-                    throw new Error('API Call Failed:\n' + JSON.stringify(response, null, 2));
+                    throw new Error(`Telegram API Error: ${data.description}`);
                } else {
                     return data.result;
                }
