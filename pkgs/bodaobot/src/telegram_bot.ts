@@ -134,10 +134,10 @@ export default class TG_BOT {
                               if (response){
                                    operations.push(key);
                                    console.log(`debug from checkUserOperations - key ${key} / response: `, response);
-                                   resolve(true);
+                                   resolve(operations);
                               }else {
                                    console.log(`debug from checkUserOperations - key ${key} / response: `, response);
-                                   resolve(false);
+                                   resolve(operations);
                               }
                              
                            //}, 1000);
