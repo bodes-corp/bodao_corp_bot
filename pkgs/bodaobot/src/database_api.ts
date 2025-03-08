@@ -343,6 +343,13 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	return await this.executeQuery(db, query, [id_msg_ref]);
  }
  
+ /**
+  * 
+  * @param db 
+  * @param id_user 
+  * @param id_thread 
+  * @returns 
+  */
  public static async dbSearchTDUserThread(db:any, id_user:string, id_thread:string) {
      if (!db) return Promise.resolve(null);
 	const query = `

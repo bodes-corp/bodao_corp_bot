@@ -16,12 +16,22 @@ export default class TG_ExecutionContext {
 	update: tgTypes.Update;
 	/** string representing the type of update that was sent */
 	update_type:updType_t = updType.UNKNOWN;
-
 	/** the Telegram Message represented in this Context */
 	update_message: ContextMessage;
-
+	/** operation is message type dependant */
 	update_operation: updOperation_t = updOperation.UNKNOWN;
+	/** list of operations specific to the bot ownwer*/
+	user_operations:string[] = [];
+	/**
+	 * mode of execution:
+	 * user_update: execute both, first user defined and second the update_operation ones
+	 * update_user: execue both, first the update nd second the user defined handlers
+	 * user: only execute user defined handlers
+	 * update: only execute the update defined handlers
+	 */
+	operationHanlerMode: 'user_update' | 'update_user' | 'user' |  'update' = 'user_update'; 
 
+	
 	/** boolean representing this is a bot command */
 	commandFlag:boolean=false;
 	
@@ -35,7 +45,7 @@ export default class TG_ExecutionContext {
 		this.bot = bot;
 		this.update = update;
 		this.update_operation = updOperation.NO_OP;
-
+		this.user_operations = bot.checkUserOperations(this);
 		if (this.update.message?.message_id) {
 			this.update_type = updType.MESSAGE;
 			this.update_operation= updOperation.NO_OP;
@@ -50,9 +60,7 @@ export default class TG_ExecutionContext {
 				//this.msg_txt = 'new_post'
 				if (this.update.message?.text) {
 				    this.update_operation = updOperation.POST_NEW;
-				    //this.msg_txt = msgJson.text;
-				    //this.is_td = checkTD(msgJson.text);
-				    //this.is_td_rp = checkRP(msgJson.text);
+				    
 				}
 	   
 				if (this.update.message?.video || this.update.message?.photo) {
@@ -174,10 +182,11 @@ export default class TG_ExecutionContext {
 			this.update_message = new ContextMessage(messageJson);
 		}
 		
-
-		
 	}
 
+	
+
+	
 	/**
 	 * Reply to the last message with a video
 	 * @param video - string to a video on the internet or a file_id on telegram

@@ -8,7 +8,7 @@ import TIOZAO_CMDS from "./tiozao/tiozao_api";
 import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
 import { BOT_INFO } from "./types/BotInfo";
 import { ContextMessage } from "./types/TelegramMessage";
-import { buttons_t, commandFunc, CommandHandler, Handler, handlerFunc, tgRequestMethod, updOperation, updType } from "./types/Types";
+import { buttons_t, checkUserOperationFuncAsync, CheckUserOperationsHandler, commandFunc, CommandHandler, Handler, handlerFunc, tgRequestMethod, updOperation, updType } from "./types/Types";
 import Webhook from "./webhook";
 
 
@@ -32,6 +32,9 @@ export default class TG_BOT {
 
      /**command handlers record map */
      commands:CommandHandler = {}
+     
+     /** The telegram handlers record map */
+	userOperationsChecks: CheckUserOperationsHandler  = {} as  CheckUserOperationsHandler;
 
      /** The telegram update object */
      update: tgTypes.Update = {} as tgTypes.Update;
@@ -103,6 +106,36 @@ export default class TG_BOT {
 		return this;
 	}
 
+     /**
+	 * Register a user checkFunction on the bot
+	 * @param event - the event or command name
+	 * @param callback - the bot context
+	 */
+	onCheck(event: string, callback: checkUserOperationFuncAsync) {
+          if (!['oncheck', 'handle'].includes(event)) {
+               this.userOperationsChecks[event] = callback;
+          }
+          return this;
+     }
+
+
+     /**this method will be called by the ContextMessage to check if user defined operations, specific for that bot */
+     checkUserOperations(ctx:TG_ExecutionContext) :string[]{
+     
+               const operations:string[] =[];
+                    
+               (Object.keys(this.userOperationsChecks) as (keyof typeof this.userOperationsChecks)[]).forEach(async (key:string, index:any) => {
+                         // 👇️ name Bobby Hadz 0, country Chile 1
+                         const response = await this.userOperationsChecks[key](ctx);
+                         if (response)operations.push(key);
+                         console.log(`debug from checkUserOperations - key ${key} / response: `, response, index);
+                       });
+                       
+               
+               return operations;
+     
+     }
+
       /**
        * Send a Text Message to the bot thread
        * @param text text to send, if it is a lont text, then it is splitted
@@ -114,8 +147,8 @@ export default class TG_BOT {
       
           for (const part of parts) {
                const params = Requests.MessageToBotTopic(this,part);
-               const response = await TG_REQ.callApi(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params );
-               console.log("debug from: tgSendMessage / response from bot: ", response);
+               const response:tgTypes.Message = await TG_REQ.callApi(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params );
+               //console.log("debug from: tgSendMessage / response from bot: ", response);
                //const response:botResponse = await this.tgSendMessageToBotThread(part);
                responses.push(Number(response.message_id));
           }
@@ -141,8 +174,8 @@ export default class TG_BOT {
                
               const params = Requests.sendButtonToBotThread(this, caption, batch);
 
-               const response = await TG_REQ.callApi(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params);
-               console.log("debug from: tgButton / response from bot: ", response);
+               const response:tgTypes.Message = await TG_REQ.callApi(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params);
+               //console.log("debug from: tgButton / response from bot: ", response);
                responses.push(Number(response.message_id));
           }
       
@@ -150,8 +183,10 @@ export default class TG_BOT {
      }
       
      
-     async tgAnswerCallbackQuery(callbackQueryId:any, text:string|null = null) {       
-          return await TG_API.tgAnswerCallbackQuery(this.botINFO.TOKEN, callbackQueryId, text);
+     async tgAnswerCallbackQuery(callbackQueryId:any, text:string|null = null) { 
+
+          const params = Requests.answerCallBack(this,callbackQueryId, text)
+          return await TG_API.answerCallbackQuery(this.botINFO.TOKEN, params);
      }
 
      async tgDeleteMessagesFromChat (chunks:any)
@@ -199,6 +234,8 @@ export default class TG_BOT {
           }
      }
 
+     
+
      /**
       * This method handles the updates from Telegram.
       * when a POST request arrives at the webhooendPoint, thebot reads te JSON
@@ -213,15 +250,17 @@ export default class TG_BOT {
           let handlerName /*: updType_t*/  = ':message';
           let args: string[] = [];
           const ctx = new TG_ExecutionContext(this, this.update);
+          
           this.currentContext = ctx;
           console.log('debug from handleUpdate - debug ctx update_type: ',ctx.update_type);
           console.log("debug from handleUpdate - debug ctx message:", ctx.update.message);
           console.log('debug from handleUpdate - operation: ',ctx.update_operation)
           //console.log("debug ctx message user:", ctx.update?.message?.from.id)
           //console.log("debug ctx message user:",ctx.update_message.id_user);
+          
           switch (ctx.update_type) {
                case updType.MESSAGE: {
-                    args = this.update.message?.text?.split(' ') ?? [];
+                    args = ctx.update.message?.text?.split(' ') ?? [];
                     handlerName = ':message';
                switch(ctx.update_operation){
                          case updOperation.THREAD_CREATE:
@@ -241,16 +280,16 @@ export default class TG_BOT {
                     break;
                }
                case updType.MESSAGE_EDIT: {
-                    args = this.update.message?.text?.split(' ') ?? [];
+                    args = ctx.update.message?.text?.split(' ') ?? [];
                     handlerName = ':edited_message';
                     break;
                }
                case updType.MESSAGE_BUSINESS: {
-                    args = this.update.message?.text?.split(' ') ?? [];
+                    args = ctx.update.message?.text?.split(' ') ?? [];
                     break;
                }
                case updType.INLINE_QUERY: {
-                    args = this.update.inline_query?.query.split(' ') ?? [];
+                    args = ctx.update.inline_query?.query.split(' ') ?? [];
                     break;
                }
                case updType.CALLBACK: {

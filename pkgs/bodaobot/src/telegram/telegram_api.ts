@@ -30,30 +30,9 @@ export default class TG_API {
 		
 	}
 
-	/**
-	 * Send an callback response to a given botApi
-	 * @param botApiURL - full URL to the telegram API without slug
-	 * @param data - data to append to the request
-	 */
-	public static async answerCallback(
-		token: string,
-		data: {
-			callback_query_id: number | string;
-			text?: string;
-			show_alert?: boolean;
-			url?: string;
-			cache_time?: number;
-		},
-	) {
-		return await  TG_REQ.tgSendRequest(token,  tgRequestMethod.ANSWER_CALLBACK, data);
-		
-	}
 
-	public static async tgAnswerCallbackQuery(token:string, callbackQueryId:any, text:string|null = null) {
-          const params:any = { callback_query_id: callbackQueryId };
-          if (text) params.text = text;
-          return await TG_REQ.tgSendRequest(token,tgRequestMethod.ANSWER_CALLBACK, params);
-     }
+
+	
 
 
 	async tgDeleteMessage(token:string, chat_id:number, message_id:any) {
@@ -2955,7 +2934,7 @@ export default class TG_API {
             url,
             cache_time,
         }: tgOptions.answerCallbackQuery): Promise<boolean> {
-        return await TG_REQ.callApi(token, 'answerCallbackQuery', {
+        return await TG_REQ.callApi(token, tgRequestMethod.ANSWER_CALLBACK, {
             callback_query_id,
             text,
             show_alert,
@@ -2963,6 +2942,7 @@ export default class TG_API {
             cache_time,
         });
     }
+
 
     /**
      * Use this method to get the list of boosts added to a chat by a user. Requires administrator rights in the chat.

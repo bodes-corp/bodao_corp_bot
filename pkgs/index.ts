@@ -1,4 +1,5 @@
 import { TG_HANDLER } from "./bodaobot/src/handlers/handlers";
+import { checkRP, checkTD } from "./bodaobot/src/library";
 import TG_BOT from "./bodaobot/src/telegram_bot";
 import TIOZAO_CMDS from "./bodaobot/src/tiozao/tiozao_api";
 import { BOT_INFO } from "./bodaobot/src/types/BotInfo";
@@ -43,7 +44,9 @@ export default {
 		.onCommand('/user', { name: 'user', desc:'Membros',func: TIOZAO_CMDS.listMembers, requiresArg: false })
 		.onCommand('/s', {name: 's', desc:'Search',func: TIOZAO_CMDS.searchTerm, requiresArg: true})
 		.onCommand('/info', { name: 'info', desc:'Perfil',func: TIOZAO_CMDS.listInfo, requiresArg: false })
-		.onCommand('/end', { name: 'end', desc:'teste end',func: TIOZAO_CMDS.testeEnd, requiresArg: false });
+		.onCommand('/end', { name: 'end', desc:'teste end',func: TIOZAO_CMDS.testeEnd, requiresArg: false })
+		.onCheck(':td',checkTD)
+		.onCheck(":rp",checkRP);
 
 		try {
 

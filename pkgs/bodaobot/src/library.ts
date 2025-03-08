@@ -1,3 +1,5 @@
+import TG_ExecutionContext from "./telegram_execution_context";
+
 export function splitMessage(text:string, maxLength:number, maxNewlines:number) {
 	const parts = [];
 	while (text.length > 0) {
@@ -23,16 +25,20 @@ export function splitMessage(text:string, maxLength:number, maxNewlines:number) 
 	return parts;
  }
 
- export function checkTD(msg_txt:string|undefined) {
-     if(!msg_txt) return 0;
-	const keywords = ["Rosto", "Peitos", "Bunda", "Corpo", "Beij", "Massagem", "Oral", "Transa", "Anal", "Presença", "Valor", "Data"];
-	return keywords.every(keyword => JSON.stringify(msg_txt).includes(keyword)) ? 1 : 0;
+ export function checkTD(ctx:TG_ExecutionContext):Promise<boolean>{
+  if (!ctx) return Promise.resolve(false);
+    const msg_txt = ctx.update.message?.text
+    if(!msg_txt) return Promise.resolve(false);
+	  const keywords = ["Rosto", "Peitos", "Bunda", "Corpo", "Beij", "Massagem", "Oral", "Transa", "Anal", "Presença", "Valor", "Data"];
+	  return keywords.every(keyword => JSON.stringify(msg_txt).includes(keyword)) ? Promise.resolve(true) : Promise.resolve(false);
  }
- 
- export function checkRP(msg_txt:string|undefined) {
-     if(!msg_txt) return 0;
+         
+ export async function  checkRP(ctx:TG_ExecutionContext):Promise<boolean>{
+  if (!ctx) return Promise.resolve(false);
+  const msg_txt = ctx.update.message?.text
+  if(!msg_txt) return Promise.resolve(false);
 	const keywords = ["01) Mudou aparência", "02) Mudou atend", "03) Livre", "04) Valor", "05) Clínica"];
-	return keywords.every(keyword => JSON.stringify(msg_txt).includes(keyword)) ? 1 : 0;
+	return keywords.every(keyword => JSON.stringify(msg_txt).includes(keyword)) ? Promise.resolve(true) : Promise.resolve(false);
  }
 
 export function isValidChat(message:any , chat_id:string ) {
