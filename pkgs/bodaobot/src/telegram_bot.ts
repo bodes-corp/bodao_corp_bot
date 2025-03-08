@@ -214,9 +214,9 @@ export default class TG_BOT {
           const id_msg_array:number[] = [];
           try {
               
-               const chunks = await TG_BOT.dbGetBotMessages(bot,old);
+               const chunks:any[] = await TG_BOT.dbGetBotMessages(bot,old);
                for (const row of chunks) {
-                    const message_id = chunks[0];
+                    const message_id = row[0];
                     id_msg_array.push(message_id);
                 }
                if (Array.isArray(id_msg_array) && ( id_msg_array).length > 0 ) {
