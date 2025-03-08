@@ -134,17 +134,18 @@ export default class TG_BOT {
                               if (response){
                                    operations.push(key);
                                    console.log(`debug from checkUserOperations - key ${key} / response: `, response);
-                                   resolve(operations);
+                                   resolve(true);
                               }else {
                                    console.log(`debug from checkUserOperations - key ${key} / response: `, response);
-                                   resolve(operations);
+                                   resolve(false);
                               }
                              
                            //}, 1000);
                          }));
                        });
                      
-                    return await Promise.all(promises);
+                    await Promise.all(promises);
+                    return operations;
                    
                }else {
                     return Promise.resolve([]);
