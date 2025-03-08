@@ -45,7 +45,6 @@ export default class TG_ExecutionContext {
 		this.bot = bot;
 		this.update = update;
 		this.update_operation = updOperation.NO_OP;
-		this.user_operations = bot.checkUserOperations(this);
 		if (this.update.message?.message_id) {
 			this.update_type = updType.MESSAGE;
 			this.update_operation= updOperation.NO_OP;

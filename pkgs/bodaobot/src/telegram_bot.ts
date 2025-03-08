@@ -250,7 +250,8 @@ export default class TG_BOT {
           let handlerName /*: updType_t*/  = ':message';
           let args: string[] = [];
           const ctx = new TG_ExecutionContext(this, this.update);
-          
+          const userOper = this.checkUserOperations(ctx);
+          ctx.user_operations = userOper;
           this.currentContext = ctx;
           console.log('debug from handleUpdate - debug ctx update_type: ',ctx.update_type);
           console.log("debug from handleUpdate - debug ctx message:", ctx.update.message);
