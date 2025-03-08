@@ -109,12 +109,12 @@ export default class TG_BOT {
 
      /**
 	 * Register a user checkFunction on the bot
-	 * @param event - the event or command name
+	 * @param key - key will be used to identify the operation
 	 * @param callback - the bot context
 	 */
-	onCheck(event: string, callback: checkUserOperationFuncAsync) {
-          if (!['oncheck', 'handle'].includes(event)) {
-               this.userOperationsChecks[event] = callback;
+	onCheck(key: string, callback: checkUserOperationFuncAsync) {
+          if (!['oncheck', 'handle'].includes(key)) {
+               this.userOperationsChecks[key] = callback;
           }
           return this;
      }
@@ -256,6 +256,7 @@ export default class TG_BOT {
           let args: string[] = [];
           const ctx = new TG_ExecutionContext(this, this.update);
           const userOper = this.checkUserOperations(ctx);
+          console.log ('debug from handleUpdate - useroper: ' ,JSON.stringify(userOper))
           ctx.user_operations = userOper;
           this.currentContext = ctx;
           console.log('debug from handleUpdate - debug ctx update_type: ',ctx.update_type);
