@@ -124,18 +124,35 @@ export default class TG_BOT {
      async checkUserOperations(ctx:TG_ExecutionContext) :Promise<string[]>{
      
                const operations:string[] =[];
-                    
-               (Object.keys(this.userOperationsChecks) as (keyof typeof this.userOperationsChecks)[]).forEach(async (key:string, index:any) => {
-                         // 👇️ name Bobby Hadz 0, country Chile 1
-                         const response = await this.userOperationsChecks[key](ctx);
-                         if (response){
-                              operations.push(key);
-                              console.log(`debug from checkUserOperations - key ${key} / response: `, response, index);
-                            
-                         } });
+               const keys:string[] = Object.keys(this.userOperationsChecks) as (keyof typeof this.userOperationsChecks)[];
+               if(keys.length > 0){
+                    const promises:any = [];
+                    keys.forEach( (key) => {
+                         promises.push(new Promise(async (resolve) => {
+                          // setTimeout(async () => {
+                              const response = await this.userOperationsChecks[key](ctx);
+                              if (response){
+                                   operations.push(key);
+                                   console.log(`debug from checkUserOperations - key ${key} / response: `, response);
+                                   resolve(true);
+                              }else {
+                                   console.log(`debug from checkUserOperations - key ${key} / response: `, response);
+                                   resolve(false);
+                              }
+                             
+                           //}, 1000);
+                         }));
+                       });
+                     
+                    return await Promise.all(promises);
+                   
+               }else {
+                    return Promise.resolve([]);
+               }
+               
                        
                          console.log(`debug from checkUserOperations - returning array: `,JSON.stringify(operations));
-               return operations;
+               
      
      }
 
