@@ -539,16 +539,25 @@ export default class TG_BOT {
           const id_thread = message.id_thread;
           const id_user = message.id_user;
           const msg_txt = message.msg_txt?.trim();
+          let response_ids:any[] = [];
           ctx.user_operations.forEach(async (prefix) => {
-               console.log('debug from handleUserDefinedOperation: find command for prefix: ',prefix)
+               //console.log('debug from handleUserDefinedOperation: find command for prefix: ',prefix)
                const commandEntry:any= Object.entries(ctx.bot.commands).find((row) => row[0]===prefix);
-               console.log(`debug from handleUserDefinedOperation - commandHandler::`, JSON.stringify(commandEntry))
+              // console.log(`debug from handleUserDefinedOperation - commandHandler::`, JSON.stringify(commandEntry))
                if (commandEntry) {
                     const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
                     const argument = msg_txt?.slice(selectedCommand.length).trim();
-                    console.log(`found command for with key:`, prefix)
+                    await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
+              
+                    if (requiresArg && argument === '') {
+                         response_ids.push(await TIOZAO_BOT_CMDs.botAlert( ctx.bot, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
+                    } else if (requiresArg && !msg_txt?.startsWith(selectedCommand + ' ')) {
+                         response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
+                    } else {
+                         response_ids = await commandFunction(ctx.bot, argument);
+                    }
                }else{
-                    console.log(`not found command for with key:`, prefix)
+                    response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, 'Handler not found for user defined operation: ' + prefix, id_thread, message_id));
                }
 
           })     
