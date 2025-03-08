@@ -121,7 +121,7 @@ export default class TG_BOT {
 
 
      /**this method will be called by the ContextMessage to check if user defined operations, specific for that bot */
-     checkUserOperations(ctx:TG_ExecutionContext) :string[]{
+     async checkUserOperations(ctx:TG_ExecutionContext) :Promise<string[]>{
      
                const operations:string[] =[];
                     
@@ -257,7 +257,7 @@ export default class TG_BOT {
           let handlerName /*: updType_t*/  = ':message';
           let args: string[] = [];
           const ctx = new TG_ExecutionContext(this, this.update);
-          const userOper = this.checkUserOperations(ctx);
+          const userOper = await  this.checkUserOperations(ctx);
           console.log ('debug from handleUpdate - useroper: ' ,JSON.stringify(userOper))
           ctx.user_operations = userOper;
           this.currentContext = ctx;
