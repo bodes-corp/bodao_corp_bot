@@ -542,7 +542,7 @@ export default class TG_BOT {
           ctx.user_operations.forEach(async (prefix) => {
                console.log('debug from handleUserDefinedOperation: find command for prefix: ',prefix)
                const commandEntry:any = Object.entries(ctx.bot.commands).find((row) => {
-                    console.log(`comparng prefix ${prefix} with key:`, row[0])
+                    console.log(`comparing prefix ${prefix} with key:`, row[0])
                     return  row[0]===prefix
                }
                    
@@ -550,10 +550,9 @@ export default class TG_BOT {
                if (commandEntry) {
                     const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
                     const argument = msg_txt?.slice(selectedCommand.length).trim();
-                    await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `o bot detectou o uso da seguinte operação: ${selectedCommand}`, id_thread, message_id);
-              
+                    console.log(`found command for with key:`, prefix)
                }else{
-                    await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `o bot nao achou o handler da seguinte operação: ${prefix}`, id_thread, message_id);
+                    console.log(`not found command for with key:`, prefix)
                }
 
           })     
