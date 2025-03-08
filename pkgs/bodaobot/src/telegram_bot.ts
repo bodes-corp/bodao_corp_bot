@@ -540,6 +540,7 @@ export default class TG_BOT {
           const id_user = message.id_user;
           const msg_txt = message.msg_txt?.trim();
           ctx.user_operations.forEach(async (prefix) => {
+               console.log('debug from handleUserDefinedOperation: find command for prefix: ',prefix)
                const commandEntry:any = Object.entries(ctx.bot.commands).find((row) =>
                     row[0]===prefix
                );
