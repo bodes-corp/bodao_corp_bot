@@ -128,11 +128,13 @@ export default class TG_BOT {
                (Object.keys(this.userOperationsChecks) as (keyof typeof this.userOperationsChecks)[]).forEach(async (key:string, index:any) => {
                          // 👇️ name Bobby Hadz 0, country Chile 1
                          const response = await this.userOperationsChecks[key](ctx);
-                         if (response)operations.push(key);
-                         console.log(`debug from checkUserOperations - key ${key} / response: `, response, index);
-                       });
+                         if (response){
+                              operations.push(key);
+                              console.log(`debug from checkUserOperations - key ${key} / response: `, response, index);
+                            
+                         } });
                        
-               
+                         console.log(`debug from checkUserOperations - returning array: `,JSON.stringify(operations));
                return operations;
      
      }
