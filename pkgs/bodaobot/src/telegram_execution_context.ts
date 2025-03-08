@@ -20,6 +20,10 @@ export default class TG_ExecutionContext {
 	update_message: ContextMessage;
 	/** operation is message type dependant */
 	update_operation: updOperation_t = updOperation.UNKNOWN;
+
+	/** boolean representing this is a bot command */
+	commandFlag:boolean=false;
+	
 	/** list of operations specific to the bot ownwer*/
 	user_operations:string[] = [];
 	/**
@@ -32,9 +36,6 @@ export default class TG_ExecutionContext {
 	operationHanlerMode: 'user_update' | 'update_user' | 'user' |  'update' = 'user_update'; 
 
 	
-	/** boolean representing this is a bot command */
-	commandFlag:boolean=false;
-	
 
 	/**
 	 * Create a telegram execution context
@@ -45,6 +46,8 @@ export default class TG_ExecutionContext {
 		this.bot = bot;
 		this.update = update;
 		this.update_operation = updOperation.NO_OP;
+		
+
 		if (this.update.message?.message_id) {
 			this.update_type = updType.MESSAGE;
 			this.update_operation= updOperation.NO_OP;
@@ -59,7 +62,9 @@ export default class TG_ExecutionContext {
 				//this.msg_txt = 'new_post'
 				if (this.update.message?.text) {
 				    this.update_operation = updOperation.POST_NEW;
-				    
+				    //this.msg_txt = msgJson.text;
+				    //this.is_td = checkTD(msgJson.text);
+				    //this.is_td_rp = checkRP(msgJson.text);
 				}
 	   
 				if (this.update.message?.video || this.update.message?.photo) {
@@ -181,11 +186,10 @@ export default class TG_ExecutionContext {
 			this.update_message = new ContextMessage(messageJson);
 		}
 		
+
+		
 	}
 
-	
-
-	
 	/**
 	 * Reply to the last message with a video
 	 * @param video - string to a video on the internet or a file_id on telegram

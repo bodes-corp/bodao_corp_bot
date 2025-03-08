@@ -1,5 +1,6 @@
 import { DB_API } from "../database_api";
 import TG_BOT from "../telegram_bot";
+import { TIOZAO_BOT_CMDs } from "../tiozao/tiozao_bot_comands";
 import { ContextMessage } from "../types/TelegramMessage";
 
 export default class BODAO_CMDS {

@@ -1,4 +1,3 @@
-import { checkRP, checkTD } from '../library.js';
 import { mediaType, mediaType_t } from './Types.js';
 
 
@@ -61,8 +60,8 @@ export class ContextMessage {
 			this.msg_txt = 'new_post'
 			if ('text' in msgJson) {
 				this.msg_txt = msgJson.text;
-				this.is_td = checkTD(msgJson.text);
-				this.is_td_rp = checkRP(msgJson.text);
+				this.is_td = 0; //checkTD(msgJson.text);
+				this.is_td_rp = 0;//checkRP(msgJson.text);
 			}
 	
 			if ('photo' in msgJson || 'video' in msgJson || 'document'in msgJson) {
