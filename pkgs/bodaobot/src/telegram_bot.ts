@@ -533,6 +533,7 @@ export default class TG_BOT {
       }
 
      async handleUserDefinedOperation( ctx: TG_ExecutionContext ) {
+          console.log('debug from handleUserDefinedOperation')
           let message:ContextMessage = ctx.update_message;
           const message_id = message.message_id;
           const id_thread = message.id_thread;
