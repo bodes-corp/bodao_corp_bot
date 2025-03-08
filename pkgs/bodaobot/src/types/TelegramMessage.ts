@@ -16,8 +16,8 @@ export class ContextMessage {
 	msg_date:any;
 	//operation:updOperation_t = updOperation.UNKNOWN;
 	msg_txt:string | undefined='';// initialized message
-	is_td: 0 | 1 = 0; //is TD?
-	is_td_rp: 0 | 1 = 0; //is repeteco?
+	//is_td: 0 | 1 = 0; //is TD?
+	//is_td_rp: 0 | 1 = 0; //is repeteco?
 	file_id:any;
 	file_unique_id:any;
 	media_type:mediaType_t = mediaType.UNKNOWN;
@@ -60,8 +60,8 @@ export class ContextMessage {
 			this.msg_txt = 'new_post'
 			if ('text' in msgJson) {
 				this.msg_txt = msgJson.text;
-				this.is_td = 0; //checkTD(msgJson.text);
-				this.is_td_rp = 0;//checkRP(msgJson.text);
+				//this.is_td = 0; //checkTD(msgJson.text);
+				//this.is_td_rp = 0;//checkRP(msgJson.text);
 			}
 	
 			if ('photo' in msgJson || 'video' in msgJson || 'document'in msgJson) {

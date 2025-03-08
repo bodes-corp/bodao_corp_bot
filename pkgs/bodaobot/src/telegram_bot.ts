@@ -16,7 +16,6 @@ import Webhook from "./webhook";
 
 
 
-
 /**
  * Class representinhg a Telegram Bot
  */
@@ -36,6 +35,9 @@ export default class TG_BOT {
      
      /** The telegram handlers record map */
 	userOperationsChecks: CheckUserOperationsHandler  = {} as  CheckUserOperationsHandler;
+
+     
+     
 
      /** The telegram update object */
      update: tgTypes.Update = {} as tgTypes.Update;
@@ -62,6 +64,8 @@ export default class TG_BOT {
 
      /**Bot Database */
      DB:any;
+
+     
 
      /**
 	*	Create a bot
@@ -259,7 +263,7 @@ export default class TG_BOT {
           }
      }
 
-     
+
 
      /**
       * This method handles the updates from Telegram.
@@ -482,7 +486,9 @@ export default class TG_BOT {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
           //console.log("handleNewPost: ", message.operation);
-          if (message.is_td_rp || message.is_td) {
+          const isTD = ctx.checkUserOperation('isTD');
+          const isRP = ctx.checkUserOperation('isRP');
+          if (isRP || isTD) {
               response_ids.push(await TIOZAO_CMDS.confirmTD(ctx.bot, ctx.bot.currentContext.update_message, 0));
           }
           return await ctx.bot.handleBotResponses(response_ids);
@@ -511,7 +517,9 @@ export default class TG_BOT {
           let message:ContextMessage = ctx.update_message;
           let response_ids:any[] = [];
       
-          if (message.is_td_rp || message.is_td) {
+          const isTD = ctx.checkUserOperation('isTD');
+          const isRP = ctx.checkUserOperation('isRP');
+          if (isRP || isTD) {
               response_ids.push(await TIOZAO_CMDS.confirmTD(ctx.bot, ctx.bot.currentContext.update_message, 1));
           }
           return await ctx.bot.handleBotResponses(response_ids);

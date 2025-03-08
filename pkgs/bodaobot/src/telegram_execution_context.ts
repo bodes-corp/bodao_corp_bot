@@ -24,7 +24,8 @@ export default class TG_ExecutionContext {
 	/** boolean representing this is a bot command */
 	commandFlag:boolean=false;
 	
-	/** list of operations specific to the bot ownwer*/
+	/** list of operations specific to the bot ownwer
+	 User operations checked to be true */
 	user_operations:string[] = [];
 	/**
 	 * mode of execution:
@@ -188,6 +189,36 @@ export default class TG_ExecutionContext {
 		
 
 		
+	}
+
+
+     /**
+      * check if a key is in the array of user operations
+      * @param keyToCheck the key to check
+      * @returns true if key is on array of user operations, false if not
+      */
+     checkUserOperation(keyToCheck:string){
+          if (this.user_operations.includes(keyToCheck)) {
+               console.log(`${keyToCheck} exists in the array.`);
+               return true;
+          } else {
+               console.log(`${keyToCheck} does not exist in the array.`);
+               return false;
+          }
+     }
+
+	/**
+	 * add a user operation to the array, if it is not there already
+	 * @param keyToAdd key to add
+	 * @returns 
+	 */
+	addUserOperation(keyToAdd:string){
+		if(this.checkUserOperation(keyToAdd)) return;
+		else {
+			this.user_operations.push(keyToAdd);
+			return;
+		}
+
 	}
 
 	/**

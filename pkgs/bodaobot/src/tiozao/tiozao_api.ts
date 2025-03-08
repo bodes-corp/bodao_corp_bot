@@ -368,19 +368,24 @@ export default class TIOZAO_CMDS {
 		console.error('Error in checkDuplicatedThread:', e.message);
 	 }
  }
+ //.onCheck('isTD',checkTD)
+//		.onCheck("isRP",checkRP)
+//		.onCheck('isATA'
  
  public static async confirmTD(bot:  TG_BOT, message: ContextMessage, edit:any) {
  
 	const result = await DB_API.dbSearchTDUserThread(bot.DB, message.id_user, message.id_thread);
 	const number_rp = result.length;
 	let text = '';
- 
+     let is_td = 0; 
+	const is_td_rp = bot.currentContext.checkUserOperation('isRP');
 	// Determine if the user has a TD in the thread
 	if (number_rp > 0) {
-	    message.is_td = 1;
-	} else if (message.is_td_rp) {
+		//bot.currentContext.addUserOperation('isTD');
+		is_td = 1;
+	} else if (is_td_rp) {
 	    text = 'Falta o seu primeiro TD nesse tópico.\nSeguir o padrão: https://gpsp.xyz/td\n';
-	    message.is_td = 0;
+	    is_td = 0;
 	    return await TIOZAO_BOT_CMDs.botAlert(bot, text, message.id_thread, message.message_id);
 	}
  
@@ -388,13 +393,13 @@ export default class TIOZAO_CMDS {
 	if (edit) {
 	    text = `TD Editado ✅`;
 	} else {
-	    text = message.is_td && number_rp > 0 
+	    text = is_td && number_rp > 0 
 		   ? `Repeteco ${number_rp} ✅ ` 
-		   : (message.is_td ? "TD ✅" : "");
+		   : (is_td ? "TD ✅" : "");
 	}
  
 	// Send the response if the message has a TD
-	if (message.is_td) {
+	if (is_td) {
 	    return await TIOZAO_BOT_CMDs.botAlert(bot, text, message.id_thread, message.message_id);
 	}
  }

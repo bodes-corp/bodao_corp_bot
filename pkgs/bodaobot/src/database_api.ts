@@ -124,11 +124,13 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 		   INSERT INTO tg_msg (id_msg, msg_txt, msg_date, td, id_user, id_thread, deleted) 
 		   VALUES (?1,?2,?3,?4,?5,?6,0)
 	    `;
-	    await this.executeQuery(bot.DB, messageQuery, [
+	    	const isTD = bot.currentContext.checkUserOperation('isTD');
+          
+	    	await this.executeQuery(bot.DB, messageQuery, [
 		   message.message_id, 
 		   message.msg_txt,
 		   message.msg_date,
-		   message.is_td,
+		   isTD,
 		   message.id_user,
 		   message.id_thread
 	    ], false);
