@@ -102,7 +102,7 @@ export default class TG_BOT {
      /**
 	 * Register a command on the bot
 	 * @param event - the event or command name
-	 * @param callback - the bot context
+	 * @param callback - the method to execute on the command
 	 */
 	onCommand(event: string, callback: commandFunc) {
 		if (!['onCommand', 'handle'].includes(event)) {
@@ -114,12 +114,15 @@ export default class TG_BOT {
      /**
 	 * Register a user checkFunction on the bot
 	 * @param key - key will be used to identify the operation
-	 * @param callback - the bot context
+	 * @param callbackCheck - callback to check if the update has a user defned condition
+      * @param callback - the handler to execute on callbackCheck returning true
 	 */
-	onCheck(key: string, callback: checkUserOperationFuncAsync) {
+	onCheck(key: string, callbackCheck: checkUserOperationFuncAsync, callback: commandFunc) {
           if (!['oncheck', 'handle'].includes(key)) {
-               this.userOperationsChecks[key] = callback;
+               this.userOperationsChecks[key] = callbackCheck;
+               this.onCommand(key,callback);
           }
+          
           return this;
      }
 
@@ -357,6 +360,9 @@ export default class TG_BOT {
           if (ctx.commandFlag) {
                await ctx.bot.handleBotCommand(ctx);
           }
+          if (ctx.user_operations.length >0 ) {
+               await ctx.bot.handleUserDefinedOperation(ctx);
+          }
                
           //updateHandlers do not receive the this pointer.
           //remember to not use them in inside the methods
@@ -525,6 +531,27 @@ export default class TG_BOT {
           return await ctx.bot.handleBotResponses(response_ids);
       
       }
+
+     async handleUserDefinedOperation( ctx: TG_ExecutionContext ) {
+          let message:ContextMessage = ctx.update_message;
+          const message_id = message.message_id;
+          const id_thread = message.id_thread;
+          const id_user = message.id_user;
+          const msg_txt = message.msg_txt?.trim();
+          ctx.user_operations.forEach(async (prefix) => {
+               const commandEntry:any = Object.entries(ctx.bot.commands).find((row) =>
+                    row[0]===prefix
+               );
+               if (commandEntry) {
+                    const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
+                    const argument = msg_txt?.slice(selectedCommand.length).trim();
+                    await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `o bot detectou o uso da seguinte operação: ${selectedCommand}`, id_thread, message_id);
+              
+               }
+
+          })     
+
+     }
       
      async handleBotCommand(ctx: TG_ExecutionContext ) {
           let message:ContextMessage = ctx.update_message;
