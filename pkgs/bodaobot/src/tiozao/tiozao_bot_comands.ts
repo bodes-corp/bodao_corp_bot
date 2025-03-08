@@ -1,7 +1,7 @@
 import { DB_API } from "../database_api";
 import { Requests } from "../requests/";
 import TG_REQ from "../telegram/RequestManager";
-import TG_API from "../telegram/telegram_api";
+import { tg } from "../telegram/updating_messages";
 import TG_BOT from "../telegram_bot";
 import { tgRequestMethod, two_buttons_t } from "../types/Types";
 
@@ -53,9 +53,20 @@ export class TIOZAO_BOT_CMDs {
                   const message_id = row[0];
                   id_msg_array.push(message_id);
               }
+              if (Array.isArray(id_msg_array) && (id_msg_array).length > 0 ) {
+                                  //const response = await TG_API.tgDeleteMessagesFromChat(bot.botINFO.TOKEN,bot.botINFO.CHATID, chunks);
+                                  const message_ids: number [] = id_msg_array;
+                                  const  chat_id = bot.botINFO.CHATID;
+                                  console.log("delete old messages - params:",  JSON.stringify({chat_id,message_ids}));
+                                  const response = await tg.deleteMessages(bot.botINFO.TOKEN,{chat_id, message_ids});
+                                  console.log('debug from tgDeleteMessagesFromChat - result:', response);
+                                                  
+                                  if (response === true) await DB_API.dbDeleteBotNotify(bot.DB, id_msg_array);
+                                  Promise.resolve(true);
+              }else {
+                                  Promise.resolve(false);
+              }
               
-              await TG_API.tgDeleteMessagesFromChat(bot.botINFO.TOKEN,bot.botINFO.CHATID, id_msg_array);
-              await DB_API.dbDeleteBotNotify(bot.DB, id_msg_array);
           }
           return [];
       }

@@ -3,6 +3,7 @@ import { chunkArray, splitMessage } from "./library";
 import { Requests } from "./requests";
 import TG_REQ from "./telegram/RequestManager";
 import TG_API from "./telegram/telegram_api";
+import { tg } from "./telegram/updating_messages";
 import TG_ExecutionContext from "./telegram_execution_context";
 import TIOZAO_CMDS from "./tiozao/tiozao_api";
 import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
@@ -189,16 +190,7 @@ export default class TG_BOT {
           return await TG_API.answerCallbackQuery(this.botINFO.TOKEN, params);
      }
 
-     async tgDeleteMessagesFromChat (chunks:any)
-     {
-          if(!Array.isArray(chunks)){
-               Promise.resolve()
-          }
-
-          for (const chunk of chunks) {
-               await TG_API.tgDeleteMessagesFromChat(this.botINFO.TOKEN,this.botINFO.CHATID, chunk);
-           }
-     }
+   
      public static async dbGetBotMessages(bot:  TG_BOT,old:number):Promise<number[]>{
           
           const query = 'SELECT id_msg FROM tg_bot WHERE msg_date < ?';
@@ -223,9 +215,19 @@ export default class TG_BOT {
           try {
               
                const chunks = await TG_BOT.dbGetBotMessages(bot,old);
-               if ((chunks).length>0 ) {
-                     await bot.tgDeleteMessagesFromChat(chunks);
-                     await DB_API.deleteMessagesFromDB(bot.DB,old);
+               
+               if (Array.isArray(chunks) && (chunks).length > 0 ) {
+                    //const response = await TG_API.tgDeleteMessagesFromChat(bot.botINFO.TOKEN,bot.botINFO.CHATID, chunks);
+                    const message_ids: number [] = chunks;
+                    const  chat_id = bot.botINFO.CHATID;
+                    console.log("delete from removeOldMessages - params:",  JSON.stringify({chat_id,message_ids}));
+                    const response = await tg.deleteMessages(bot.botINFO.TOKEN,{chat_id, message_ids});
+                    console.log('debug from removeOldMessages - result:', response);
+                                    
+                    if (response === true) await DB_API.deleteMessagesFromDB(bot.DB,old);
+                    Promise.resolve(true);
+               }else {
+                    Promise.resolve(false);
                }
       
              
