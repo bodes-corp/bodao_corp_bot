@@ -224,7 +224,7 @@ export default class TG_BOT {
                     const message_ids: number [] = id_msg_array;
                     const  chat_id = bot.botINFO.CHATID;
                     console.log("delete from removeOldMessages - params:",  JSON.stringify({chat_id,message_ids}));
-                    const response = await tg.deleteMessages(bot.botINFO.TOKEN,{chat_id, message_ids});
+                    const response:boolean = await tg.deleteMessages(bot.botINFO.TOKEN,{chat_id, message_ids});
                     console.log('debug from removeOldMessages - result:', response);
                                     
                     if (response === true) await DB_API.deleteMessagesFromDB(bot.DB,old);
