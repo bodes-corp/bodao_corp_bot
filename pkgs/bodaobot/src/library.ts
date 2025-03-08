@@ -27,10 +27,14 @@ export function splitMessage(text:string, maxLength:number, maxNewlines:number) 
 
  export function checkTD(ctx:TG_ExecutionContext):Promise<boolean>{
   if (!ctx) return Promise.resolve(false);
+  
     const msg_txt = ctx.update.message?.text
+    console.log('debug from checkTD: msg_text: ', JSON.stringify(msg_txt))
     if(!msg_txt) return Promise.resolve(false);
 	  const keywords = ["Rosto", "Peitos", "Bunda", "Corpo", "Beij", "Massagem", "Oral", "Transa", "Anal", "Presença", "Valor", "Data"];
-	  return keywords.every(keyword => JSON.stringify(msg_txt).includes(keyword)) ? Promise.resolve(true) : Promise.resolve(false);
+	  const result =  keywords.every(keyword => JSON.stringify(msg_txt).includes(keyword)) ?true : false;
+    console.log('debug from checkTD: result: ', result)
+    return Promise.resolve(result)
  }
          
  export async function  checkRP(ctx:TG_ExecutionContext):Promise<boolean>{
