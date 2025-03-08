@@ -3,6 +3,7 @@ import TelegramInlineQueryResultPhoto from '../types/TelegramInlineQueryResultPh
 import TelegramInlineQueryResultVideo from '../types/TelegramInlineQueryResultVideo.js';
 import { tgRequestMethod } from '../types/Types.js';
 import TG_REQ from './RequestManager.js';
+import { tg } from './updating_messages.js';
 
 
 
@@ -54,7 +55,11 @@ export default class TG_API {
 	    try {
 
 			if(Array.isArray(chunk) && chunk.length >=0) {
-				const ChunkString = JSON.stringify(chunk);
+                const message_ids: number [] = chunk;
+                const response = await tg.deleteMessages(token, {chat_id,message_ids});
+
+				/*
+                const ChunkString = JSON.stringify(chunk);
 				const deleteParams = { chat_id, message_ids: ChunkString };
 				console.log("delete old messages - params:",  JSON.stringify(deleteParams))
 				const response = await fetch(TG_REQ.tgApiUrl(token, tgRequestMethod.MESSAGES_DELETE, {
@@ -62,15 +67,18 @@ export default class TG_API {
 				    headers: { 'Content-Type': 'application/json' },
 				    body: JSON.stringify(deleteParams)
 				}));
-		  
+                
 				const result:any = await response.json();
-				if (!result.ok) {
-				    throw new Error(`Failed to delete messages: ${result.description}`);
-				}
+                */
+				if (!response) {
+				    throw new Error(`Failed to delete messages:`);
+				}else {
+                    console.log('debug from - result ok.messages deleted')
+                }
 			}
 		  
 	    } catch (error) {
-		   console.error('Error deleting messages:', error);
+		   console.error('Error deleting messages: tgDeleteMessagesFromChat', error);
 	    }
     }
 
