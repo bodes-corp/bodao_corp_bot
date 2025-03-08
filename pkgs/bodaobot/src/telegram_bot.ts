@@ -549,6 +549,8 @@ export default class TG_BOT {
                     const argument = msg_txt?.slice(selectedCommand.length).trim();
                     await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `o bot detectou o uso da seguinte operação: ${selectedCommand}`, id_thread, message_id);
               
+               }else{
+                    await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `o bot nao achou o handler da seguinte operação: ${prefix}`, id_thread, message_id);
                }
 
           })     
