@@ -1,4 +1,3 @@
-import { DB_API } from "../database_api";
 import { Requests } from "../requests";
 import TG_API from "../telegram/telegram_api";
 import TG_BOT from "../telegram_bot";
@@ -44,7 +43,10 @@ export default class BODAO_CMDS {
 
         //check if the document is in database
         console.log('debug from handleATA -  message_id: ', bot.currentContext.update_message.message_id)
-        await DB_API.dbUpdateMediaType(bot,mediaType.DOCUMENT_ATA, bot.currentContext.update_message.message_id)
+        bot.currentContext.update_message.media_type = mediaType.DOCUMENT_ATA;
+            //if it will execute media edit handler it is not necessary dbupdate here.
+            // //otherwise it is
+            // await DB_API.dbUpdateMediaType(bot,mediaType.DOCUMENT_ATA, bot.currentContext.update_message.message_id)
         //if not add it to atas database, and create apoll to check visualization and approval
         //if yes verify if there is approvation pool.
         //create a poll to aprove the document
