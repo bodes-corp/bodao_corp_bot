@@ -185,7 +185,7 @@ public static async dbUpdateMediaType(bot: TG_BOT,media_type:mediaType_t, messag
 
 	const fileQuery = `
              UPDATE tg_media
-             SET type = = ?1
+             SET type = ?1
              WHERE id_msg = ?2
          `;
          await this.executeQuery(bot.DB, fileQuery, [

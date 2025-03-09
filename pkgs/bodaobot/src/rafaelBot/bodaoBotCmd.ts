@@ -43,7 +43,7 @@ export default class BODAO_CMDS {
 
 
         //check if the document is in database
-        console.log('debug fromhandleATA -  message_id: ', bot.currentContext.update_message.message_id)
+        console.log('debug from handleATA -  message_id: ', bot.currentContext.update_message.message_id)
         DB_API.dbUpdateMediaType(bot,mediaType.DOCUMENT_ATA, bot.currentContext.update_message.message_id)
         //if not add it to atas database, and create apoll to check visualization and approval
         //if yes verify if there is approvation pool.
