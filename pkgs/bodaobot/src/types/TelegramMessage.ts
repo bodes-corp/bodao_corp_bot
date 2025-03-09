@@ -91,6 +91,7 @@ export class ContextMessage {
 				}
 				if ('caption' in msgJson) {
 					this.caption = msgJson.caption;
+					
 				}
 				if ('media_group_id' in msgJson)
 					this.media_group_id = msgJson.media_group_id;

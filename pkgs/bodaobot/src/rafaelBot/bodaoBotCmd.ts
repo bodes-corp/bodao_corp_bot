@@ -2,7 +2,6 @@ import { Requests } from "../requests";
 import TG_API from "../telegram/telegram_api";
 import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
-import { mediaType } from "../types/Types";
 
 export default class BODAO_CMDS {
 
@@ -40,17 +39,27 @@ export default class BODAO_CMDS {
         if (!bot) return Promise.resolve([]);
         let response_ids:any[] = [];
 
-
-        //check if the document is in database
-        console.log('debug from handleATA -  message_id: ', bot.currentContext.update_message.message_id)
-        bot.currentContext.update_message.media_type = mediaType.DOCUMENT_ATA;
+        //1)Check media database
+        //document is already in media database with correct type. This is handled by editMedia Handler
             //if it will execute media edit handler it is not necessary dbupdate here.
             // //otherwise it is
             // await DB_API.dbUpdateMediaType(bot,mediaType.DOCUMENT_ATA, bot.currentContext.update_message.message_id)
-        //if not add it to atas database, and create apoll to check visualization and approval
+            //if not add it to atas database, and create apoll to check visualization and approval
+        
+        //2)create and manage the poll
+        console.log('debug from handleATA -  message_id: ', bot.currentContext.update_message.message_id)
+        const questionText = "poll teste";
+        const opt1 = Requests.pollOption("option 1");
+        const opt2 = Requests.pollOption("option 2");
+        const questionOptions:tgTypes.InputPollOption[] = [];
+        questionOptions.push(opt1);
+        questionOptions.push(opt2);
+        const pollParams = Requests.sendPoll(bot,questionText,questionOptions);
+        const poolResponse = await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
         //if yes verify if there is approvation pool.
         //create a poll to aprove the document
-
+        console.log('debug from handleATA -  poll response: ', JSON.stringify(poolResponse))
+        
         const markup = {
             inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
         }

@@ -622,6 +622,8 @@ declare namespace tgOptions {
                  reply_markup?: tgTypes.InlineKeyboardMarkup | tgTypes.ReplyKeyboardMarkup | tgTypes.ReplyKeyboardRemove | tgTypes.ForceReply;
      }
 
+     
+
 
 
 
