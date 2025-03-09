@@ -266,10 +266,10 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
 }
 
 
-public static async dbInsertPoll(db:any,data:tgTypes.Poll,media_group_id:number , message_thread_id:number){
+public static async dbInsertPollFromPollResponse(db:any,data:tgTypes.PollResponse,media_group_id:number , message_thread_id:number){
 	const query = `
          INSERT INTO tg_poll (id_poll, media_group_id , message_thread_id ,question, total_voter_count , is_closed, is_anonymous, type, allows_multiple_answers, has_protected_content, is_topic_message)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10 , ?1)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10 , ?11)
          ON CONFLICT (id_poll)
          DO UPDATE SET media_group_id = excluded.media_group_id, 
           message_thread_id = excluded.message_thread_id ,
@@ -282,7 +282,7 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll,media_group_id:number 
           has_protected_content = excluded.has_protected_content, 
           is_topic_message = excluded.is_topic_message
      `;
-	let params:any[] = [data.id, media_group_id, message_thread_id, data.question, data.total_voter_count,data.is_closed, data.is_anonymous,data.type, data.allows_multiple_answers]
+	let params:any[] = [data.id, media_group_id, message_thread_id, data.question, data.total_voter_count,(data.is_closed === true? 1:0), (data.is_anonymous  === true? 1:0),data.type, (data.allows_multiple_answers  === true? 1:0), (data.has_protected_content  === true? 1:0),  (data.is_topic_message === true? 1:0)]
      await this.executeQuery(db, query,params , false);
 	return data.id;
 

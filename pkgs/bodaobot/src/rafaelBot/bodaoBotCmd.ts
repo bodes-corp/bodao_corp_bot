@@ -56,13 +56,15 @@ export default class BODAO_CMDS {
         questionOptions.push(opt1);
         questionOptions.push(opt2);
         const pollParams = Requests.sendPoll(bot,questionText,questionOptions);
-        const pollResponse = await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
+        const pollResponse:any = await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
         console.log('debug from handleATA -  poll response: ', JSON.stringify(pollResponse));
        
         if(pollResponse) {
-            const newPollData:tgTypes.Poll|undefined = pollResponse.poll
+            const newPollData:tgTypes.PollResponse|undefined = pollResponse.poll
             const media_group_id = bot.currentContext.update_message.media_group_id;
-            if (newPollData) await DB_API.dbInsertPoll(bot.DB,newPollData,media_group_id,Number(bot.botINFO.THREADBOT))
+           // const has_protected_content = pollResponse.poll.has_protected_content === true? 1:0; 
+           // const is_topic_message = pollResponse.poll.is_topic_message === true? 1:0;
+            if (newPollData) await DB_API.dbInsertPollFromPollResponse(bot.DB,newPollData, media_group_id,Number(bot.botINFO.THREADBOT))
         
         }
         
