@@ -1,0 +1,37 @@
+//poll create answer
+      "message": [
+        "debug from handleATA -  poll response: ",
+        "{\"message_id\":557,
+        \"from\":{\"id\":7530215388,\"is_bot\":true,\"first_name\":\"bodão-bot\",\"username\":\"bodao_corp_bot\"},
+        \"chat\":{\"id\":-1002271335705,\"title\":\"Arls Rafael Loduca\",\"is_forum\":true,\"type\":\"supergroup\"},
+        \"date\":1741516730,
+        \"message_thread_id\":2,
+        \"reply_to_message\":{\"message_id\":2,\"from\":{\"id\":1998627310,\"is_bot\":false,\"first_name\":\"Salvatore\",\"username\":\"SalvatoreGF\",\"language_code\":\"pt-br\"},\"chat\":{\"id\":-1002271335705,\"title\":\"Arls Rafael Loduca\",\"is_forum\":true,\"type\":\"supergroup\"},
+        \"date\":1739752487,
+        \"message_thread_id\":2,
+        \"forum_topic_created\":{\"name\":\"Bodão Bot\",\"icon_color\":16478047},\"is_topic_message\":true},
+        \"poll\":{
+          \"id\":\"5075857818599293112\",
+          \"question\":\"poll teste\",
+          \"options\":[{\"text\":\"option 1\",\"voter_count\":0},
+                       {\"text\":\"option 2\",\"voter_count\":0}],
+          \"total_voter_count\":0,
+          \"is_closed\":false,
+          \"is_anonymous\":false,
+          \"type\":\"regular\",
+          \"allows_multiple_answers\":false},
+          \"has_protected_content\":true,
+          \"is_topic_message\":true}"
+      ],
+      //callApi response
+      "message": [
+        "debug from callApi- result: ",
+        "{\"message_id\":558,\"from\":{\"id\":7530215388,\"is_bot\":true,\"first_name\":\"bodão-bot\",\"username\":\"bodao_corp_bot\"},\"chat\":{\"id\":-1002271335705,\"title\":\"Arls Rafael Loduca\",\"is_forum\":true,\"type\":\"supergroup\"},\"date\":1741516730,\"message_thread_id\":2,\"reply_to_message\":{\"message_id\":2,\"from\":{\"id\":1998627310,\"is_bot\":false,\"first_name\":\"Salvatore\",\"username\":\"SalvatoreGF\",\"language_code\":\"pt-br\"},\"chat\":{\"id\":-1002271335705,\"title\":\"Arls Rafael Loduca\",\"is_forum\":true,\"type\":\"supergroup\"},\"date\":1739752487,\"message_thread_id\":2,\"forum_topic_created\":{\"name\":\"Bodão Bot\",\"icon_color\":16478047},\"is_topic_message\":true},\"text\":\"Welcome to my bot! Press the button to accept my rules!\",\"reply_markup\":{\"inline_keyboard\":[[{\"text\":\"I Accept\",\"callback_data\":\"accept_rules\"}]]},\"is_topic_message\":true}"
+      ],
+
+//poll create update/
+//update received after creating a poll
+
+
+
+//pool answer

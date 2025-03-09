@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS [tg_ata] ("media_group_id" integer PRIMARY KEY,"pool_id" integer);

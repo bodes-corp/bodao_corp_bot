@@ -330,6 +330,14 @@ export default class TG_BOT {
                     handlerName = ':callback';
                     break;
                }
+               case updType.POLL: {
+                    handlerName = ':poll';
+                    break;
+               }
+               case updType.POLL_ANSWER: {
+                    handlerName = ':poll_answer';
+                    break;
+               }
                /*
                case 'edit_thread': {
                     handlerName = ':edit_thread';

@@ -264,6 +264,29 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
  
      return new Response("DB-EDIT-ok");
 }
+
+
+public static async dbInsertPoll(db:any,data:tgTypes.Poll,media_group_id:number , message_thread_id:number){
+	const query = `
+         INSERT INTO tg_poll (id_poll, media_group_id , message_thread_id ,question, total_voter_count , is_closed, is_anonymous, type, allows_multiple_answers, has_protected_content, is_topic_message)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10 , ?1)
+         ON CONFLICT (id_poll)
+         DO UPDATE SET media_group_id = excluded.media_group_id, 
+          message_thread_id = excluded.message_thread_id ,
+          question = excluded.question, 
+          total_voter_count = excluded.total_voter_count , 
+          is_closed = excluded.is_closed, 
+          is_anonymous = excluded.is_anonymous, 
+          type = excluded.type, 
+          allows_multiple_answers = excluded.allows_multiple_answers, 
+          has_protected_content = excluded.has_protected_content, 
+          is_topic_message = excluded.is_topic_message
+     `;
+	let params:any[] = [data.id, media_group_id, message_thread_id, data.question, data.total_voter_count,data.is_closed, data.is_anonymous,data.type, data.allows_multiple_answers]
+     await this.executeQuery(db, query,params , false);
+	return data.id;
+
+}
  
 /**
  * Insert Caption/text to the media

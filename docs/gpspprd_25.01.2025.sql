@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS tg_msg (id_msg integer PRIMARY KEY,msg_txt text,msg_d
 CREATE TABLE IF NOT EXISTS [tg_media] ("id_msg" integer PRIMARY KEY,"file_id" text,"file_unique_id" text,"msg_date" integer,"id_user" integer,"id_thread" integer, type integer, deleted integer, media_group_id numeric);
 CREATE TABLE IF NOT EXISTS [tg_caption] ("media_group_id" integer PRIMARY KEY,"caption" text, normalized_caption TEXT);
 CREATE TABLE IF NOT EXISTS d1_kv (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+
+
 CREATE INDEX idx_threadname_normalized ON tg_thread (normalized_threadname);
 CREATE INDEX idx_thread_msg ON tg_msg (id_thread, id_msg);
 CREATE INDEX idx_td_deleted_thread ON tg_msg (id_thread, td, deleted);

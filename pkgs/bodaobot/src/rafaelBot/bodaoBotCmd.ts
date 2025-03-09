@@ -1,3 +1,4 @@
+import { DB_API } from "../database_api";
 import { Requests } from "../requests";
 import TG_API from "../telegram/telegram_api";
 import TG_BOT from "../telegram_bot";
@@ -55,11 +56,19 @@ export default class BODAO_CMDS {
         questionOptions.push(opt1);
         questionOptions.push(opt2);
         const pollParams = Requests.sendPoll(bot,questionText,questionOptions);
-        const poolResponse = await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
+        const pollResponse = await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
+        console.log('debug from handleATA -  poll response: ', JSON.stringify(pollResponse));
+       
+        if(pollResponse) {
+            const newPollData:tgTypes.Poll|undefined = pollResponse.poll
+            const media_group_id = bot.currentContext.update_message.media_group_id;
+            if (newPollData) await DB_API.dbInsertPoll(bot.DB,newPollData,media_group_id,Number(bot.botINFO.THREADBOT))
+        
+        }
+        
         //if yes verify if there is approvation pool.
         //create a poll to aprove the document
-        console.log('debug from handleATA -  poll response: ', JSON.stringify(poolResponse))
-        
+         
         const markup = {
             inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
         }
