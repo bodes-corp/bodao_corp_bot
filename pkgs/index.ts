@@ -47,7 +47,7 @@ export default {
 		.onCommand('/end', { name: 'end', desc:'teste end',func: TIOZAO_CMDS.testeEnd, requiresArg: false })
 		//.onCheck('isTD',checkTD)
 		//.onCheck("isRP",checkRP)
-		.onCheck('isATA',BODAO_CMDS.checkATA, { name: 'isATA', desc:'handle ata',func: TIOZAO_CMDS.testeEnd, requiresArg: false });
+		.onCheck('isATA',BODAO_CMDS.checkATA, { name: 'isATA', desc:'handle ata',func: BODAO_CMDS.handleATA, requiresArg: false });
 
 		try {
 

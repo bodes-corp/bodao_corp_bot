@@ -231,7 +231,8 @@ export const mediaType = {
      UNKNOWN:-1,
      PHOTO: 1,
      VIDEO: 2,
-     DOCUMENT:3
+     DOCUMENT:3,
+     DOCUMENT_ATA:4
 }
 
 export type mediaType_t = typeof mediaType[keyof typeof  mediaType];

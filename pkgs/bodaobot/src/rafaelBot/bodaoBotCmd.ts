@@ -1,4 +1,9 @@
+import { DB_API } from "../database_api";
+import { Requests } from "../requests";
+import TG_API from "../telegram/telegram_api";
+import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
+import { mediaType } from "../types/Types";
 
 export default class BODAO_CMDS {
 
@@ -26,6 +31,31 @@ export default class BODAO_CMDS {
         
         return Promise.resolve(false);
     }
+
+    /**
+     * Handler to be used when the bot detec a new ata
+     * @param bot TG_BOT object
+     * @returns 
+     */
+    public static async handleATA(bot: TG_BOT){
+        if (!bot) return Promise.resolve([]);
+        let response_ids:any[] = [];
+
+
+        //check if the document is in database
+        console.log('debug fromhandleATA -  message_id: ', bot.currentContext.update_message.message_id)
+        DB_API.dbUpdateMediaType(bot,mediaType.DOCUMENT_ATA, bot.currentContext.update_message.message_id)
+        //if not add it to atas database, and create apoll to check visualization and approval
+        //if yes verify if there is approvation pool.
+        //create a poll to aprove the document
+
+        const markup = {
+            inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
+        }
+        const params = Requests.MessageToBotTopicWithMarkup(bot,'Welcome to my bot! Press the button to accept my rules!', markup)
+        await TG_API.sendMessage(bot.botINFO.TOKEN,params);
+        return response_ids;
+     }
     
 
 

@@ -4,7 +4,7 @@
 import { removeAccents, stringToWordsArray } from "./library";
 import TG_BOT from "./telegram_bot";
 import { ContextMessage } from "./types/TelegramMessage";
-import { updOperation } from "./types/Types";
+import { mediaType_t, updOperation } from "./types/Types";
 
  
 
@@ -180,6 +180,19 @@ public static async dbUpdateUsers(db:any, users:tgTypes.User[]){
 	}
 
 };
+
+public static async dbUpdateMediaType(bot: TG_BOT,media_type:mediaType_t, message_id:number){
+
+	const fileQuery = `
+             UPDATE tg_media
+             SET type = = ?1
+             WHERE id_msg = ?2
+         `;
+         await this.executeQuery(bot.DB, fileQuery, [
+             media_type,
+             message_id
+         ], false)
+}
  
 public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
      if (!bot.DB) return Promise.resolve(null);
