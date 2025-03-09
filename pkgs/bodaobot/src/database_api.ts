@@ -182,7 +182,7 @@ public static async dbUpdateUsers(db:any, users:tgTypes.User[]){
 };
 
 public static async dbUpdateMediaType(bot: TG_BOT,media_type:mediaType_t, message_id:number){
-
+	console.log('debug from dbUpdateMediaType: DocType: ', media_type)
 	const fileQuery = `
              UPDATE tg_media
              SET type = ?1
