@@ -13,7 +13,9 @@ export class DB_API {
 
 public static async executeQuery(db:any, query:string, params:any[] = [], returnResults = true) {
      if (!db) return Promise.resolve(null);     
+
 	try {
+		console.log('debug from executeQuery -query: ', query)
 		const preparedStatement = db.prepare(query).bind(...params);
       
           if (returnResults) {
@@ -191,7 +193,7 @@ public static async dbUpdateMediaType(bot: TG_BOT,media_type:mediaType_t, messag
          await this.executeQuery(bot.DB, fileQuery, [
              media_type,
              message_id
-         ], false)
+         ], true)
 }
  
 public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
