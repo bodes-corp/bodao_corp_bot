@@ -193,13 +193,38 @@ public static async dbUpdateMediaType(bot: TG_BOT,media_type:mediaType_t, messag
          await this.executeQuery(bot.DB, fileQuery, [
              media_type,
              message_id
-         ], true)
+         ], false)
 }
  
 public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
      if (!bot.DB) return Promise.resolve(null);
 	const operation = bot.currentContext.update_operation;
-     if (operation === updOperation.MEDIA_EDIT || operation === updOperation.DOC_EDIT) {
+     if (operation === updOperation.DOC_EDIT){
+		const fileQuery = `
+		UPDATE tg_media
+		SET file_id = ?1,
+		    file_unique_id = ?2,
+		    type = ?3
+		WHERE id_msg = ?4
+	 `;
+	 await this.executeQuery(bot.DB, fileQuery, [
+		message.file_id,
+		message.file_unique_id,
+		message.media_type,
+		message.message_id
+	 ], false);
+
+	 const groupQuery = `
+		UPDATE tg_media
+		SET deleted = ?1
+		WHERE media_group_id = ?2
+	 `;
+	 await this.executeQuery(bot.DB, groupQuery, [
+		message.deleted,
+		message.media_group_id
+	 ], false);
+	}
+	if (operation === updOperation.MEDIA_EDIT ) {
          const fileQuery = `
              UPDATE tg_media
              SET file_id = ?1,

@@ -29,7 +29,7 @@ import { isValidChat } from "../library";
 import TG_ExecutionContext from "../telegram_execution_context";
 import TIOZAO_CMDS from "../tiozao/tiozao_api";
 import { ContextMessage } from "../types/TelegramMessage";
-import { commandFunc, updOperation } from "../types/Types";
+import { commandFunc, mediaType, updOperation } from "../types/Types";
 
  export class TG_HANDLER {
 
@@ -89,7 +89,12 @@ import { commandFunc, updOperation } from "../types/Types";
                   await ctx.bot.handleEditPost(ctx);
                   break;
               case updOperation.DOC_EDIT:
+                if(ctx.checkUserOperation('isATA')){
+                    message.media_type = mediaType.DOCUMENT_ATA
+                }
                 await ctx.bot.handleEditDocument(ctx);
+                
+               
                 break;
           }
           await DB_API.dbEditMessage( ctx.bot, message);
