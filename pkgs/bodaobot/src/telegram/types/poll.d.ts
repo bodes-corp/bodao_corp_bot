@@ -134,41 +134,4 @@ declare namespace tgTypes {
         close_date?: number;
     }
 
-    interface PollResponse {
-        /**
-         * Unique poll identifier
-         */
-        id: string;
-        /**
-         * Poll question, 1-300 characters
-         */
-        question: string;
-       /**
-         * List of poll options
-         */
-        options: tgTypes.PollOption[];
-        /**
-         * Total number of users that voted in the poll
-         */
-        total_voter_count: number;
-        /**
-         * True, if the poll is closed
-         */
-        is_closed: boolean;
-        /**
-         * True, if the poll is anonymous
-         */
-        is_anonymous: boolean;
-        /**
-         * Poll type, currently can be “regular” or “quiz”
-         */
-        type: 'regular' | 'quiz';
-        /**
-         * True, if the poll allows multiple answers
-         */
-        allows_multiple_answers: boolean;
-        has_protected_content:boolean;
-        is_topic_message:boolean;
-        
-    }
 }
