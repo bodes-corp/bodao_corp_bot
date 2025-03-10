@@ -268,7 +268,7 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
 
 public static async dbInsertPoll(db:any,data:tgTypes.Poll,media_group_id:number , message_thread_id:number){
 	const query = `
-         INSERT INTO tg_poll (id_poll, media_group_id , message_thread_id ,question, total_voter_count , is_closed, is_anonymous, type, allows_multiple_answers, has_protected_content, is_topic_message)
+         INSERT INTO tg_poll (id_poll, media_group_id , message_thread_id ,question, total_voter_count , is_closed, is_anonymous, type, allows_multiple_answers)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
          ON CONFLICT (id_poll)
          DO UPDATE SET media_group_id = excluded.media_group_id, 

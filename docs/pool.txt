@@ -19,9 +19,11 @@
           \"is_closed\":false,
           \"is_anonymous\":false,
           \"type\":\"regular\",
-          \"allows_multiple_answers\":false},
-          \"has_protected_content\":true,
-          \"is_topic_message\":true}"
+          \"allows_multiple_answers\":false
+        },
+        \"has_protected_content\":true,
+        \"is_topic_message\":true
+     }"
       ],
       //callApi response
       "message": [
