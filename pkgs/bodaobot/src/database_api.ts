@@ -266,13 +266,12 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
 }
 
 
-public static async dbInsertPoll(db:any,data:tgTypes.Poll,media_group_id:number , message_thread_id:number){
+public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:number,media_group_id:number|null =null){
 	const query = `
-         INSERT INTO tg_poll (id_poll, media_group_id , message_thread_id ,question, total_voter_count , is_closed, is_anonymous, type, allows_multiple_answers)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+         INSERT INTO tg_poll (id_poll,  message_thread_id ,question, total_voter_count , is_closed, is_anonymous, type, allows_multiple_answers)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
          ON CONFLICT (id_poll)
-         DO UPDATE SET media_group_id = excluded.media_group_id, 
-          message_thread_id = excluded.message_thread_id ,
+         DO UPDATE SET message_thread_id = excluded.message_thread_id ,
           question = excluded.question, 
           total_voter_count = excluded.total_voter_count , 
           is_closed = excluded.is_closed, 
@@ -280,11 +279,24 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll,media_group_id:number 
           type = excluded.type, 
           allows_multiple_answers = excluded.allows_multiple_answers
      `;
-	let params:any[] = [data.id, media_group_id, message_thread_id, data.question, data.total_voter_count,(data.is_closed === true? 1:0), (data.is_anonymous  === true? 1:0),data.type, (data.allows_multiple_answers  === true? 1:0)]
+	let params:any[] = [data.id,  message_thread_id, data.question, data.total_voter_count,(data.is_closed === true? 1:0), (data.is_anonymous  === true? 1:0),data.type, (data.allows_multiple_answers  === true? 1:0)]
      await this.executeQuery(db, query,params , false);
+
+	if(media_group_id){
+		const query = `
+			INSERT INTO tg_poll_media (id_poll,  media_group_id)
+			VALUES (?1, ?2)
+			ON CONFLICT DO NOTHING
+	    `;
+		let params:any[] = [data.id, media_group_id ]
+		await this.executeQuery(db, query,params , false);
+
+	}
 	return data.id;
 
 }
+
+
  
 /**
  * Insert Caption/text to the media

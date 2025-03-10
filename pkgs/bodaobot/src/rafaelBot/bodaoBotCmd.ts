@@ -64,7 +64,7 @@ export default class BODAO_CMDS {
             const media_group_id = bot.currentContext.update_message.media_group_id;
            // const has_protected_content = pollResponse.poll.has_protected_content === true? 1:0; 
            // const is_topic_message = pollResponse.poll.is_topic_message === true? 1:0;
-            if (newPollData) await DB_API.dbInsertPoll(bot.DB,newPollData, media_group_id,Number(bot.botINFO.THREADBOT))
+            if (newPollData) await DB_API.dbInsertPoll(bot.DB,newPollData,Number(bot.botINFO.THREADBOT), media_group_id)
         
         }
         
