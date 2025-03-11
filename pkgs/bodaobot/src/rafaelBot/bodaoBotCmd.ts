@@ -67,7 +67,9 @@ export default class BODAO_CMDS {
             if (newPollData) await DB_API.dbInsertPoll(bot.DB,newPollData,Number(bot.botINFO.THREADBOT), media_group_id)
             //add options
             const options = pollResponse.poll.options;
-            await DB_API.dbInsertPollOptions(bot.DB,options,pollResponse.poll.id);
+            const pollID = pollResponse.poll.id;
+            console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
+            await DB_API.dbInsertPollOptions(bot.DB,pollID,options);
             
         }
         
