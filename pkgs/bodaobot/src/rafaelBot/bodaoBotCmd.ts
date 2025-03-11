@@ -60,6 +60,8 @@ export default class BODAO_CMDS {
         //console.log('debug from handleATA -  poll response: ', JSON.stringify(pollResponse));
        
         if(pollResponse) {
+            const params = Requests.MessageToBotTopic(bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
+            await TG_API.sendMessage(bot.botINFO.TOKEN,params);
             const newPollData:tgTypes.Poll|undefined = pollResponse.poll
             const media_group_id = bot.currentContext.update_message.media_group_id;
            // const has_protected_content = pollResponse.poll.has_protected_content === true? 1:0; 
@@ -72,15 +74,8 @@ export default class BODAO_CMDS {
             await DB_API.dbInsertPollOptions(bot.DB,pollID,options);
             
         }
-        
-        //if yes verify if there is approvation pool.
-        //create a poll to aprove the document
-         
-        const markup = {
-            inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
-        }
-        const params = Requests.MessageToBotTopicWithMarkup(bot,'Welcome to my bot! Press the button to accept my rules!', markup)
-        await TG_API.sendMessage(bot.botINFO.TOKEN,params);
+       
+       
         return response_ids;
      }
     
