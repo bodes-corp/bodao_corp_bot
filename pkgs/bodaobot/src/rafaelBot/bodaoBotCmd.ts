@@ -65,7 +65,10 @@ export default class BODAO_CMDS {
            // const has_protected_content = pollResponse.poll.has_protected_content === true? 1:0; 
            // const is_topic_message = pollResponse.poll.is_topic_message === true? 1:0;
             if (newPollData) await DB_API.dbInsertPoll(bot.DB,newPollData,Number(bot.botINFO.THREADBOT), media_group_id)
-        
+            //add options
+            const options = pollResponse.poll.options;
+            await DB_API.dbInsertPollOptions(bot.DB,options,pollResponse.poll.id);
+            
         }
         
         //if yes verify if there is approvation pool.

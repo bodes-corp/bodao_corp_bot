@@ -296,6 +296,22 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 
 }
 
+public static async dbInsertPollOptions(db:any,pollID:number,data:tgTypes.PollOption[]){
+	if(!Array.isArray(data)) return Promise.resolve();
+
+	data.forEach(async (option:tgTypes.PollOption)=> {
+		const query = `
+			INSERT INTO tg_poll_options (id_poll,text,voter_count)
+			VALUES (?1, ?2, ?3)
+	    `;
+		let params:any[] = [pollID,option.text, option.voter_count ]
+		await this.executeQuery(db, query,params , false);
+
+	})
+	
+
+}
+
 
  
 /**
