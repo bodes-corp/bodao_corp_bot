@@ -49,15 +49,15 @@ export default class BODAO_CMDS {
         
         //2)create and manage the poll
         console.log('debug from handleATA -  message_id: ', bot.currentContext.update_message.message_id)
-        const questionText = "poll teste";
-        const opt1 = Requests.pollOption("option 1");
-        const opt2 = Requests.pollOption("option 2");
+        const questionText = `Aprovação da Ata: ${bot.currentContext.update_message.caption}`;
+        const opt1 = Requests.pollOption("Ata está Correta - Aprovada");
+        const opt2 = Requests.pollOption("Ata precisa de Alterações");
         const questionOptions:tgTypes.InputPollOption[] = [];
         questionOptions.push(opt1);
         questionOptions.push(opt2);
         const pollParams = Requests.sendPoll(bot,questionText,questionOptions);
         const pollResponse:any = await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
-        console.log('debug from handleATA -  poll response: ', JSON.stringify(pollResponse));
+        //console.log('debug from handleATA -  poll response: ', JSON.stringify(pollResponse));
        
         if(pollResponse) {
             const newPollData:tgTypes.Poll|undefined = pollResponse.poll
@@ -68,7 +68,7 @@ export default class BODAO_CMDS {
             //add options
             const options = pollResponse.poll.options;
             const pollID = pollResponse.poll.id;
-            console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
+            //console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
             await DB_API.dbInsertPollOptions(bot.DB,pollID,options);
             
         }
