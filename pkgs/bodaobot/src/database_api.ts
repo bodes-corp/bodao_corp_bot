@@ -265,7 +265,23 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
      return new Response("DB-EDIT-ok");
 }
 
+public static async checkHasPoll(db:any, mediaGroupId:number): Promise<boolean> {
+	if(!db || !mediaGroupId) return Promise.resolve(false);
+	let apiresponse = false;
+	const query = `
+	    SELECT *
+	    FROM tg_poll_media
+	    WHERE media_group_id = ?1;
+	`;
+	const result = await this.executeQuery(db, query, [mediaGroupId]);
+	if (result.length === 0) {
+		apiresponse = false;
+	} else {
+		apiresponse = true;
+	}
 
+	return Promise.resolve(apiresponse);
+}
 public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:number,media_group_id:number|null =null){
 	const query = `
          INSERT INTO tg_poll (id_poll,  message_thread_id ,question, total_voter_count , is_closed, is_anonymous, type, allows_multiple_answers)
