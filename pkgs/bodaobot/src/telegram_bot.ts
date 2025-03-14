@@ -174,7 +174,7 @@ export default class TG_BOT {
           const responses = [];
       
           for (const part of parts) {
-               const params = Requests.MessageToBotTopic(this,part);
+               const params = Requests.MessageToBotTopicRequest(this,part);
                const response:tgTypes.Message = await TG_REQ.callApi(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params );
                //console.log("debug from: tgSendMessage / response from bot: ", response);
                //const response:botResponse = await this.tgSendMessageToBotThread(part);
@@ -200,7 +200,7 @@ export default class TG_BOT {
           for (let i = 0; i < buttons.length; i += batchSize) {
               const batch = buttons.slice(i, i + batchSize);
                
-              const params = Requests.sendButtonToBotThread(this, caption, batch);
+              const params = Requests.sendButtonToBotThreadRequest(this, caption, batch);
 
                const response:tgTypes.Message = await TG_REQ.callApi(this.botINFO.TOKEN,tgRequestMethod.SEND_MESSAGE, params);
                //console.log("debug from: tgButton / response from bot: ", response);
@@ -213,7 +213,7 @@ export default class TG_BOT {
      
      async tgAnswerCallbackQuery(callbackQueryId:any, text:string|null = null) { 
 
-          const params = Requests.answerCallBack(this,callbackQueryId, text)
+          const params = Requests.answerCallBackRequest(this,callbackQueryId, text)
           return await TG_API.answerCallbackQuery(this.botINFO.TOKEN, params);
      }
 

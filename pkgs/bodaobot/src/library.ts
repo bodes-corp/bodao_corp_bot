@@ -1,5 +1,7 @@
 import TG_ExecutionContext from "./telegram_execution_context";
 
+
+
 export function splitMessage(text:string, maxLength:number, maxNewlines:number) {
 	const parts = [];
 	while (text.length > 0) {

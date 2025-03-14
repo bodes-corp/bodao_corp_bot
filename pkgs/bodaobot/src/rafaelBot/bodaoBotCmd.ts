@@ -50,43 +50,43 @@ export default class BODAO_CMDS {
         //verify if it has already a poll for this document
         const hasPoll = await DB_API.checkHasPoll(bot.DB,media_group_id);
         if(hasPoll) {
-            const params = Requests.MessageToBotTopic(bot,'Já existe um Quiz para essa Ata')
+            const params = Requests.MessageToBotTopicRequest(bot,'Já existe um Quiz para essa Ata')
             await TG_API.sendMessage(bot.botINFO.TOKEN,params);
     
 
         }else {
-//2)create and manage the poll
-console.log('debug from handleATA -  message_id: ', bot.currentContext.update_message.message_id)
-const questionText = `Aprovação da Ata: ${bot.currentContext.update_message.caption}`;
-const opt1 = Requests.pollOption("Ata está Correta - Aprovada");
-const opt2 = Requests.pollOption("Ata precisa de Alterações");
-const questionOptions:tgTypes.InputPollOption[] = [];
-questionOptions.push(opt1);
-questionOptions.push(opt2);
-const pollParams = Requests.sendPoll(bot,questionText,questionOptions);
-const pollResponse:any = await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
-//console.log('debug from handleATA -  poll response: ', JSON.stringify(pollResponse));
+            //2)create and manage the poll
+            console.log('debug from handleATA -  message_id: ', bot.currentContext.update_message.message_id)
+            const questionText = `Aprovação da Ata: ${bot.currentContext.update_message.caption}`;
+            const opt1 = Requests.pollOptionRequest("Ata está Correta - Aprovada");
+            const opt2 = Requests.pollOptionRequest("Ata precisa de Alterações");
+            const questionOptions:tgTypes.InputPollOption[] = [];
+            questionOptions.push(opt1);
+            questionOptions.push(opt2);
+            const pollParams = Requests.sendPollRequest(bot,questionText,questionOptions);
+            const pollResponse:any = await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
+            //console.log('debug from handleATA -  poll response: ', JSON.stringify(pollResponse));
 
-if(pollResponse) {
-    const params = Requests.MessageToBotTopic(bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
-    await TG_API.sendMessage(bot.botINFO.TOKEN,params);
-    const newPollData:tgTypes.Poll|undefined = pollResponse.poll
-    // const has_protected_content = pollResponse.poll.has_protected_content === true? 1:0; 
-   // const is_topic_message = pollResponse.poll.is_topic_message === true? 1:0;
-    if (newPollData) await DB_API.dbInsertPoll(bot.DB,newPollData,Number(bot.botINFO.THREADBOT), media_group_id)
-    //add options
-    const options = pollResponse.poll.options;
-    const pollID = pollResponse.poll.id;
-    //console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
-    await DB_API.dbInsertPollOptions(bot.DB,pollID,options);
-    
-}
+            if(pollResponse) {
+                const params = Requests.MessageToBotTopicRequest(bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
+                await TG_API.sendMessage(bot.botINFO.TOKEN,params);
+                const newPollData:tgTypes.Poll|undefined = pollResponse.poll
+                // const has_protected_content = pollResponse.poll.has_protected_content === true? 1:0; 
+                // const is_topic_message = pollResponse.poll.is_topic_message === true? 1:0;
+                if (newPollData) await DB_API.dbInsertPoll(bot.DB,newPollData,Number(bot.botINFO.THREADBOT), media_group_id)
+                //add options
+                const options = pollResponse.poll.options;
+                const pollID = pollResponse.poll.id;
+                //console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
+                await DB_API.dbInsertPollOptions(bot.DB,pollID,options);
+                
+            }
         }
-        
-       
-       
+
         return response_ids;
-     }
+    }
+
+
     
 
 

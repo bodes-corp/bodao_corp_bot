@@ -27,7 +27,7 @@ export function MessageReplyThreadRequest(bot:TG_BOT, text:string, id_thread:any
  * @param text The text to send
  * @returns param object
  */
-export function MessageToBotTopic(bot:TG_BOT, text:string): tgOptions.sendMessage{
+export function MessageToBotTopicRequest(bot:TG_BOT, text:string): tgOptions.sendMessage{
      const params ={
           chat_id: bot.botINFO.CHATID,
           message_thread_id: Number(bot.botINFO.THREADBOT),
@@ -38,7 +38,7 @@ export function MessageToBotTopic(bot:TG_BOT, text:string): tgOptions.sendMessag
       return params;
 }
 
-export function MessageToBotTopicWithMarkup(bot:TG_BOT,text: string,markup:any): tgOptions.sendMessage{
+export function MessageToBotTopicWithMarkupRequest(bot:TG_BOT,text: string,markup:any): tgOptions.sendMessage{
      const params = {
           text: text,
           chat_id: bot.botINFO.CHATID,
@@ -54,7 +54,7 @@ export function MessageToBotTopicWithMarkup(bot:TG_BOT,text: string,markup:any):
  * @param media media to send
  * @returns param object
  */
-export function MediaGroup(bot:TG_BOT,media:(tgTypes.InputMediaAudio | tgTypes.InputMediaDocument | tgTypes.InputMediaPhoto | tgTypes.InputMediaVideo)[]): tgOptions.sendMediaGroup{
+export function MediaGroupRequest(bot:TG_BOT,media:(tgTypes.InputMediaAudio | tgTypes.InputMediaDocument | tgTypes.InputMediaPhoto | tgTypes.InputMediaVideo)[]): tgOptions.sendMediaGroup{
      const params = {
           chat_id: bot.botINFO.CHATID,
           message_thread_id: Number(bot.botINFO.THREADBOT),
@@ -72,7 +72,7 @@ export function MediaGroup(bot:TG_BOT,media:(tgTypes.InputMediaAudio | tgTypes.I
  * @param buttonsMarkup button markup
  * @returns the param object
  */
-export function sendButtonToBotThread(bot: TG_BOT,text:string, buttonsMarkup:any) {
+export function sendButtonToBotThreadRequest(bot: TG_BOT,text:string, buttonsMarkup:any) {
      const params = {
           chat_id: bot.botINFO.CHATID,
           message_thread_id: Number(bot.botINFO.THREADBOT),
@@ -89,7 +89,7 @@ export function sendButtonToBotThread(bot: TG_BOT,text:string, buttonsMarkup:any
  * @param caption the text to add to the answer
  * @returns 
  */
-export function answerCallBack(bot:TG_BOT, callbackQueryId:string, caption:string|null):tgOptions.answerCallbackQuery{
+export function answerCallBackRequest(bot:TG_BOT, callbackQueryId:string, caption:string|null):tgOptions.answerCallbackQuery{
      const params:any = { 
           callback_query_id: callbackQueryId,
      };
@@ -98,7 +98,7 @@ export function answerCallBack(bot:TG_BOT, callbackQueryId:string, caption:strin
      return params;
 }
 
-export function sendPoll(bot:TG_BOT,question:string,options: tgTypes.InputPollOption[],multiple:boolean=false,){
+export function sendPollRequest(bot:TG_BOT,question:string,options: tgTypes.InputPollOption[],multiple:boolean=false,){
 
      const params:any = { 
         
@@ -153,7 +153,7 @@ export function sendPoll(bot:TG_BOT,question:string,options: tgTypes.InputPollOp
 
 }
 
-export function pollOption(text:string){
+export function pollOptionRequest(text:string){
      const params: tgTypes.InputPollOption ={
           /**
            * Option text, 1-100 characters
