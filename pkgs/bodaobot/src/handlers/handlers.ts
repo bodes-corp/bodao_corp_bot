@@ -161,7 +161,8 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
      public static async handlePollOption(ctx:TG_ExecutionContext){
           const operation:any = ctx.update_operation;
           console.log("debug from handlePollOption - operation: ", operation);
-          console.log("debug from handlePollOption - mensagem: ",JSON.stringify(ctx.update_message))
+          const answer:tgTypes.PollAnswer|undefined = ctx.update.poll_answer;
+          console.log("debug from handlePollOption - Answer: ",JSON.stringify(answer))
           return new Response('ok');
 
      }
