@@ -49,9 +49,10 @@ export default class TIOZAO_CMDS {
 	const markup = {
 		inline_keyboard: [[button]]
 	}
+	//\"reply_markup\":{\"inline_keyboard\":[[{\"text\":\"I Accept\",\"callback_data\":\"accept_rules\",\"hide\":false}]]}}
 	const markup2 =   inlineKeyboard([button]) 
 	console.log('debug from  testeEnd - markup:', JSON.stringify(markup2))
-	const params = Requests.MessageToBotTopicWithMarkupRequest(bot,'Welcome to my bot! Press the button to accept my rules!', markup)
+	const params = Requests.MessageToBotTopicWithMarkupRequest(bot,'Welcome to my bot! Press the button to accept my rules!', markup2)
 	await TG_API.sendMessage(bot.botINFO.TOKEN,params);
 	return response_ids;
  }

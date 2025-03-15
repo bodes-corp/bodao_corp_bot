@@ -1,4 +1,5 @@
-import TG_BOT from "../telegram_bot";
+import TG_BOT from "../../telegram_bot";
+
 
 /**
  * create a object with items to send a message to the 
@@ -43,8 +44,8 @@ export function MessageToBotTopicWithMarkupRequest(bot:TG_BOT,text: string,marku
           text: text,
           chat_id: bot.botINFO.CHATID,
           message_thread_id:Number(bot.botINFO.THREADBOT), //without this the message goes to general thread of the chat
-          reply_markup: markup
       }
+      var objectC = {...params, ...markup}; // this is the answer
       return params;
 }
 
