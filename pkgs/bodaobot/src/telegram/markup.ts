@@ -20,8 +20,7 @@ import {
        | ReplyKeyboardRemove
        | ForceReply,
    > {
-	static button: any
-     constructor(readonly reply_markup: T) {}
+	constructor(readonly reply_markup: T) {}
    
      selective<T extends ForceReply | ReplyKeyboardMarkup>(
        this: Markup<T>,
@@ -62,7 +61,7 @@ import {
      }
    }
    
-
+export * as button from '../requests/button'
    
    export function removeKeyboard(): Markup<ReplyKeyboardRemove> {
      return new Markup<ReplyKeyboardRemove>({ remove_keyboard: true })

@@ -1,11 +1,18 @@
 import { DB_API } from "../database_api";
 import { formatDate, isValidSearchTerm } from "../library";
-import { button, Requests } from "../requests/";
+import { Requests } from "../requests/";
+import { callback } from "../requests/button";
+import { inlineKeyboard } from "../telegram/markup";
 import TG_API from "../telegram/telegram_api";
+import { InlineKeyboardButton, KeyboardButton } from "../telegram/types/markup";
 import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
 import { ContextMessage } from "../types/TelegramMessage";
 import { TIOZAO_BOT_CMDs } from "./tiozao_bot_comands";
+
+type Hideable<B> = B & { hide?: boolean }
+   type HideableKBtn = Hideable<KeyboardButton>
+   type HideableIKBtn = Hideable<InlineKeyboardButton>
 
 export default class TIOZAO_CMDS {
 
@@ -40,9 +47,9 @@ export default class TIOZAO_CMDS {
 	const markup = {
 		inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
 	}
-	const test = button.callback('I Accept', 'accept_rules');
-	//const markup2 =  { ...Markup.button.callback('I Accept', 'accept_rules') }
-	console.log('debug from  testeEnd - markup:', JSON.stringify(test))
+	const but: any = callback('I Accept', 'accept_rules');
+	const markup2 =   inlineKeyboard(but) 
+	console.log('debug from  testeEnd - markup:', JSON.stringify(markup2))
 	const params = Requests.MessageToBotTopicWithMarkupRequest(bot,'Welcome to my bot! Press the button to accept my rules!', markup2)
 	await TG_API.sendMessage(bot.botINFO.TOKEN,params);
 	return response_ids;
