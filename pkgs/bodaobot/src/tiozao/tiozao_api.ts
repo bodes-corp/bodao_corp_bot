@@ -44,12 +44,12 @@ export default class TIOZAO_CMDS {
  public static async testeEnd(bot: TG_BOT){
 
 	let response_ids:any[] = [];
-	const but: any = callback('I Accept', 'accept_rules');
+	const button: Hideable<InlineKeyboardButton.CallbackButton> = callback('I Accept', 'accept_rules');
 	
 	const markup = {
-		inline_keyboard: [[but]]
+		inline_keyboard: [[button]]
 	}
-	const markup2 =   inlineKeyboard(but) 
+	const markup2 =   inlineKeyboard([button]) 
 	console.log('debug from  testeEnd - markup:', JSON.stringify(markup2))
 	const params = Requests.MessageToBotTopicWithMarkupRequest(bot,'Welcome to my bot! Press the button to accept my rules!', markup)
 	await TG_API.sendMessage(bot.botINFO.TOKEN,params);
