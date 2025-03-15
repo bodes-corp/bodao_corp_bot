@@ -44,12 +44,21 @@ export function MessageToBotTopicRequest(bot:TG_BOT, text:string): tgOptions.sen
 export function MessageToBotTopicWithMarkupRequest(bot:TG_BOT,text: string,markup:any): tgOptions.sendMessage{
      
      const hasreply = Object.hasOwn(markup, 'reply_markup')
+     let myMarkup;
      const params = {
           text: text,
           chat_id: bot.botINFO.CHATID,
           message_thread_id:Number(bot.botINFO.THREADBOT), //without this the message goes to general thread of the chat
       }
-      var objectC = {...params, ...markup}; // this is the answer
+      if(hasreply) {
+          myMarkup = markup
+          
+      }else{
+          myMarkup = {
+               reply_markup: markup
+          }
+      }
+      let objectC = {...params, ...myMarkup}; // this is the answer
       return objectC;
 }
 
