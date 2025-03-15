@@ -219,13 +219,8 @@ export type commandFunc = {
 
 export type CommandHandler = Record<string, commandFunc>
 
-export type button_t = { 
-     text: string;
-     callback_data: string
-}
-export type two_buttons_t =  button_t[]
+export type Hideable<B> = B & { hide: boolean }
 
-export type buttons_t = two_buttons_t[]|button_t[]
 
 export const mediaType = {
      UNKNOWN:-1,

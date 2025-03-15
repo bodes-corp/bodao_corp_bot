@@ -1,4 +1,5 @@
 import TG_BOT from "../../telegram_bot";
+import { inlineKeyboard } from "./markup";
 
 
 /**
@@ -75,6 +76,7 @@ export function MediaGroupRequest(bot:TG_BOT,media:(tgTypes.InputMediaAudio | tg
           media,
           disable_notification: true
      }
+     
      return params;
  
 }
@@ -87,14 +89,16 @@ export function MediaGroupRequest(bot:TG_BOT,media:(tgTypes.InputMediaAudio | tg
  * @returns the param object
  */
 export function sendButtonToBotThreadRequest(bot: TG_BOT,text:string, buttonsMarkup:any) {
+     const myMarkup =   inlineKeyboard([buttonsMarkup])
      const params = {
           chat_id: bot.botINFO.CHATID,
           message_thread_id: Number(bot.botINFO.THREADBOT),
-          reply_markup:JSON.stringify( { inline_keyboard: buttonsMarkup }),
+          //reply_markup:JSON.stringify( { inline_keyboard: buttonsMarkup }),
           text,
           disable_notification: true
      }
-     return params
+     let objectC = {...params, ...myMarkup}; // this is the answer
+     return objectC;
 }
 /**
  * return minimum params to answer a callback

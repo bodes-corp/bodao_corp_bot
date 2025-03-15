@@ -3,13 +3,14 @@ import { chunkArray, splitMessage } from "./library";
 import TG_REQ from "./telegram/RequestManager";
 import { Requests } from "./telegram/requests";
 import TG_API from "./telegram/telegram_api";
+import { InlineKeyboardButton } from "./telegram/types/markup";
 import { tg } from "./telegram/updating_messages";
 import TG_ExecutionContext from "./telegram_execution_context";
 import TIOZAO_CMDS from "./tiozao/tiozao_api";
 import { TIOZAO_BOT_CMDs } from "./tiozao/tiozao_bot_comands";
 import { BOT_INFO } from "./types/BotInfo";
 import { ContextMessage } from "./types/TelegramMessage";
-import { buttons_t, checkUserOperationFuncAsync, CheckUserOperationsHandler, commandFunc, CommandHandler, Handler, handlerFunc, tgRequestMethod, updOperation, updType } from "./types/Types";
+import { checkUserOperationFuncAsync, CheckUserOperationsHandler, commandFunc, CommandHandler, Handler, handlerFunc, Hideable, tgRequestMethod, updOperation, updType } from "./types/Types";
 import Webhook from "./webhook";
 
 
@@ -190,7 +191,7 @@ export default class TG_BOT {
       * @param caption text caption to appent to buttons
       * @returns message_id[]
       */
-     async tgSendButtons(buttons:buttons_t, caption:string) {
+     async tgSendButtons(buttons:Hideable<InlineKeyboardButton.CallbackButton>[], caption:string) {
           if(!Array.isArray(buttons) || !caption) {
                return Promise.resolve([]);
           }
