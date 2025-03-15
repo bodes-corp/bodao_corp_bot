@@ -11,7 +11,9 @@ import TG_BOT from "../../telegram_bot";
  * @returns the object with the request
  */
 export function MessageReplyThreadRequest(bot:TG_BOT, text:string, id_thread:any, message_id:any): Record<string, any> {
-          const params = {
+          
+
+     const params = {
                chat_id: bot.botINFO.CHATID,
                message_thread_id: id_thread,
                text,
@@ -40,13 +42,15 @@ export function MessageToBotTopicRequest(bot:TG_BOT, text:string): tgOptions.sen
 }
 
 export function MessageToBotTopicWithMarkupRequest(bot:TG_BOT,text: string,markup:any): tgOptions.sendMessage{
+     
+     const hasreply = Object.hasOwn(markup, 'reply_markup')
      const params = {
           text: text,
           chat_id: bot.botINFO.CHATID,
           message_thread_id:Number(bot.botINFO.THREADBOT), //without this the message goes to general thread of the chat
       }
       var objectC = {...params, ...markup}; // this is the answer
-      return params;
+      return objectC;
 }
 
 /**
