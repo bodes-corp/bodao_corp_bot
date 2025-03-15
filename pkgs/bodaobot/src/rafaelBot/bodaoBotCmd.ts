@@ -48,11 +48,12 @@ export default class BODAO_CMDS {
             // await DB_API.dbUpdateMediaType(bot,mediaType.DOCUMENT_ATA, bot.currentContext.update_message.message_id)
             //if not add it to atas database, and create apoll to check visualization and approval
         //verify if it has already a poll for this document
-        const hasPoll = await DB_API.checkHasPoll(bot.DB,media_group_id);
+        const hasPoll = false//await DB_API.checkHasPoll(bot.DB,media_group_id);
         if(hasPoll) {
             const params = Requests.MessageToBotTopicRequest(bot,'Já existe um Quiz para essa Ata')
             await TG_API.sendMessage(bot.botINFO.TOKEN,params);
-    
+            const params2 = Requests.MessageToBotTopicRequest(bot,'Já existe um Quiz para esta Ata. não será criado outro')
+            await TG_API.sendMessage(bot.botINFO.TOKEN,params2);
 
         }else {
             //2)create and manage the poll
