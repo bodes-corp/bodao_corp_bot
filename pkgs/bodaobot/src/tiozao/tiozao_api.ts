@@ -47,7 +47,7 @@ export default class TIOZAO_CMDS {
 	const but: any = callback('I Accept', 'accept_rules');
 	
 	const markup = {
-		inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
+		inline_keyboard: [[but]]
 	}
 	const markup2 =   inlineKeyboard(but) 
 	console.log('debug from  testeEnd - markup:', JSON.stringify(markup2))

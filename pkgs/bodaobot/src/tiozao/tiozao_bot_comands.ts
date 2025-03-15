@@ -1,6 +1,6 @@
 import { DB_API } from "../database_api";
-import { Requests } from "../requests/";
 import TG_REQ from "../telegram/RequestManager";
+import { Requests } from "../telegram/requests";
 import { tg } from "../telegram/updating_messages";
 import TG_BOT from "../telegram_bot";
 import { tgRequestMethod, two_buttons_t } from "../types/Types";
@@ -25,7 +25,7 @@ export class TIOZAO_BOT_CMDs {
  
       
       public static async botResponseMedia(bot:  TG_BOT,  json:any) {
-            const params = Requests.MediaGroup(bot,json)
+            const params = Requests.MediaGroupRequest(bot,json)
             const response = await TG_REQ.tgSendRequest(bot.botINFO.TOKEN,tgRequestMethod.SEND_MEDIA_GROUP,   params );
             return response.result.map((media: { message_id: any; }) => Number(media.message_id));
       }
