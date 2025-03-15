@@ -97,7 +97,7 @@ export function sendButtonToBotThreadRequest(bot: TG_BOT,text:string, buttonsMar
           text,
           disable_notification: true
      }
-     let objectC = {...params, ...myMarkup}; // this is the answer
+     let objectC = {...params, ...myMarkup}; 
      return objectC;
 }
 /**

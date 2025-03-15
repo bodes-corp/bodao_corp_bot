@@ -34,6 +34,7 @@ export default {
            .on(':edit_thread',TG_HANDLER.handleEditThread)
            .on(':create_thread',TG_HANDLER.handleCreateThread)
            .on(':handle_member',TG_HANDLER.handleMemberOperation)
+		 .on(':poll_answer',TG_HANDLER.handlePollOption)
 		 .onCommand('/active_gp', { name: 'active_gp', desc:'GPs Ativas', func: TIOZAO_CMDS.listActiveGp, requiresArg: false })
 		.onCommand( '/chat', { name: 'chat', desc:'Bate Papo',func: TIOZAO_CMDS.listChat, requiresArg: false })
 		.onCommand('/gp_td', { name: 'gp_td', desc:'Lista GPs',func: TIOZAO_CMDS.listTdGp, requiresArg: false })

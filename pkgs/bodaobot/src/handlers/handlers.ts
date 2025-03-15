@@ -148,7 +148,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
 
      public static async handleMemberOperation(ctx:TG_ExecutionContext) {
           const operation:any = ctx.update_operation;
-          console.log("operation: ", operation);
+          console.log("debug from handleMemberOperation - operation: ", operation);
           if (operation === updOperation.MEMBER_JOIN) {
                if(ctx.update_message.Users)
                await DB_API.dbUpdateUsers(ctx.bot.DB, ctx.update_message.Users);
@@ -156,6 +156,14 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
                await DB_API.dbDeactivateUser(ctx.bot.DB, ctx.update_message);
           } 
           return new Response('ok');
+     }
+
+     public static async handlePollOption(ctx:TG_ExecutionContext){
+          const operation:any = ctx.update_operation;
+          console.log("debug from handlePollOption - operation: ", operation);
+          console.log("debug from handlePollOption - mensagem: ",JSON.stringify(ctx.update_message))
+          return new Response('ok');
+
      }
 
  }
