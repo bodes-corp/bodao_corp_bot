@@ -3,7 +3,7 @@ import {
   KeyboardButton,
   KeyboardButtonRequestChat,
   KeyboardButtonRequestUsers
-} from "../telegram/types/markup"
+} from "../types/markup"
 
 type Hideable<B> = B & { hide: boolean }
    

@@ -1,8 +1,8 @@
 import { DB_API } from "../database_api";
 import { formatDate, isValidSearchTerm } from "../library";
-import { Requests } from "../requests/";
-import { callback } from "../requests/button";
-import { inlineKeyboard } from "../telegram/markup";
+import { Requests } from "../telegram/requests";
+import { callback } from "../telegram/requests/button";
+import { inlineKeyboard } from "../telegram/requests/markup";
 import TG_API from "../telegram/telegram_api";
 import { InlineKeyboardButton, KeyboardButton } from "../telegram/types/markup";
 import TG_BOT from "../telegram_bot";
@@ -44,13 +44,14 @@ export default class TIOZAO_CMDS {
  public static async testeEnd(bot: TG_BOT){
 
 	let response_ids:any[] = [];
-	const markup = {
-		inline_keyboard: [[{ text: 'I Accept', callback_data: 'accept_rules' }]]
-	}
 	const but: any = callback('I Accept', 'accept_rules');
+	
+	const markup = {
+		inline_keyboard: [[but]]
+	}
 	const markup2 =   inlineKeyboard(but) 
 	console.log('debug from  testeEnd - markup:', JSON.stringify(markup2))
-	const params = Requests.MessageToBotTopicWithMarkupRequest(bot,'Welcome to my bot! Press the button to accept my rules!', markup2)
+	const params = Requests.MessageToBotTopicWithMarkupRequest(bot,'Welcome to my bot! Press the button to accept my rules!', markup)
 	await TG_API.sendMessage(bot.botINFO.TOKEN,params);
 	return response_ids;
  }

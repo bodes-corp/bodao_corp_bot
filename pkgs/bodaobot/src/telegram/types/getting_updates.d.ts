@@ -69,7 +69,7 @@ declare namespace tgTypes {
         /**
          * _Optional_. New incoming callback query
          */
-        callback_query?: tgTypes.CallbackQuery;
+        callback_query?: CallbackQuery;
         /**
          * _Optional_. New incoming shipping query. Only for invoices with flexible price
          */

@@ -1,13 +1,14 @@
 
-import { is2D } from '../library'
+
+import { is2D } from '../../library'
 import {
-     ForceReply,
-     InlineKeyboardButton,
-     InlineKeyboardMarkup,
-     KeyboardButton,
-     ReplyKeyboardMarkup,
-     ReplyKeyboardRemove
-} from './types/markup'
+  ForceReply,
+  InlineKeyboardButton,
+  InlineKeyboardMarkup,
+  KeyboardButton,
+  ReplyKeyboardMarkup,
+  ReplyKeyboardRemove
+} from '../types/markup'
    
    type Hideable<B> = B & { hide?: boolean }
    type HideableKBtn = Hideable<KeyboardButton>
@@ -61,7 +62,7 @@ import {
      }
    }
    
-export * as button from '../requests/button'
+export * as button from './button'
    
    export function removeKeyboard(): Markup<ReplyKeyboardRemove> {
      return new Markup<ReplyKeyboardRemove>({ remove_keyboard: true })

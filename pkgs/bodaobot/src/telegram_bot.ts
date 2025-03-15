@@ -1,7 +1,7 @@
 import { DB_API } from "./database_api";
 import { chunkArray, splitMessage } from "./library";
-import { Requests } from "./requests";
 import TG_REQ from "./telegram/RequestManager";
+import { Requests } from "./telegram/requests";
 import TG_API from "./telegram/telegram_api";
 import { tg } from "./telegram/updating_messages";
 import TG_ExecutionContext from "./telegram_execution_context";

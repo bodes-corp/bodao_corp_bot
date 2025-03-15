@@ -11,7 +11,7 @@
      ['message_reaction_count', (update) => handlers.handleMessageReactionCount(update as tgTypes.MessageReactionCountUpdated)],
      ['inline_query', (update) => handlers.handleInlineQuery(update as tgTypes.InlineQuery)],
      ['chosen_inline_result', (update) => handlers.handleChosenInlineResult(update as tgTypes.ChosenInlineResult)],
-     ['callback_query', (update) => handlers.handleCallbackQuery(update as tgTypes.CallbackQuery)],
+     ['callback_query', (update) => handlers.handleCallbackQuery(update as CallbackQuery)],
      ['shipping_query', (update) => handlers.handleShippingQuery(update as tgTypes.ShippingQuery)],
      ['pre_checkout_query', (update) => handlers.handlePreCheckoutQuery(update as tgTypes.PreCheckoutQuery)],
      ['poll', (update) => handlers.handlePoll(update as tgTypes.Poll)],

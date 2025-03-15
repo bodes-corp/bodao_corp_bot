@@ -1,5 +1,5 @@
 import { DB_API } from "../database_api";
-import { Requests } from "../requests";
+import { Requests } from "../telegram/requests";
 import TG_API from "../telegram/telegram_api";
 import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
