@@ -1,9 +1,10 @@
 import { DB_API } from "../database_api";
 import TG_REQ from "../telegram/RequestManager";
 import { Requests } from "../telegram/requests";
+import { callback } from "../telegram/requests/button";
 import { tg } from "../telegram/updating_messages";
 import TG_BOT from "../telegram_bot";
-import { tgRequestMethod, two_buttons_t } from "../types/Types";
+import { tgRequestMethod } from "../types/Types";
 
 
 
@@ -11,13 +12,13 @@ export class TIOZAO_BOT_CMDs {
 
  
      public static async botShowMenu( bot:  TG_BOT ) {
-       
-          const menuButtons:two_buttons_t[] = [
-              [{ text: bot.commands['/gp_td'].desc, callback_data: '/'+bot.commands['/gp_td'].name}, { text:  bot.commands['/top_gp'].desc, callback_data: '/'+bot.commands['/top_gp'].name}],
-              [{ text: bot.commands['/top_rp'].desc, callback_data: '/'+bot.commands['/top_rp'].name},{ text:  bot.commands['/active_gp'].desc, callback_data: '/'+bot.commands['/active_gp'].name}],
-              [{ text: bot.commands['/trend_gp'].desc, callback_data: '/'+bot.commands['/trend_gp'].name}, { text:  bot.commands['/spa'].desc, callback_data: '/'+bot.commands['/spa'].name}],
-              [{ text: bot.commands['/user'].desc, callback_data: '/'+bot.commands['/user'].name },{ text:  bot.commands['/chat'].desc, callback_data: '/'+bot.commands['/chat'].name }],
-              [{ text: bot.commands['/info'].desc, callback_data: '/'+bot.commands['/info'].name }]
+       ;
+          const menuButtons: any[] = [
+              [ callback(bot.commands['/gp_td'].desc, '/'+bot.commands['/gp_td'].name), callback(bot.commands['/top_gp'].desc, '/'+bot.commands['/top_gp'].name)],
+              [ callback(bot.commands['/top_rp'].desc, '/'+bot.commands['/top_rp'].name),callback(bot.commands['/active_gp'].desc,  '/'+bot.commands['/active_gp'].name)],
+              [ callback(bot.commands['/trend_gp'].desc, '/'+bot.commands['/trend_gp'].name), callback(bot.commands['/spa'].desc, '/'+bot.commands['/spa'].name)],
+              [ callback(bot.commands['/user'].desc, '/'+bot.commands['/user'].name),callback(bot.commands['/chat'].desc,  '/'+bot.commands['/chat'].name )],
+              [ callback(bot.commands['/info'].desc, '/'+bot.commands['/info'].name )]
           ];
           return await bot.tgSendButtons(menuButtons, 'Menu:');
       }

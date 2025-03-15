@@ -1,3 +1,4 @@
+import { Hideable } from "../../types/Types"
 import {
   InlineKeyboardButton,
   KeyboardButton,
@@ -5,7 +6,7 @@ import {
   KeyboardButtonRequestUsers
 } from "../types/markup"
 
-type Hideable<B> = B & { hide: boolean }
+
    
 export function text(
      text: string,
