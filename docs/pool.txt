@@ -37,3 +37,22 @@
 
 
 //pool answer
+// voto na primeira opção
+"{\"poll_id\":\"5093747220675559568\",
+\"user\":{\"id\":1998627310,
+\"is_bot\":false,
+\"first_name\":\"Salvatore\",
+\"username\":\"SalvatoreGF\",
+\"language_code\":\"pt-br\"},
+\"option_ids\":[0]
+}"
+
+//voto na segunda opção
+"{\"poll_id\":\"5093747220675559569\",
+\"user\":{\"id\":1998627310,
+\"is_bot\":false,
+\"first_name\":\"Salvatore\",
+\"username\":\"SalvatoreGF\",
+\"language_code\":\"pt-br\"},
+\"option_ids\":[1]}"
+      
