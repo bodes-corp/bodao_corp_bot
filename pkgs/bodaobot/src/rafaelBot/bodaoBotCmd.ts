@@ -49,13 +49,13 @@ export default class BODAO_CMDS {
             //if not add it to atas database, and create apoll to check visualization and approval
         //verify if it has already a poll for this document
         const hasPoll = await DB_API.checkHasPoll(bot.DB,media_group_id);
-        if(hasPoll) {
+        if(hasPoll) { //ja existe u, poll for the media
             const params = Requests.MessageToBotTopicRequest(bot,'Já existe um Quiz para essa Ata')
             await TG_API.sendMessage(bot.botINFO.TOKEN,params);
             const params2 = Requests.MessageToBotTopicRequest(bot,'Já existe um Quiz para esta Ata. não será criado outro')
             await TG_API.sendMessage(bot.botINFO.TOKEN,params2);
 
-        }else {
+        }else { //do not exist a poll for the media
             //2)create and manage the poll
             console.log('debug from handleATA -  message_id: ', bot.currentContext.update_message.message_id)
             const questionText = `Aprovação da Ata: ${bot.currentContext.update_message.caption}`;
@@ -66,12 +66,13 @@ export default class BODAO_CMDS {
             questionOptions.push(opt2);
             const pollParams = Requests.sendPollRequest(bot,questionText,questionOptions);
             const pollResponse:any = await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
-            //console.log('debug from handleATA -  poll response: ', JSON.stringify(pollResponse));
+            console.log('[debug from handleATA] poll response: ', JSON.stringify(pollResponse));
 
             if(pollResponse) {
                 const params = Requests.MessageToBotTopicRequest(bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
                 await TG_API.sendMessage(bot.botINFO.TOKEN,params);
                 const newPollData:tgTypes.Poll|undefined = pollResponse.poll
+                console.log('[debug from handleATA] new poll data: ', JSON.stringify(newPollData));
                 // const has_protected_content = pollResponse.poll.has_protected_content === true? 1:0; 
                 // const is_topic_message = pollResponse.poll.is_topic_message === true? 1:0;
                 if (newPollData) await DB_API.dbInsertPoll(bot.DB,newPollData,Number(bot.botINFO.THREADBOT), media_group_id)

@@ -199,10 +199,10 @@ export default class TG_ExecutionContext {
       */
      checkUserOperation(keyToCheck:string){
           if (this.user_operations.includes(keyToCheck)) {
-               console.log(`${keyToCheck} exists in the array.`);
+               console.log(`[debug from checkUserOperation] ${keyToCheck} exists in the array.`);
                return true;
           } else {
-               console.log(`${keyToCheck} does not exist in the array.`);
+               console.log(`[debug from checkUserOperation] ${keyToCheck} does not exist in the array.`);
                return false;
           }
      }

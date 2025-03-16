@@ -265,6 +265,12 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
      return new Response("DB-EDIT-ok");
 }
 
+/**
+ * Check if there is poll for the selected media in the database
+ * @param db the database connect object
+ * @param mediaGroupId The media identifier
+ * @returns true if it has a poll for the selected media
+ */
 public static async checkHasPoll(db:any, mediaGroupId:number): Promise<boolean> {
 	if(!db || !mediaGroupId) return Promise.resolve(false);
 	let apiresponse = false;

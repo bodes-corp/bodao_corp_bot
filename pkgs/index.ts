@@ -64,10 +64,10 @@ export default {
 		
 
 
-		console.log(`[LOGGING FROM /fetch]: Request came from ${request.url}`);
+		//console.log(`[LOGGING FROM /fetch]: Request came from ${request.url}`);
 		const webhook = new Webhook(env.SECRET_TELEGRAM_API_TOKEN, request);
 		const url = new URL(request.url);
-		console.log(`[LOGGING FROM /fetch]: this token: ${env.SECRET_TELEGRAM_API_TOKEN}`);
+		//console.log(`[LOGGING FROM /fetch]: this token: ${env.SECRET_TELEGRAM_API_TOKEN}`);
 		
 		
 			switch (request.method) {
