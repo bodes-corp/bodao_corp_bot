@@ -63,6 +63,7 @@ export default class TG_REQ{
                     headers: { 'Content-Type': 'application/json' }
                });
                const data: botResponse = await response.json();
+               console.log('[debug from scallApi] response data:', data);
                if (!data.ok) {
                     throw new Error(`Telegram API Error: ${data.description}`);
                } else {

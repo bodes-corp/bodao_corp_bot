@@ -166,6 +166,8 @@ export default class TG_API {
             reply_parameters,
             reply_markup,
         }: tgOptions.sendMessage): Promise<tgTypes.Message> {
+            console.log('[debug from sendMessage] will call api');
+                
         const response =  await TG_REQ.callApi(token, 'sendMessage', {
             chat_id,
             text,
