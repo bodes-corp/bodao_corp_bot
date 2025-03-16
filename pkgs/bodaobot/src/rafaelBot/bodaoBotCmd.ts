@@ -50,10 +50,8 @@ export default class BODAO_CMDS {
         //verify if it has already a poll for this document
         const hasPoll = await DB_API.checkHasPoll(bot.DB,media_group_id);
         if(hasPoll) { //ja existe u, poll for the media
-            const params = Requests.MessageToBotTopicRequest(bot,'Já existe um Quiz para essa Ata')
+            const params = Requests.MessageToBotTopicRequest(bot,'Já existe um Quiz para esta Ata. não será criado outro')
             await TG_API.sendMessage(bot.botINFO.TOKEN,params);
-            const params2 = Requests.MessageToBotTopicRequest(bot,'Já existe um Quiz para esta Ata. não será criado outro')
-            await TG_API.sendMessage(bot.botINFO.TOKEN,params2);
 
         }else { //do not exist a poll for the media
             //2)create and manage the poll
@@ -72,8 +70,8 @@ export default class BODAO_CMDS {
             if(pollResponse) {
                 console.log('[debug from handleATA] entered poll response if');
                 const params = Requests.MessageToBotTopicRequest(bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
-                const response  = await TG_API.sendMessage(bot.botINFO.TOKEN,params);
-                console.log('[debug from handleATA] response from sendMessage:', JSON.stringify(response));
+                //const response  = await TG_API.sendMessage(bot.botINFO.TOKEN,params);
+                //console.log('[debug from handleATA] response from sendMessage:', JSON.stringify(response));
                 
                 const newPollData:tgTypes.Poll|undefined = pollResponse.poll
                 console.log('[debug from handleATA] new poll data: ', JSON.stringify(newPollData));
