@@ -71,7 +71,7 @@ export default class TG_REQ{
                          throw new Error(`Telegram API Error: ${data.description}`);
                     } else {
                          console.log("debug from callApi- result: ", JSON.stringify(data.result))
-                         return data.result;
+                         return await data.result;
                     }
                }else {
                     console.error(`Error in ${methodName} response not received`);
