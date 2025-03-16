@@ -11,7 +11,7 @@ import { mediaType_t, updOperation } from "./types/Types";
 export class DB_API {
 
 
-public static async executeQuery(db:any, query:string, params:any[] = []):Promise<any> {
+public static async executeQuery(db:any, query:string, params:any[] = [],resp:boolean=false):Promise<any> {
      if (!db || !query) return Promise.resolve(null);
 	const returnResults =  query.includes("SELECT");     
      let response = null;
