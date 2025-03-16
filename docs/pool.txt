@@ -56,3 +56,16 @@
 \"language_code\":\"pt-br\"},
 \"option_ids\":[1]}"
       
+
+
+//poll update
+{\"id\":\"5096097998010581178\",
+\"question\":\"Aprovação da Ata: Ata teste 44\",
+\"options\":[{\"text\":\"Ata está Correta - Aprovada\",\"voter_count\":1},
+             {\"text\":\"Ata precisa de Alterações\",\"voter_count\":0}],
+\"total_voter_count\":1,
+\"is_closed\":false,
+\"is_anonymous\":false,
+\"type\":\"regular\",
+\"allows_multiple_answers\":false
+}"

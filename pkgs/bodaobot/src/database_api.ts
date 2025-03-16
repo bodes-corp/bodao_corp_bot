@@ -15,7 +15,7 @@ public static async executeQuery(db:any, query:string, params:any[] = [], return
      if (!db) return Promise.resolve(null);     
 
 	try {
-		//console.log('debug from executeQuery -query: ', query)
+		console.log('debug from executeQuery -query: ', query)
 		const preparedStatement = db.prepare(query).bind(...params);
       
           if (returnResults) {
