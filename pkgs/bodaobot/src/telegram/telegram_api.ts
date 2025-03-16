@@ -166,7 +166,7 @@ export default class TG_API {
             reply_parameters,
             reply_markup,
         }: tgOptions.sendMessage): Promise<tgTypes.Message> {
-        return await TG_REQ.callApi(token, 'sendMessage', {
+        const response =  await TG_REQ.callApi(token, 'sendMessage', {
             chat_id,
             text,
             business_connection_id,
@@ -180,6 +180,8 @@ export default class TG_API {
             reply_parameters: JSON.stringify(reply_parameters),
             reply_markup: JSON.stringify(reply_markup),
         });
+        console.log('[debug from sendMessage] reponse: ', JSON.stringify(response));
+        return response;
     }
     /**
 	 * Send a message to a given botApi
