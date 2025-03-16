@@ -65,10 +65,12 @@ export default class BODAO_CMDS {
             questionOptions.push(opt1);
             questionOptions.push(opt2);
             const pollParams = Requests.sendPollRequest(bot,questionText,questionOptions);
-            const pollResponse:any = await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
+            let pollResponse:any  = null;
+            pollResponse= await TG_API.sendPoll(bot.botINFO.TOKEN, pollParams);
             console.log('[debug from handleATA] poll response: ', JSON.stringify(pollResponse));
 
             if(pollResponse) {
+                console.log('[debug from handleATA] entered poll response if');
                 const params = Requests.MessageToBotTopicRequest(bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
                 await TG_API.sendMessage(bot.botINFO.TOKEN,params);
                 const newPollData:tgTypes.Poll|undefined = pollResponse.poll
