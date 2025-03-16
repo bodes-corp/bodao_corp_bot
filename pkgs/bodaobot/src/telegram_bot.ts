@@ -600,6 +600,7 @@ export default class TG_BOT {
                   response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
               } else {
                   response_ids = await commandFunction(ctx.bot, argument);
+                  console.log('[debug from handleBotCommand] responseIds',JSON.stringify(response_ids))
               }
           } else {
               response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, 'Comando desconhecido: ' + command, id_thread, message_id));

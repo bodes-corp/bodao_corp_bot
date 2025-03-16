@@ -69,9 +69,6 @@ export default class BODAO_CMDS {
 
             if(pollResponse) {
                 console.log('[debug from handleATA] entered poll response if');
-                const params = Requests.MessageToBotTopicRequest(bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
-                const response  = await TG_API.sendMessage(bot.botINFO.TOKEN,params);
-                console.log('[debug from handleATA] response from sendMessage:', JSON.stringify(response));
                 
                 const newPollData:tgTypes.Poll|undefined = pollResponse.poll
                 console.log('[debug from handleATA] new poll data: ', JSON.stringify(newPollData));
@@ -83,6 +80,10 @@ export default class BODAO_CMDS {
                 const pollID = pollResponse.poll.id;
                 //console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
                 await DB_API.dbInsertPollOptions(bot.DB,pollID,options);
+                const params = Requests.MessageToBotTopicRequest(bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
+                const response  = await TG_API.sendMessage(bot.botINFO.TOKEN,params);
+                console.log('[debug from handleATA] response from sendMessage:', JSON.stringify(response));
+                
                 
             }
         }
