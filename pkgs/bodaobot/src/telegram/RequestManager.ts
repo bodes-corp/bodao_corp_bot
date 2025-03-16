@@ -53,7 +53,7 @@ export default class TG_REQ{
                }
      }
 
-     public static async callApi(token:string, methodName:tgRequestMethod_t, params?: Record<string, any>){
+     public static async callApi(token:string, methodName:tgRequestMethod_t, params?: Record<string, any>): Promise<any> {
           try {
                if (params) {
                params = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined && v !== null));
@@ -63,6 +63,7 @@ export default class TG_REQ{
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                });
+               console.log('[debug from callApi] returned from fetch:');
                const data: botResponse = await response.json();
                console.log('[debug from callApi] response data:', data);
                if (!data.ok) {
