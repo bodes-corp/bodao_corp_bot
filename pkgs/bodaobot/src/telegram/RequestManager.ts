@@ -63,15 +63,21 @@ export default class TG_REQ{
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                });
-               console.log('[debug from callApi] returned from fetch:');
-               const data: botResponse = await response.json();
-               console.log('[debug from callApi] response data:', data);
-               if (!data.ok) {
-                    throw new Error(`Telegram API Error: ${data.description}`);
-               } else {
-                    console.log("debug from callApi- result: ", JSON.stringify(data.result))
-                    return data.result;
+               if(response) {
+                    console.log('[debug from callApi] returned from fetch:');
+                    const data: botResponse = await response.json();
+                    console.log('[debug from callApi] response data:', data);
+                    if (!data.ok) {
+                         throw new Error(`Telegram API Error: ${data.description}`);
+                    } else {
+                         console.log("debug from callApi- result: ", JSON.stringify(data.result))
+                         return data.result;
+                    }
+               }else {
+                    console.error(`Error in ${methodName} response not received`);
+                    throw new Error(`Telegram API Error:response not received`);
                }
+               
           } catch (error) {
                console.error(`Error in ${methodName} request:`, error);
                throw error;
