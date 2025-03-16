@@ -58,12 +58,13 @@ export default class TG_REQ{
                if (params) {
                params = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined && v !== null));
                }
+               console.log('[debug from callApi] response params:', JSON.stringify(params));
                const response = await fetch(TG_REQ.tgApiUrl(token, methodName, params),{
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                });
                const data: botResponse = await response.json();
-               console.log('[debug from scallApi] response data:', data);
+               console.log('[debug from callApi] response data:', data);
                if (!data.ok) {
                     throw new Error(`Telegram API Error: ${data.description}`);
                } else {
