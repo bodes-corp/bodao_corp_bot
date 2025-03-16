@@ -11,18 +11,20 @@ import { mediaType_t, updOperation } from "./types/Types";
 export class DB_API {
 
 
-public static async executeQuery(db:any, query:string, params:any[] = [], returnResults = true) {
+public static async executeQuery(db:any, query:string, params:any[] = [], returnResults = true):Promise<any> {
      if (!db) return Promise.resolve(null);     
-
+     let response = null;
 	try {
 		console.log('debug from executeQuery -query: ', query)
 		const preparedStatement = db.prepare(query).bind(...params);
       
           if (returnResults) {
-              return await preparedStatement.raw(); // For SELECT queries, return the results
+              response =  await preparedStatement.raw(); // For SELECT queries, return the results
           } else {
-              return await preparedStatement.run(); // For non-SELECT queries, just execute the query
+              response =  await preparedStatement.run(); // For non-SELECT queries, just execute the query
           }
+		console.log('[debug from ] result:', JSON.stringify(response))
+		return Promise.resolve(response);
 	 } catch (e:any) {
 		console.error('Error in DB_API executeQuery:', e.message);
 	 }
