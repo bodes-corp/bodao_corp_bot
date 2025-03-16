@@ -65,6 +65,7 @@ declare namespace tgTypes {
          * 0-based identifiers of chosen answer options. May be empty if the vote was retracted.
          */
         option_ids: number[];
+        is_bot?:boolean; //undocumented option
     }
 
     /**

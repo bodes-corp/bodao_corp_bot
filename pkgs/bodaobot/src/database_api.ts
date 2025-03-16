@@ -312,6 +312,35 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 
 }
 
+public static async dbUpdatePoolAnswer(db:any,answers:tgTypes.PollAnswer){
+	if(Array.isArray(answers.option_ids)){
+		answers.option_ids.forEach(async (id)=>{
+			const userQuery = `INSERT INTO tg_poll_answers (id_poll,id_user, id_chat,is_bot,option_index)
+         		VALUES (?1, ?2, ?3, ?4,?5)
+ 			`;
+			 const userid = answers.user?.id? answers.user.id:'anonymous';
+			 const chatid = answers.voter_chat?.id? answers.voter_chat?.id: "undefined";
+			 let params:any[] = [answers.poll_id,userid,chatid,(answers.is_bot?1:0),id ]
+			 await this.executeQuery(db, userQuery,params , false);
+
+		})
+	}else{
+		const userQuery = `INSERT INTO tg_poll_answers (id_poll,id_user, id_chat,is_bot,option_index)
+			VALUES (?1, ?2, ?3, ?4,?5)
+		`;
+		const userid = answers.user?.id? answers.user.id:'anonymous';
+		const chatid = answers.voter_chat?.id? answers.voter_chat?.id: "undefined";
+		let params:any[] = [answers.poll_id,userid,chatid,(answers.is_bot?1:0),answers.option_ids ]
+		await this.executeQuery(db, userQuery,params , false);
+	}
+	
+
+}
+
+public static async dbUpdatePool(db:any,data:tgTypes.Poll){
+
+}
+
 public static async dbInsertPollOptions(db:any,pollID:number,data:tgTypes.PollOption[]){
 	if(!Array.isArray(data)) return Promise.resolve();
 

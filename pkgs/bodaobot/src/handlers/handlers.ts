@@ -158,13 +158,29 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
           return new Response('ok');
      }
 
-     public static async handlePollOption(ctx:TG_ExecutionContext){
+     public static async handlePollAnswer(ctx:TG_ExecutionContext){
           const operation:any = ctx.update_operation;
-          console.log("debug from handlePollOption - operation: ", operation);
+          console.log("debug from handlePollAnswer - operation: ", operation);
           const answer:tgTypes.PollAnswer|undefined = ctx.update.poll_answer;
-          console.log("debug from handlePollOption - Answer: ",JSON.stringify(answer))
+          console.log("debug from handlePollAnswer - Answer: ",JSON.stringify(answer))
+          if(answer) DB_API.dbUpdatePoolAnswer(ctx.bot.DB,answer);
           return new Response('ok');
 
+     }
+
+     public static async handlePollUpdate(ctx:TG_ExecutionContext){
+          const operation:any = ctx.update_operation;
+          console.log("debug from handlePollAnswer - operation: ", operation);
+          const pollData:tgTypes.Poll | undefined= ctx.update.poll;
+          if(pollData) {
+               console.log("debug from handlePollAnswer - Answer: ",JSON.stringify(pollData))
+               DB_API.dbUpdatePool(ctx.bot.DB,pollData);
+               return new Response('ok');
+     
+          }else {
+               return new Response('error');
+          }
+          
      }
 
  }
