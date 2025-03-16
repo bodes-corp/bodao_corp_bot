@@ -160,7 +160,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
 
      public static async handlePollAnswer(ctx:TG_ExecutionContext){
           const operation:any = ctx.update_operation;
-          console.log("debug from handlePollAnswer - operation: ", operation);
+          //console.log("debug from handlePollAnswer - operation: ", operation);
           const answer:tgTypes.PollAnswer|undefined = ctx.update.poll_answer;
           console.log("debug from handlePollAnswer - Answer: ",JSON.stringify(answer))
           if(answer) DB_API.dbUpdatePoolAnswer(ctx.bot.DB,answer);
@@ -169,12 +169,18 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
      }
 
      public static async handlePollUpdate(ctx:TG_ExecutionContext){
-          const operation:any = ctx.update_operation;
-          console.log("debug from handlePollAnswer - operation: ", operation);
+          //const operation:any = ctx.update_operation;
+          const media_group_id = ctx.bot.currentContext.update_message.media_group_id;
+          console.log("debug from handlePollUpdate - media-group-id: ",media_group_id )
+          //console.log("debug from handlePollUpdate - operation: ", operation);
           const pollData:tgTypes.Poll | undefined= ctx.update.poll;
           if(pollData) {
-               console.log("debug from handlePollAnswer - Answer: ",JSON.stringify(pollData))
+               console.log("debug from handlePollUpdate - Poll: ",JSON.stringify(pollData))
                DB_API.dbUpdatePool(ctx.bot.DB,pollData);
+               // const has_protected_content = pollResponse.poll.has_protected_content === true? 1:0; 
+                // const is_topic_message = pollResponse.poll.is_topic_message === true? 1:0;
+                if (pollData) await DB_API.dbInsertPoll(ctx.bot.DB,pollData,Number(ctx.bot.botINFO.THREADBOT), media_group_id)
+               
                return new Response('ok');
      
           }else {
