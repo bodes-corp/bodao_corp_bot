@@ -78,7 +78,7 @@ export default class BODAO_CMDS {
                 //add options
                 const options = pollResponse.poll.options;
                 const pollID = pollResponse.poll.id;
-                //console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
+                console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
                 await DB_API.dbInsertPollOptions(bot.DB,pollID,options);
                 const params = Requests.MessageToBotTopicRequest(bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
                 const response  = await TG_API.sendMessage(bot.botINFO.TOKEN,params);
