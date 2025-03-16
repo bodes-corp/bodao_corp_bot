@@ -21,16 +21,21 @@ public static async executeQuery(db:any, query:string, params:any[] = [],resp:bo
           
           if (returnResults) {
               response =  await preparedStatement.raw(); // For SELECT queries, return the results
-          } else {
+		    console.log('[debug from executeQuery] result:', JSON.stringify(response))
+		    return Promise.resolve(response);
+		
+		} else {
               response =  await preparedStatement.run(); // For non-SELECT queries, just execute the query
-          }
-		// response exemple: {\"success\":true,\"meta\":{\"served_by\":\"v3-prod\",\"served_by_region\":\"ENAM\",\"served_by_primary\":true,\"timings\":{\"sql_duration_ms\":0.2194},\"duration\":0.2194,\"changes\":0,\"last_row_id\":0,\"changed_db\":false,\"size_after\":118784,\"rows_read\":0,\"rows_written\":0},\"results\":[]}"
-		console.log('[debug from executeQuery] result:', JSON.stringify(response))
-		if(response.success){
-			return Promise.resolve(response);
-		}else{
-			throw new Error(`Database API Error on query: ${query}`);
+		    // response exemple: {\"success\":true,\"meta\":{\"served_by\":\"v3-prod\",\"served_by_region\":\"ENAM\",\"served_by_primary\":true,\"timings\":{\"sql_duration_ms\":0.2194},\"duration\":0.2194,\"changes\":0,\"last_row_id\":0,\"changed_db\":false,\"size_after\":118784,\"rows_read\":0,\"rows_written\":0},\"results\":[]}"
+		    console.log('[debug from executeQuery] result:', JSON.stringify(response))
+			
+		    if(response.success){
+				return Promise.resolve(response);
+			}else{
+				throw new Error(`Database API Error on query: ${query}`);
+			}
 		}
+		
 		
 	 } catch (e:any) {
 		console.error('Error in DB_API executeQuery:', e.message);
