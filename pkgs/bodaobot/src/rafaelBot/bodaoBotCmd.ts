@@ -76,13 +76,8 @@ export default class BODAO_CMDS {
                 // const is_topic_message = pollResponse.poll.is_topic_message === true? 1:0;
                 if (newPollData) {
                     const responseInsert = await DB_API.dbInsertPoll(bot.DB,newPollData,Number(bot.botINFO.THREADBOT), media_group_id)
-                    console.log("debug from handleATA - response insert poll",JSON.stringify(responseInsert))
+                    console.log("debug from handleATA - response insert poll",JSON.stringify(responseInsert));
                     
-                    //add options
-                    const options = pollResponse.poll.options;
-                    const pollID = pollResponse.poll.id;
-                    console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
-                    await DB_API.dbInsertPollOptions(bot.DB,pollID,options);
                     const params = Requests.MessageToBotTopicRequest(bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
                     const response  = await TG_API.sendMessage(bot.botINFO.TOKEN,params);
                     console.log('[debug from handleATA] response from sendMessage:', JSON.stringify(response));

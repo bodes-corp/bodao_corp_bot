@@ -318,6 +318,12 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 	let params:any[] = [data.id,  message_thread_id, data.question, data.total_voter_count,(data.is_closed === true? 1:0), (data.is_anonymous  === true? 1:0),data.type, (data.allows_multiple_answers  === true? 1:0)]
      await this.executeQuery(db, query,params , false);
 
+	//add options
+	const options = data.options;
+	const pollID = data.id;
+	console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
+	await DB_API.dbInsertPollOptions(db,Number(pollID),options);
+					
 	if(media_group_id){
 		const query = `
 			INSERT INTO tg_poll_media (id_poll,  media_group_id)
