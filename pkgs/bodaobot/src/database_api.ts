@@ -305,6 +305,7 @@ public static async checkHasPoll(db:any, mediaGroupId:number): Promise<boolean> 
 	return Promise.resolve(apiresponse);
 }
 public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:number,media_group_id:number|null =null){
+	try{
 	const query = `
          INSERT INTO tg_poll (id_poll,  message_thread_id ,question, total_voter_count , is_closed, is_anonymous, type, allows_multiple_answers)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
@@ -338,8 +339,11 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 		await this.executeQuery(db, query,params , false);
 
 	}
+	
 	return data.id;
-
+	}catch(e:any) {
+		console.error('Error in batch dbInsertPoll', e.message);
+	}
 }
 
 public static async dbUpdatePoolAnswer(db:any,answers:tgTypes.PollAnswer){
