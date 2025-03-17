@@ -321,7 +321,7 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 	//add options
 	const options = data.options;
 	const pollID = data.id;
-	console.log("debug from handleATA - option/ids",JSON.stringify(options),pollID)
+	console.log("debug from dbInsertPoll - option/ids",JSON.stringify(options),pollID)
 	await DB_API.dbInsertPollOptions(db,Number(pollID),options);
 					
 	if(media_group_id){
