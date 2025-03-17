@@ -30,6 +30,8 @@ public static async executeQuery(db:any, query:string, params:any[] = [],resp:bo
 		    console.log('[debug from executeQuery] result:', JSON.stringify(response))
 			
 		    if(response.success){
+			console.log('[debug from executeQuery] returning response')
+			
 				return Promise.resolve(response);
 			}else{
 				throw new Error(`Database API Error on query: ${query}`);
