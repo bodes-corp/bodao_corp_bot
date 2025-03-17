@@ -316,8 +316,10 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
           allows_multiple_answers = excluded.allows_multiple_answers
      `;
 	let params:any[] = [data.id,  message_thread_id, data.question, data.total_voter_count,(data.is_closed === true? 1:0), (data.is_anonymous  === true? 1:0),data.type, (data.allows_multiple_answers  === true? 1:0)]
-     await this.executeQuery(db, query,params , false);
-
+     console.log("debug from dbInsertPoll - params",JSON.stringify(params));
+	
+	const result = await this.executeQuery(db, query,params , false);
+	console.log("debug from dbInsertPoll - result",JSON.stringify(result));
 	//add options
 	const options = data.options;
 	const pollID = data.id;
