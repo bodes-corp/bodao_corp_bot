@@ -17,18 +17,19 @@ public static async executeQuery(db:any, query:string, params:any[] = [],resp:bo
      let response = null;
 	try {
 		console.log('debug from executeQuery -query: ', query)
-		const preparedStatement = db.prepare(query).bind(...params);
+		const preparedStatement = await db.prepare(query).bind(...params);
           
           if (returnResults) {
               response =  await preparedStatement.raw(); // For SELECT queries, return the results
-		    console.log('[debug from executeQuery] result:', JSON.stringify(response))
+		    console.log('[debug from executeQuery] result:', JSON.stringify(response));
+		    console.log('[debug from executeQuery] result from query:',query);
 		    return Promise.resolve(response);
 		
 		} else {
               response =  await preparedStatement.run(); // For non-SELECT queries, just execute the query
 		    // response exemple: {\"success\":true,\"meta\":{\"served_by\":\"v3-prod\",\"served_by_region\":\"ENAM\",\"served_by_primary\":true,\"timings\":{\"sql_duration_ms\":0.2194},\"duration\":0.2194,\"changes\":0,\"last_row_id\":0,\"changed_db\":false,\"size_after\":118784,\"rows_read\":0,\"rows_written\":0},\"results\":[]}"
 		    console.log('[debug from executeQuery] result:', JSON.stringify(response))
-			
+		    console.log('[debug from executeQuery] result from query:',query);	
 		    if(response.success){
 			console.log('[debug from executeQuery] returning response')
 			
