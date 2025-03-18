@@ -324,10 +324,21 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 	const result = await this.executeQuery(db, query,params , false);
 	console.log("debug from dbInsertPoll - result",JSON.stringify(result));
 	//add options
-	const options = data.options;
-	const pollID = data.id;
-	console.log("debug from dbInsertPoll - option/ids",JSON.stringify(options),pollID)
-	await DB_API.dbInsertPollOptions(db,Number(pollID),options);
+	//const options = data.options;
+	//const pollID = data.id;
+	console.log("debug from dbInsertPoll - option/ids",JSON.stringify(data.options),data.id)
+	//await DB_API.dbInsertPollOptions(db,Number(pollID),options);
+
+
+	data.options.forEach(async (option:tgTypes.PollOption,index)=> {
+		const query = `
+			INSERT INTO tg_poll_options (id_poll,option_index,text,voter_count)
+			VALUES (?1, ?2, ?3,?4)
+	    `;
+		let params:any[] = [data.id,index,option.text, option.voter_count ]
+		await this.executeQuery(db, query,params , false);
+
+	})
 					
 	if(media_group_id){
 		const query = `
@@ -339,7 +350,7 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 		await this.executeQuery(db, query,params , false);
 
 	}
-	
+
 	return data.id;
 	}catch(e:any) {
 		console.error('Error in batch dbInsertPoll', e.message);
