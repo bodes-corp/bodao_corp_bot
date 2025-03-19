@@ -81,24 +81,29 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
           const messageJson:any = ctx.update.edited_message
           const message:ContextMessage = new ContextMessage(messageJson);
           console.log("debug from handleEditedMessage- operation: ", ctx.update_operation);
+          let editDB = false;
           switch (ctx.update_operation) {
               case updOperation.MEDIA_EDIT:
                   await ctx.bot.handleEditMedia(ctx);
+                  editDB = true;
                   break;
               case updOperation.POST_EDIT:
                   await ctx.bot.handleEditPost(ctx);
+                  editDB = true;
                   break;
               case updOperation.DOC_EDIT:
-                if(ctx.checkUserOperation('isATA')){
-                    message.media_type = mediaType.DOCUMENT_ATA
-                }
-                await ctx.bot.handleEditDocument(ctx);
-                
-               
-                break;
+                    if(ctx.checkUserOperation('isATA')){
+                         message.media_type = mediaType.DOCUMENT_ATA
+                    }else {
+                         await ctx.bot.handleEditDocument(ctx);
+                         editDB = true;
+                    }
+                    break;
           }
-          await DB_API.dbEditMessage( ctx.bot, message);
-          return new Response('ok');
+          if (editDB) {
+               await DB_API.dbEditMessage( ctx.bot, message);
+               return new Response('ok');
+          }
      }
 
      public static async handleCallbackQuery(ctx:TG_ExecutionContext) {
