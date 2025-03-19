@@ -78,7 +78,7 @@ export default {
 					//console.log(this.update);
 					
 					
-					context.waitUntil(rafaelBot.handleUpdate(update));
+					context.waitUntil(rafaelBot.BotExecute(update));
 				}
 				case 'GET': {
 					switch (url.searchParams.get('command')) {
