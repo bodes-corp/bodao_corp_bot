@@ -49,6 +49,8 @@ export default class TG_BOT {
      /** The current bot context */
      currentContext!: TG_ExecutionContext;
 
+     currentHandlerName:string='';
+
      /** The envirownment variables */
      //env:Environment;
 
@@ -267,6 +269,46 @@ export default class TG_BOT {
           }
      }
 
+     async BotExecute(update: tgTypes.Update){
+          await this.handleUpdate(update);
+          await this.runHandlers(update);
+     }
+
+     async runHandlers(update: tgTypes.Update){
+          
+         
+               
+          //updateHandlers do not receive the this pointer.
+          //remember to not use them in inside the methods
+          //the best way is to make them static methods
+
+          const promises:any[] = [];
+          if (this.currentContext.commandFlag) {
+               promises.push(new Promise(async (resolve) => {
+                    // setTimeout(async () => {
+                        const response =  await this.currentContext.bot.handleBotCommand(this.currentContext);                  
+                        resolve(response);
+                        //}, 1000);
+                   }));
+          }
+          if (this.currentContext.user_operations.length >0 ) {
+               promises.push(new Promise(async (resolve) => {
+                    // setTimeout(async () => {
+                        const response =  await this.currentContext.bot.handleUserDefinedOperation(this.currentContext);
+                        resolve(response);
+                    }));
+               
+          }
+          promises.push(new Promise(async (resolve) => {
+               // setTimeout(async () => {
+                   const response =  await this.updateHandlers[this.currentHandlerName](this.currentContext);
+                   resolve(response);
+               }));
+
+          return Promise.all(promises);
+          
+     }
+
 
 
      /**
@@ -366,18 +408,8 @@ export default class TG_BOT {
           if (!( handlerName in this.updateHandlers)) {
                handlerName = ':message';
           }
-          if (ctx.commandFlag) {
-               await ctx.bot.handleBotCommand(ctx);
-          }
-          if (ctx.user_operations.length >0 ) {
-               await ctx.bot.handleUserDefinedOperation(ctx);
-          }
-               
-          //updateHandlers do not receive the this pointer.
-          //remember to not use them in inside the methods
-          //the best way is to make them static methods
-          return await this.updateHandlers[handlerName](this.currentContext);
-          
+          this.currentHandlerName = handlerName;
+                    
           
      }
  
