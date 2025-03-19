@@ -236,10 +236,10 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
 		SET deleted = ?1
 		WHERE media_group_id = ?2
 	 `;
-	 await this.executeQuery(bot.DB, groupQuery, [
-		message.deleted,
-		message.media_group_id
-	 ], false);
+	 //await this.executeQuery(bot.DB, groupQuery, [
+	//	message.deleted,
+	//	message.media_group_id
+	 //], false);
 	}
 	if (operation === updOperation.MEDIA_EDIT ) {
          const fileQuery = `
@@ -261,10 +261,10 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
              SET deleted = ?1
              WHERE media_group_id = ?2
          `;
-         await this.executeQuery(bot.DB, groupQuery, [
-             message.deleted,
-             message.media_group_id
-         ], false);
+         //await this.executeQuery(bot.DB, groupQuery, [
+         //    message.deleted,
+         //    message.media_group_id
+        // ], false);
      }
  
      if (operation === updOperation.POST_EDIT) {
