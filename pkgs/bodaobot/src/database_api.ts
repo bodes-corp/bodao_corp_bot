@@ -512,7 +512,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	    WHERE type = 4;
 	`;
 	
-	return await this.executeQuery(db, query, [mediaGroupId]);
+	return await this.executeQuery(db, query, []);
  }
  
  public static async dbSearchNotify(db:any, id_msg_ref:string) {
