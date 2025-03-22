@@ -514,6 +514,16 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	
 	return await this.executeQuery(db, query, [MediaType]);
  }
+
+ public static async dbListPolls(db:any) {
+     if (!db) return Promise.resolve(null);
+	const query = `
+	    SELECT *
+	    FROM tg_polls;
+	`;
+	
+	return await this.executeQuery(db, query, []);
+ }
  
  public static async dbSearchNotify(db:any, id_msg_ref:string) {
      if (!db) return Promise.resolve(null);

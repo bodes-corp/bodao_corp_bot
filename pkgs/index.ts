@@ -42,6 +42,7 @@ export default {
 		.onCommand('/spa', { name: 'spa', desc:'Clínicas',func: TIOZAO_CMDS.listSpa, requiresArg: false })
 		.onCommand('/top_gp', { name: 'top_gp', desc:'Top GPs',func: TIOZAO_CMDS.listTopGp, requiresArg: false })
 		.onCommand('/atas', { name: 'atas', desc:'Lista Atas',func: BODAO_CMDS.listAtas, requiresArg: false })
+		.onCommand('/quiz', { name: 'quiz', desc:'Lista Quizes',func: BODAO_CMDS.listPolls, requiresArg: false })
 		.onCommand('/top_rp', { name: 'top_rp', desc:'Top Repetecos',func: TIOZAO_CMDS.listTopRp, requiresArg: false })
 		.onCommand('/trend_gp', { name: 'trend_gp', desc:'GPs Tendência',func: TIOZAO_CMDS.listTrendGp, requiresArg: false })
 		.onCommand('/user', { name: 'user', desc:'Membros',func: TIOZAO_CMDS.listMembers, requiresArg: false })
