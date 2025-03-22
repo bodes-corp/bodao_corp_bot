@@ -519,7 +519,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
      if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT *
-	    FROM tg_polls;
+	    FROM tg_poll;
 	`;
 	
 	return await this.executeQuery(db, query, []);
