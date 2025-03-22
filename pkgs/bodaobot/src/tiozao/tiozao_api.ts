@@ -78,30 +78,7 @@ export default class TIOZAO_CMDS {
 	return response_ids;
  }
 
- public static async listAtas(bot:  TG_BOT) {
-	//const env = bot.env
-	let response_ids:any[] = [];
-	let text = `═════════════════════\n<b>Atass</b>\nAtas dos últimos 4 meses\n═════════════════════\n`;
- 
-	try {
-	    const result = await DB_API.dbListAtas(bot.DB);
-	    if (result.length === 0) {
-		   text += `Nenhum resultado encontrado`;
-	    } else {
-		   for (const row of result) {
-			  const day = formatDate(row[3]);
-			  text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
-		   }
-	    }
-	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
-	} catch (error) {
-	    console.error('Error during search operation:', error);
-	    text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-	    await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
-	}
- 
-	return response_ids;
- }
+
  
  public static async listTopGp(bot:  TG_BOT) {
 	//const env = bot.env;

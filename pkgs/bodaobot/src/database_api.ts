@@ -4,7 +4,7 @@
 import { removeAccents, stringToWordsArray } from "./library";
 import TG_BOT from "./telegram_bot";
 import { ContextMessage } from "./types/TelegramMessage";
-import { mediaType_t, updOperation } from "./types/Types";
+import { mediaType, mediaType_t, updOperation } from "./types/Types";
 
  
 
@@ -504,15 +504,15 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
 	return await this.executeQuery(db, query, [mediaGroupId]);
  }
 
- public static async dbListAtas(db:any) {
+ public static async dbListMediabyType(db:any, MediaType: mediaType_t = mediaType.UNKNOWN) {
      if (!db) return Promise.resolve(null);
 	const query = `
 	    SELECT *
 	    FROM tg_media
-	    WHERE type = 4;
+	    WHERE type = ?1;
 	`;
 	
-	return await this.executeQuery(db, query, []);
+	return await this.executeQuery(db, query, [MediaType]);
  }
  
  public static async dbSearchNotify(db:any, id_msg_ref:string) {

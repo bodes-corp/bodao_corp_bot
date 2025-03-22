@@ -1,8 +1,11 @@
 import { DB_API } from "../database_api";
+import { formatDate } from "../library";
 import { Requests } from "../telegram/requests";
 import TG_API from "../telegram/telegram_api";
 import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
+import TIOZAO_CMDS from "../tiozao/tiozao_api";
+import { mediaType } from "../types/Types";
 
 export default class BODAO_CMDS {
 
@@ -88,6 +91,36 @@ export default class BODAO_CMDS {
             }
         }
 
+        return response_ids;
+    }
+
+    /**
+     * List the media with type = 4 (atas)
+     * @param bot The Bot object
+     * @returns 
+     */
+    public static async listAtas(bot:  TG_BOT) {
+        //const env = bot.env
+        let response_ids:any[] = [];
+        let text = `═════════════════════\n<b>Atass</b>\nAtas dos últimos 4 meses\n═════════════════════\n`;
+     
+        try {
+            const result = await DB_API.dbListMediabyType(bot.DB, mediaType.DOCUMENT_ATA);
+            if (result.length === 0) {
+               text += `Nenhum resultado encontrado`;
+            } else {
+               for (const row of result) {
+                  const day = formatDate(row[3]);
+                  text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
+               }
+            }
+            await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
+        } catch (error) {
+            console.error('Error during search operation:', error);
+            text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
+            await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
+        }
+     
         return response_ids;
     }
 
