@@ -337,7 +337,7 @@ export default class TG_BOT {
           this.currentContext = ctx;
           console.log('debug from handleUpdate - debug ctx update_type: ',ctx.update_type);
           console.log("debug from handleUpdate - debug ctx message:", ctx.update.message);
-          console.log('debug from handleUpdate - operation: ',ctx.update_operation)
+          console.log('debug from handleUpdate - update operation: ',ctx.update_operation)
           //console.log("debug ctx message user:", ctx.update?.message?.from.id)
           //console.log("debug ctx message user:",ctx.update_message.id_user);
           
@@ -590,9 +590,11 @@ export default class TG_BOT {
           ctx.user_operations.forEach(async (prefix) => {
                console.log('debug from handleUserDefinedOperation: find command for prefix: ',prefix)
                const commandEntry:any= Object.entries(ctx.bot.commands).find((row) => row[0]===prefix);
-               console.log(`debug from handleUserDefinedOperation - commandHandler::`, JSON.stringify(commandEntry))
+               console.log(`debug from handleUserDefinedOperation - commandHandler: `, JSON.stringify(commandEntry))
                if (commandEntry) {
+                    
                     const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
+                    console.log(`debug from handleUserDefinedOperation - commandfound: `, selectedCommand);
                     const argument = msg_txt?.slice(selectedCommand.length).trim();
                     await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
               
