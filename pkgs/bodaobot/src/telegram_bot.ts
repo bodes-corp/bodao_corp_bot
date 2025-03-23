@@ -580,7 +580,7 @@ export default class TG_BOT {
       }
 
      async handleUserDefinedOperation( ctx: TG_ExecutionContext ) {
-          console.log('debug from handleUserDefinedOperation')
+          console.log('debug from handleUserDefinedOperation: useroperations array: ', JSON.stringify(ctx.user_operations));
           let message:ContextMessage = ctx.update_message;
           const message_id = message.message_id;
           const id_thread = message.id_thread;
@@ -588,9 +588,9 @@ export default class TG_BOT {
           const msg_txt = message.msg_txt?.trim();
           let response_ids:any[] = [];
           ctx.user_operations.forEach(async (prefix) => {
-               //console.log('debug from handleUserDefinedOperation: find command for prefix: ',prefix)
+               console.log('debug from handleUserDefinedOperation: find command for prefix: ',prefix)
                const commandEntry:any= Object.entries(ctx.bot.commands).find((row) => row[0]===prefix);
-              // console.log(`debug from handleUserDefinedOperation - commandHandler::`, JSON.stringify(commandEntry))
+               console.log(`debug from handleUserDefinedOperation - commandHandler::`, JSON.stringify(commandEntry))
                if (commandEntry) {
                     const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
                     const argument = msg_txt?.slice(selectedCommand.length).trim();
