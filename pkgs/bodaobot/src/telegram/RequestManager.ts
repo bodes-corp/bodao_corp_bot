@@ -34,8 +34,12 @@ export default class TG_REQ{
       */
      public static async tgSendRequest(token:string, method: tgRequestMethod_t,  params:Record<string, any >  ): Promise<botResponse> {
                
-          const timeoutPromise = new Promise((resolve, reject) => {})
-          
+          const timeoutPromise2 = new Promise((resolve, reject) => {})
+          const timeoutPromise = new Promise((resolve, reject) => {
+               setTimeout(() => {
+                 reject(new Error('Request timed out')) // reject the promise after 3 seconds
+               }, 3000)
+             });
 
 // Since the timeoutPromise never rejects, the fetchPromise will continue indefinitely
 
@@ -51,22 +55,17 @@ export default class TG_REQ{
                          headers: { 'Content-Type': 'application/json' }
                        })
 
-                       return Promise.race([fetchPromise, timeoutPromise])
-                       .then(response => {
-                         // handle the successful fetch response
-                         console.log('debug from tgSendRequest - return from fetch: ', JSON.stringify(response))
-                         const data:any = response;//await response.json();
-                         if (!data.ok) {
-                            throw new Error(`Telegram API Error: ${data.description}`);
-                         }
+                    const response:any = await Promise.race([fetchPromise, timeoutPromise])
+                                            // handle the successful fetch response
+                    console.log('debug from tgSendRequest - return from fetch: ', JSON.stringify(response))
+                    const data:any = await response.json();
+                    if (!data.ok) {
+                         throw new Error(`Telegram API Error: ${data.description}`);
+                    }
                 
-                         return Promise.resolve(data);
-                       })
-                       .catch(error => {
-                         // handle any other fetch errors
-                         console.error(`Error in ${method} request:`, error);
-                         throw error;
-                       })
+                    return Promise.resolve(data);
+                       
+                       
                     //const response = await fetch(apiUrl, {
                     //     method: 'POST',
                     //     headers: { 'Content-Type': 'application/json' }
