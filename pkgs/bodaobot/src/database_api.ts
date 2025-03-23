@@ -13,20 +13,23 @@ export class DB_API {
 
 public static async executeQuery(db:any, query:string, params:any[] = [],resp:boolean=false):Promise<any> {
      if (!db || !query) return Promise.resolve(null);
-	const returnResults =  query.includes("SELECT");     
+	const returnResults:boolean =  query.includes("SELECT");     
+	console.log('debug from executeQuery -returnresult: ', returnResults)
      let response = null;
 	try {
 		console.log('debug from executeQuery -query: ', query)
 		console.log('debug from executeQuery -params: ',JSON.stringify(params));
 		const preparedStatement = await db.prepare(query).bind(...params);
-          console.log('debug from executeQuery -comands: ',preparedStatement);
+          console.log('debug from executeQuery -comands: ',JSON.stringify(preparedStatement));
           if (returnResults) {
+			console.log('[debug from executeQuery] will run raw():');
               response =  await preparedStatement.raw(); // For SELECT queries, return the results
 		    console.log('[debug from executeQuery] result:', JSON.stringify(response));
 		    console.log('[debug from executeQuery] result from query:',query);
 		    return Promise.resolve(response);
 		
 		} else {
+			console.log('[debug from executeQuery] will run run():');
               response =  await preparedStatement.run(); // For non-SELECT queries, just execute the query
 		    // response exemple: {\"success\":true,\"meta\":{\"served_by\":\"v3-prod\",\"served_by_region\":\"ENAM\",\"served_by_primary\":true,\"timings\":{\"sql_duration_ms\":0.2194},\"duration\":0.2194,\"changes\":0,\"last_row_id\":0,\"changed_db\":false,\"size_after\":118784,\"rows_read\":0,\"rows_written\":0},\"results\":[]}"
 		    console.log('[debug from executeQuery] result:', JSON.stringify(response))
