@@ -49,3 +49,5 @@ nok
 
              "{\"dbSession\":{\"fetcher\":{},\"bookmarkOrConstraint\":\"first-primary\"},\"statement\":\"\\n         INSERT INTO tg_caption (media_group_id, caption, normalized_caption)\\n         VALUES (?1, ?2, ?3)\\n         ON CONFLICT (media_group_id)\\n         DO UPDATE SET caption = excluded.caption, normalized_caption = excluded.normalized_caption\\n     \",\"params\":[\"782\",\"Ata teste 31\",\"ata teste 31\"]}"
       
+
+      INSERT INTO tg_caption (media_group_id, caption, normalized_caption) VALUES (782,"Ata teste 33","ata teste 33") ON CONFLICT (media_group_id) DO UPDATE SET caption = excluded.caption, normalized_caption = excluded.normalized_caption\n

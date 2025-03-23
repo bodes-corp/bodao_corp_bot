@@ -116,7 +116,7 @@ database_id = "ea73c71e-1ffc-4abc-b0ab-ab5d843d8ddf"
 # index_name = "my-index"
 # wrangler.toml (wrangler v3.88.0^)
 [observability.logs]
-enabled = false
+enabled = true
 #invocation_logs = false
 
 
