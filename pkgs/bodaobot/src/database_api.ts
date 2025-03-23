@@ -28,7 +28,7 @@ export class DB_API {
 public static async executeQuery(db:any, query:string, params:any[] = [],resp:boolean=false):Promise< any[] | boolean | null> {
      if (!db || !query) return Promise.resolve(false);
 	const returnResults:boolean =  query.includes("SELECT");     
-	console.log('debug from executeQuery -returnresult: ', returnResults)
+	console.log('debug from executeQuery - shall return result: ', returnResults)
      let response: d1Return;
 	try {
 		console.log('debug from executeQuery -query: ', query)

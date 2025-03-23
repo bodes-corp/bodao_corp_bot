@@ -47,8 +47,8 @@ TG_CHATID = "-1002271335705"
 # database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 [[d1_databases]]
 binding = "DB"
-database_name = "rafaelbotdata"
-database_id = "f01ddad9-582b-4b04-b4c8-8c1768496d8b"
+database_name = "rafabotdata"
+database_id = "ea73c71e-1ffc-4abc-b0ab-ab5d843d8ddf"
 # Bind a dispatch namespace. Use Workers for Platforms to deploy serverless functions programmatically on behalf of your customers.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#dispatch-namespace-bindings-workers-for-platforms
 # [[dispatch_namespaces]]
