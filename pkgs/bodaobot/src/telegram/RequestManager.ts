@@ -33,22 +33,46 @@ export default class TG_REQ{
       * @returns the params appended to the request JSON formated
       */
      public static async tgSendRequest(token:string, method: tgRequestMethod_t,  params:Record<string, any >  ): Promise<botResponse> {
-               try {
+               
+          const timeoutPromise = new Promise((resolve, reject) => {})
+          
+
+// Since the timeoutPromise never rejects, the fetchPromise will continue indefinitely
+
+
+
+
+          try {
                     
                     const apiUrl = TG_REQ.tgApiUrl(token,method, params);
                     console.log('debug from tgSendRequest - apiURL: ',apiUrl)
-                    const response = await fetch(apiUrl, {
+                    const fetchPromise = fetch(apiUrl, {
                          method: 'POST',
                          headers: { 'Content-Type': 'application/json' }
-                    });
-                    console.log('debug from tgSendRequest -return fro fetch: ',JSON.stringify(response))
-        
-                    const data:botResponse = await response.json();
-                    if (!data.ok) {
-                       throw new Error(`Telegram API Error: ${data.description}`);
-                    }
-           
-                    return data;
+                       })
+
+                       Promise.race([fetchPromise, timeoutPromise])
+                       .then(response => {
+                         // handle the successful fetch response
+                         console.log('debug from tgSendRequest - return fro fetch: ', JSON.stringify(response))
+                         const data:any = response;//await response.json();
+                         if (!data.ok) {
+                            throw new Error(`Telegram API Error: ${data.description}`);
+                         }
+                
+                         return data;
+                       })
+                       .catch(error => {
+                         // handle any other fetch errors
+                         console.error(`Error in ${method} request:`, error);
+                         throw error;
+                       })
+                    //const response = await fetch(apiUrl, {
+                    //     method: 'POST',
+                    //     headers: { 'Content-Type': 'application/json' }
+                   // });
+                    
+                    
                } catch (error) {
                    console.error(`Error in ${method} request:`, error);
                    throw error;
