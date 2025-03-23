@@ -17,8 +17,9 @@ public static async executeQuery(db:any, query:string, params:any[] = [],resp:bo
      let response = null;
 	try {
 		console.log('debug from executeQuery -query: ', query)
+		console.log('debug from executeQuery -params: ',JSON.stringify(params));
 		const preparedStatement = await db.prepare(query).bind(...params);
-          
+          console.log('debug from executeQuery -comands: ',preparedStatement);
           if (returnResults) {
               response =  await preparedStatement.raw(); // For SELECT queries, return the results
 		    console.log('[debug from executeQuery] result:', JSON.stringify(response));
