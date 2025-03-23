@@ -1,4 +1,5 @@
 import { DB_API } from "../database_api";
+import { TG_HANDLER } from "../handlers/handlers";
 import { formatDate } from "../library";
 import { Requests } from "../telegram/requests";
 import TG_API from "../telegram/telegram_api";
@@ -43,7 +44,7 @@ export default class BODAO_CMDS {
         if (!bot) return Promise.resolve([]);
         let response_ids:any[] = [];
         const media_group_id = bot.currentContext.update_message.media_group_id;
-           
+        await TG_HANDLER.handleEditedMessage(bot.currentContext);
         //1)Check media database
         //document is already in media database with correct type. This is handled by editMedia Handler
             //if it will execute media edit handler it is not necessary dbupdate here.

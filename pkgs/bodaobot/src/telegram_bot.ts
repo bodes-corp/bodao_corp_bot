@@ -14,31 +14,32 @@ import { checkUserOperationFuncAsync, CheckUserOperationsHandler, commandFunc, C
 import Webhook from "./webhook";
 
 
-
-
-
 /**
  * Class representinhg a Telegram Bot
  */
 export default class TG_BOT {
 
-     /** The telegram token */
-     token: string;
+     
 
-     /** The telegram api URL */
-     api: URL;
 
-     /** The telegram handlers record map */
+     /** The telegram update handlers record map 
+      * This type of handler is executed based on the type of 
+      * update message received from the Telegram
+     */
      updateHandlers:Handler  = {} as Handler;
 
-     /**command handlers record map */
+     /**bot command handlers record map 
+      * this handlers are executed based n user comands
+     */
      commands:CommandHandler = {}
      
-     /** The telegram handlers record map */
+     /** The telegram user Operations Handlers record map 
+      * this handlers are executed based on special 
+      * checks performed by the bot. 
+      * The bot check for special conditions and the excute the comand 
+      * handler as if it was a bot command if the condition was met
+     */
 	userOperationsChecks: CheckUserOperationsHandler  = {} as  CheckUserOperationsHandler;
-
-     
-     
 
      /** The telegram update object */
      update: tgTypes.Update = {} as tgTypes.Update;
@@ -76,16 +77,17 @@ export default class TG_BOT {
 	*/
      constructor(info:BOT_INFO,secret:string,database:any=null) {
           this.secret = secret;
-		this.token = info.TOKEN;
+		//this.token = info.TOKEN;
           this.botThreadId = info.THREADBOT;
-          this.botINFO = new BOT_INFO(
+          this.botINFO = info;
+          /*new BOT_INFO(
                info.TOKEN,
                info.CHATID,
-               info.THREADBOT
-          )
+               info.THREADBOT,
+               new URL('https://api.telegram.org/bot' + info.TOKEN)
+          )*/
           this.DB=database;
-		this.api = new URL('https://api.telegram.org/bot' + info.TOKEN);
-           
+		
           
 	}
 
@@ -130,7 +132,11 @@ export default class TG_BOT {
      }
 
 
-     /**this method will be called by the ContextMessage to check if user defined operations, specific for that bot */
+     /**this method will be called by the ContextMessage to check if 
+      * user defined operations, specific for that bot 
+      * the method will execute the handler added by the onCheck command 
+      * 
+     */
      async checkUserOperations(ctx:TG_ExecutionContext) :Promise<string[]>{
      
                const operations:string[] =[];
@@ -155,16 +161,15 @@ export default class TG_BOT {
                        });
                      
                     await Promise.all(promises);
+                    console.log(`debug from checkUserOperations - returning array: `,JSON.stringify(operations));
                     return operations;
                    
                }else {
                     return Promise.resolve([]);
                }
                
-                       
-                         console.log(`debug from checkUserOperations - returning array: `,JSON.stringify(operations));
                
-     
+               
      }
 
       /**
@@ -290,20 +295,21 @@ export default class TG_BOT {
                         resolve(response);
                         //}, 1000);
                    }));
-          }
-          if (this.currentContext.user_operations.length >0 ) {
+          }else if (this.currentContext.user_operations.length >0 ) {
                promises.push(new Promise(async (resolve) => {
                     // setTimeout(async () => {
                         const response =  await this.currentContext.bot.handleUserDefinedOperation(this.currentContext);
                         resolve(response);
                     }));
                
+          } else {
+               promises.push(new Promise(async (resolve) => {
+                    // setTimeout(async () => {
+                        const response =  await this.updateHandlers[this.currentHandlerName](this.currentContext);
+                        resolve(response);
+                    }));
           }
-          promises.push(new Promise(async (resolve) => {
-               // setTimeout(async () => {
-                   const response =  await this.updateHandlers[this.currentHandlerName](this.currentContext);
-                   resolve(response);
-               }));
+          
 
           return Promise.all(promises);
           

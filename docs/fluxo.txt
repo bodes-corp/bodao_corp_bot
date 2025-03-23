@@ -1,0 +1,42 @@
+3 types of hadlers 
+
+ /** The telegram update handlers record map 
+  * This type of handler is executed based on the type of 
+  * update message received from the Telegram
+*/
+updateHandlers:Handler  = {} as Handler;
+
+/**bot command handlers record map 
+ * this handlers are executed based n user comands
+*/
+commands:CommandHandler = {}
+     
+/** The telegram user Operations Handlers record map 
+ * this handlers are executed based on special 
+ * checks performed by the bot. 
+ * The bot check for special conditions and the excute the comand 
+ * handler as if it was a bot command if the condition was met
+ This method sets up tho handlers:
+  first: the check handler. this handler will check if the special condition is met in the current update
+  second: the commnd handler. this handler will e executed once the special condition checked by the first andler is met.
+*/
+userOperationsChecks: CheckUserOperationsHandler  = {} as  C
+
+index 
+     1)check authorizarion
+     2)check method
+     3) create Bot object
+     4) call runBot (main Loop)
+         4.1)  call handleUpdate(update);
+               4.1.1) Create execution context object
+               4.1.2) Check User Operations 
+                    4.1.2.1) run all the onCheck Handlers and add the one passed the tests to the string array of suceeded checks.
+                    4.1.2.2) and return the array.
+               4.1.3) fill variable currentContext.user_operations (current context variable) with the returned array
+               4.1.4) check Update Type 
+               4.1.5) fill bot.currentHandlerName (Bot object variable)
+         4.2)  call runHandlers(update);  
+               4.2.1) (if the message istarted by \) execute the command handler, if it is a command
+               4.2.2) (if currentContext.user_operations array has something) execute the related command handler if the special condition is met
+               4.2.3) execute the update handler  
+                      

@@ -24,7 +24,8 @@ export default {
 		const botINFO = new BOT_INFO(
 			env.SECRET_TELEGRAM_API_TOKEN,
 			env.TG_CHATID,
-			env.TG_THREADBOT
+			env.TG_THREADBOT,
+			new URL('https://api.telegram.org/bot' + env.SECRET_TELEGRAM_API_TOKEN)
 		)
 		const rafaelBot = new  TG_BOT(botINFO,env.TG_SECRET,env.DB);
 		
