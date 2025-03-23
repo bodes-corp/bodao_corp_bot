@@ -58,6 +58,11 @@ export default class TG_REQ{
           
 
           try {
+               const timeoutPromise = new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                      reject(new Error('Request timed out')) // reject the promise after 3 seconds
+                    }, 3000) //3 seconds
+                  });
                     
                     const apiUrl = TG_REQ.tgApiUrl(token,method, params);
                     console.log('debug from tgSendRequest - apiURL: ',apiUrl)
@@ -66,7 +71,7 @@ export default class TG_REQ{
                          headers: { 'Content-Type': 'application/json' }
                     })
 
-                    const response:any = await Promise.race([fetchPromise, TG_REQ.timeoutPromise])
+                    const response:any = await Promise.race([fetchPromise, timeoutPromise])
                     // handle the successful fetch response
                     console.log('debug from tgSendRequest - return from fetch: ', JSON.stringify(response))
                     const data:any = await response.json();
@@ -91,6 +96,12 @@ export default class TG_REQ{
 
      public static async callApi(token:string, methodName:tgRequestMethod_t, params?: Record<string, any>): Promise<any> {
           try {
+               const timeoutPromise = new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                      reject(new Error('Request timed out')) // reject the promise after 3 seconds
+                    }, 3000) //3 seconds
+                  });
+
                if (params) {
                params = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined && v !== null));
                }
@@ -101,7 +112,7 @@ export default class TG_REQ{
                     headers: { 'Content-Type': 'application/json' }
                });
 
-               const response:any = await Promise.race([fetchPromise, TG_REQ.timeoutPromise])
+               const response:any = await Promise.race([fetchPromise, timeoutPromise]);
                
                //const response = await fetch(TG_REQ.tgApiUrl(token, methodName, params),{
                //     method: 'POST',
