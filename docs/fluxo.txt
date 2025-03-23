@@ -40,3 +40,9 @@ index
                4.2.2) (if currentContext.user_operations array has something) execute the related command handler if the special condition is met
                4.2.3) execute the update handler  
                       
+ok
+        "https://api.telegram.org/bot7530215388:AAE-xq_eQP3ilbFLxZwIh11gHDrPaORZsCg/sendMessage?chat_id=-1002271335705&message_thread_id=2&text=Voce+usou+o+comando+%2Fquiz&parse_mode=html&disable_notification=true&reply_to_message_id=778"
+nok    
+
+        "https://api.telegram.org/bot7530215388:AAE-xq_eQP3ilbFLxZwIh11gHDrPaORZsCg/sendMessage?chat_id=-1002271335705&message_thread_id=2&text=Voce+usou+o+comando+isATA&parse_mode=html&disable_notification=true&reply_to_message_id=770"
+     

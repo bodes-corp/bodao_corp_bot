@@ -600,8 +600,8 @@ export default class TG_BOT {
                     //const argument = msg_txt?.slice(selectedCommand.length).trim();
                     //console.log(`debug from handleUserDefinedOperation - argument: `,argument);
                     
-                    await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
-                    console.log(`debug from handleUserDefinedOperation - require argument: `,requiresArg);
+                    //await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
+                    //console.log(`debug from handleUserDefinedOperation - require argument: `,requiresArg);
                     
                    // if (requiresArg && argument === '') {
                     //     response_ids.push(await TIOZAO_BOT_CMDs.botAlert( ctx.bot, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
