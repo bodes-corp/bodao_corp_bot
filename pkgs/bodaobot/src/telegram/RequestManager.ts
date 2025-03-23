@@ -35,12 +35,13 @@ export default class TG_REQ{
      public static async tgSendRequest(token:string, method: tgRequestMethod_t,  params:Record<string, any >  ): Promise<botResponse> {
                try {
                     
-                    
-                    const response = await fetch(TG_REQ.tgApiUrl(token,method, params), {
+                    const apiUrl = TG_REQ.tgApiUrl(token,method, params);
+                    console.log('debug from tgSendRequest - apiURL: ',apiUrl)
+                    const response = await fetch(apiUrl, {
                          method: 'POST',
                          headers: { 'Content-Type': 'application/json' }
                     });
-                    console.log('return fro fetch: ',JSON.stringify(response))
+                    console.log('debug from tgSendRequest -return fro fetch: ',JSON.stringify(response))
         
                     const data:botResponse = await response.json();
                     if (!data.ok) {
