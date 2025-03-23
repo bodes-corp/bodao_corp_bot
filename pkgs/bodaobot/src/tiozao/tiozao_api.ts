@@ -26,9 +26,9 @@ export default class TIOZAO_CMDS {
  
 	try {
 	    const result = await DB_API.dbListChat(bot.DB);
-	    if (result.length === 0) {
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-	    } else {
+	    } else if (Array.isArray(result)){
 		   for (const row of result) {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
@@ -60,9 +60,9 @@ export default class TIOZAO_CMDS {
  
 	try {
 	    const result = await DB_API.dbListActiveGp(bot.DB);
-	    if (result.length === 0) {
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-	    } else {
+	    } else if (Array.isArray(result)){
 		   for (const row of result) {
 			  const day = formatDate(row[3]);
 			  text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
@@ -87,9 +87,9 @@ export default class TIOZAO_CMDS {
  
 	try {
 	    const result = await DB_API.dbListTopGp(bot.DB);
-	    if (result.length === 0) {
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-	    } else {
+	    } else if (Array.isArray(result)){
 		   for (const row of result) {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> -> ${row[3]}\n`;
 		   }
@@ -111,9 +111,9 @@ export default class TIOZAO_CMDS {
  
 	try {
 	    const result = await DB_API.dbListTopRp(bot.DB);
-	    if (result.length === 0) {
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-	    } else {
+	    } else if (Array.isArray(result)){
 		   for (const row of result) {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> -> ${row[3]}\n`;
 		   }
@@ -135,9 +135,9 @@ export default class TIOZAO_CMDS {
  
 	try {
 	    const result = await DB_API.dbListTdGp(bot.DB);
-	    if (result.length === 0) {
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-	    } else {
+	    } else if (Array.isArray(result)){
 		   for (const row of result) {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[2]}/${row[3]}">${row[0]}</a> -> ${row[1]}\n`;
 		   }
@@ -158,9 +158,9 @@ export default class TIOZAO_CMDS {
  
 	try {
 	    const result = await DB_API.dbListTrendGp(bot.DB);
-	    if (result.length === 0) {
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-	    } else {
+	    } else if (Array.isArray(result)) {
 		   for (const row of result) {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
 		   }
@@ -182,9 +182,9 @@ export default class TIOZAO_CMDS {
  
 	try {
 	    const result = await DB_API.dbListMembers(bot.DB);
-	    if (result.length === 0) {
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-	    } else {
+	    } else if (Array.isArray(result)){
 		   text += 'Nome -> Posts / TDs / Desbravamentos\n';
 		   for (const row of result) {
 			  text += `• ${row[0]} -> ${row[1]} / ${row[2]} / ${row[3]} \n`;
@@ -207,10 +207,10 @@ export default class TIOZAO_CMDS {
  
 	try {
 	    const result = await DB_API.dbListSpa(bot.DB);
-	    if (result.length === 0) {
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
 		   await TIOZAO_CMDS.sendResponse(bot,text, response_ids);
-	    } else {
+	    } else if (Array.isArray(result)){
 		   const spasButtons:any[] = result.map((row: any[]) =>
 			  row.map(buttonText => ({ text: buttonText, callback_data: '/spa ' + buttonText }))
 		   );
@@ -240,9 +240,9 @@ export default class TIOZAO_CMDS {
  
 	try {
 	    const result = await DB_API.dbSearchSpa(bot.DB, spa);
-	    if (result.length === 0) {
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-	    } else {
+	    } else if (Array.isArray(result)){
 		   for (const row of result) {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[1]}/${row[2]}">${row[0]}</a> -> ${row[3]}\n`;
 		   }
@@ -273,10 +273,10 @@ export default class TIOZAO_CMDS {
 	let td_unique_count = 0;
  
 	try {
-	    const result:any[] = await DB_API.dbSearchUserData(bot.DB, id_user);
-	    if (result.length === 0) {
+	    const result = await DB_API.dbSearchUserData(bot.DB, id_user);
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-	    } else {
+	    } else if (Array.isArray(result)) {
 		   for (const row of result) {
 			  first_name = row[0];
 			  username = row[1];
@@ -296,9 +296,9 @@ export default class TIOZAO_CMDS {
 	    }
 	    text += "<b>Lista de TDs:</b>\n";
 	    const result2 = await DB_API.dbSearchUserTd(bot.DB, id_user);
-	    if (result2.length === 0) {
+	    if (Array.isArray(result2) && result2.length === 0) {
 		   text += "Nenhum resultado encontrado";
-	    } else {
+	    } else if (Array.isArray(result2)){
 		   for (const row of result2) {
 			  const day = formatDate(row[3]);
 			  text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
@@ -327,9 +327,9 @@ export default class TIOZAO_CMDS {
 	}
 	try {
 	    const result = await DB_API.dbSearchTerm(bot.DB, name);
-	    if (result.length === 0) {
+	    if (Array.isArray(result) && result.length === 0) {
 		   text += `Nenhum resultado encontrado`;
-	    } else {
+	    } else if (Array.isArray(result)){
 		   for (const row of result) {
 			  text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a> \n`;
 		   }
@@ -364,10 +364,10 @@ export default class TIOZAO_CMDS {
 	try {
 		const result = await DB_API.dbSearchThreadname(bot.DB, threadname);
 		//console.log("log from  checkDuplicatedThread - result: ", result)
-		if (result.length == 0) {
+		if (Array.isArray(result) && result.length === 0) {
 		text = 'Seguir o padrão em https://gpsp.xyz/td';
 		}
-		else {
+		else if (Array.isArray(result)){
 		text = 'Existe(m) outro(s) tópico(s) com título parecido, verifique antes de postar aqui: \n';
 		for (const row of result) {
 			text += `• <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
@@ -385,33 +385,37 @@ export default class TIOZAO_CMDS {
  public static async confirmTD(bot:  TG_BOT, message: ContextMessage, edit:any) {
  
 	const result = await DB_API.dbSearchTDUserThread(bot.DB, message.id_user, message.id_thread);
-	const number_rp = result.length;
-	let text = '';
-     let is_td = 0; 
-	const is_td_rp = bot.currentContext.checkUserOperation('isRP');
-	// Determine if the user has a TD in the thread
-	if (number_rp > 0) {
-		//bot.currentContext.addUserOperation('isTD');
-		is_td = 1;
-	} else if (is_td_rp) {
-	    text = 'Falta o seu primeiro TD nesse tópico.\nSeguir o padrão: https://gpsp.xyz/td\n';
-	    is_td = 0;
-	    return await TIOZAO_BOT_CMDs.botAlert(bot, text, message.id_thread, message.message_id);
+	if(Array.isArray(result) ) {
+
+		const number_rp = result.length;
+		let text = '';
+		let is_td = 0; 
+		const is_td_rp = bot.currentContext.checkUserOperation('isRP');
+		// Determine if the user has a TD in the thread
+		if (number_rp > 0) {
+			//bot.currentContext.addUserOperation('isTD');
+			is_td = 1;
+		} else if (is_td_rp) {
+		text = 'Falta o seu primeiro TD nesse tópico.\nSeguir o padrão: https://gpsp.xyz/td\n';
+		is_td = 0;
+		return await TIOZAO_BOT_CMDs.botAlert(bot, text, message.id_thread, message.message_id);
+		}
+	
+		// Determine the response text based on the TD status and whether it's an edit
+		if (edit) {
+		text = `TD Editado ✅`;
+		} else {
+		text = is_td && number_rp > 0 
+			? `Repeteco ${number_rp} ✅ ` 
+			: (is_td ? "TD ✅" : "");
+		}
+	
+		// Send the response if the message has a TD
+		if (is_td) {
+		return await TIOZAO_BOT_CMDs.botAlert(bot, text, message.id_thread, message.message_id);
+		}
 	}
- 
-	// Determine the response text based on the TD status and whether it's an edit
-	if (edit) {
-	    text = `TD Editado ✅`;
-	} else {
-	    text = is_td && number_rp > 0 
-		   ? `Repeteco ${number_rp} ✅ ` 
-		   : (is_td ? "TD ✅" : "");
-	}
- 
-	// Send the response if the message has a TD
-	if (is_td) {
-	    return await TIOZAO_BOT_CMDs.botAlert(bot, text, message.id_thread, message.message_id);
-	}
+	
  }
  
  public static async checkHaveCaption(bot:TG_BOT, message:ContextMessage, edit = false) {
