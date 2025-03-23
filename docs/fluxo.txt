@@ -46,3 +46,6 @@ nok
 
         "https://api.telegram.org/bot7530215388:AAE-xq_eQP3ilbFLxZwIh11gHDrPaORZsCg/sendMessage?chat_id=-1002271335705&message_thread_id=2&text=Voce+usou+o+comando+isATA&parse_mode=html&disable_notification=true&reply_to_message_id=770"
      
+
+             "{\"dbSession\":{\"fetcher\":{},\"bookmarkOrConstraint\":\"first-primary\"},\"statement\":\"\\n         INSERT INTO tg_caption (media_group_id, caption, normalized_caption)\\n         VALUES (?1, ?2, ?3)\\n         ON CONFLICT (media_group_id)\\n         DO UPDATE SET caption = excluded.caption, normalized_caption = excluded.normalized_caption\\n     \",\"params\":[\"782\",\"Ata teste 31\",\"ata teste 31\"]}"
+      

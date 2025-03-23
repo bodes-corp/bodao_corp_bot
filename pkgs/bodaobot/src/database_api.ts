@@ -6,16 +6,30 @@ import TG_BOT from "./telegram_bot";
 import { ContextMessage } from "./types/TelegramMessage";
 import { mediaType, mediaType_t, updOperation } from "./types/Types";
 
- 
+type d1Return = {
+	success: boolean, // true if the operation was successful, false otherwise
+	meta: {
+	  served_by: string // the version of Cloudflare's backend Worker that returned the result
+	  duration: number, // the duration of the SQL query execution only, in milliseconds
+	  changes: number, // the number of changes made to the database
+	  last_row_id: number, // the last inserted row ID, only applies when the table is defined without the `WITHOUT ROWID` option
+	  changed_db: boolean, // true if something on the database was changed
+	  size_after: number, // the size of the database after the query is successfully applied
+	  rows_read: number, // the number of rows read (scanned) by this query
+	  rows_written: number // the number of rows written by this query
+	}
+	results: any[] | null, // [] if empty, or null if it does not apply
+   }
+// response exemple: {\"success\":true,\"meta\":{\"served_by\":\"v3-prod\",\"served_by_region\":\"ENAM\",\"served_by_primary\":true,\"timings\":{\"sql_duration_ms\":0.2194},\"duration\":0.2194,\"changes\":0,\"last_row_id\":0,\"changed_db\":false,\"size_after\":118784,\"rows_read\":0,\"rows_written\":0},\"results\":[]}"
 
 export class DB_API {
 
 
-public static async executeQuery(db:any, query:string, params:any[] = [],resp:boolean=false):Promise<any> {
-     if (!db || !query) return Promise.resolve(null);
+public static async executeQuery(db:any, query:string, params:any[] = [],resp:boolean=false):Promise< any[] | boolean | null> {
+     if (!db || !query) return Promise.resolve(false);
 	const returnResults:boolean =  query.includes("SELECT");     
 	console.log('debug from executeQuery -returnresult: ', returnResults)
-     let response = null;
+     let response: d1Return;
 	try {
 		console.log('debug from executeQuery -query: ', query)
 		console.log('debug from executeQuery -params: ',JSON.stringify(params));
@@ -26,27 +40,30 @@ public static async executeQuery(db:any, query:string, params:any[] = [],resp:bo
               response =  await preparedStatement.raw(); // For SELECT queries, return the results
 		    console.log('[debug from executeQuery] result:', JSON.stringify(response));
 		    console.log('[debug from executeQuery] result from query:',query);
-		    return Promise.resolve(response);
+		    return Promise.resolve(response.results);
 		
 		} else {
-			console.log('[debug from executeQuery] will run run():');
+		    console.log('[debug from executeQuery] will run run():');
               response =  await preparedStatement.run(); // For non-SELECT queries, just execute the query
-		    // response exemple: {\"success\":true,\"meta\":{\"served_by\":\"v3-prod\",\"served_by_region\":\"ENAM\",\"served_by_primary\":true,\"timings\":{\"sql_duration_ms\":0.2194},\"duration\":0.2194,\"changes\":0,\"last_row_id\":0,\"changed_db\":false,\"size_after\":118784,\"rows_read\":0,\"rows_written\":0},\"results\":[]}"
+		    
 		    console.log('[debug from executeQuery] result:', JSON.stringify(response))
 		    console.log('[debug from executeQuery] result from query:',query);	
 		    if(response.success){
 			console.log('[debug from executeQuery] returning response')
 			
-				return Promise.resolve(response);
+				return Promise.resolve(response.success);
 			}else{
 				throw new Error(`Database API Error on query: ${query}`);
 			}
+			
 		}
+		
 		
 		
 	 } catch (e:any) {
 		console.error('Error in DB_API executeQuery:', e.message);
-	 }
+		return Promise.resolve(false);
+	}
 	
 	
 }
@@ -301,10 +318,12 @@ public static async checkHasPoll(db:any, mediaGroupId:number): Promise<boolean> 
 	    WHERE media_group_id = ?1;
 	`;
 	const result = await this.executeQuery(db, query, [mediaGroupId]);
-	if (result.length === 0) {
+	if (Array.isArray(result) && result.length === 0) {
 		apiresponse = false;
-	} else {
+	} else if (Array.isArray(result) && result.length > 0){
 		apiresponse = true;
+	}else {
+		apiresponse = false;
 	}
 
 	return Promise.resolve(apiresponse);

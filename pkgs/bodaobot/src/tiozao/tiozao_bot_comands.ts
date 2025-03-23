@@ -57,7 +57,7 @@ export class TIOZAO_BOT_CMDs {
           const result = await DB_API.dbSearchNotify(bot.DB, id_msg_ref);
           const id_msg_array:number[] = [];
       
-          if (result.length != 0) {
+          if (Array.isArray(result) && result.length != 0) {
               for (const row of result) {
                   const message_id = row[0];
                   id_msg_array.push(message_id);

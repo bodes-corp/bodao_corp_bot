@@ -107,9 +107,9 @@ export default class BODAO_CMDS {
      
         try {
             const result = await DB_API.dbListMediabyType(bot.DB, mediaType.DOCUMENT_ATA);
-            if (result.length === 0) {
+            if (Array.isArray(result) && result.length === 0) {
                text += `Nenhum resultado encontrado`;
-            } else {
+            } else if (Array.isArray(result)){
                for (const row of result) {
                   const day = formatDate(row[3]);
                   text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
@@ -132,9 +132,9 @@ export default class BODAO_CMDS {
      
         try {
             const result = await DB_API.dbListPolls(bot.DB);
-            if (result.length === 0) {
+            if (Array.isArray(result) && result.length === 0) {
                text += `Nenhum resultado encontrado`;
-            } else {
+            } else if (Array.isArray(result)){
                for (const row of result) {
                   const day = formatDate(row[3]);
                   text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
