@@ -51,16 +51,16 @@ export default class TG_REQ{
                          headers: { 'Content-Type': 'application/json' }
                        })
 
-                       Promise.race([fetchPromise, timeoutPromise])
+                       return Promise.race([fetchPromise, timeoutPromise])
                        .then(response => {
                          // handle the successful fetch response
-                         console.log('debug from tgSendRequest - return fro fetch: ', JSON.stringify(response))
+                         console.log('debug from tgSendRequest - return from fetch: ', JSON.stringify(response))
                          const data:any = response;//await response.json();
                          if (!data.ok) {
                             throw new Error(`Telegram API Error: ${data.description}`);
                          }
                 
-                         return data;
+                         return Promise.resolve(data);
                        })
                        .catch(error => {
                          // handle any other fetch errors
