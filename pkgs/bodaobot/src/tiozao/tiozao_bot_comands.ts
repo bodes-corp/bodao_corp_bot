@@ -34,6 +34,7 @@ export class TIOZAO_BOT_CMDs {
       public static async botAlert(bot:  TG_BOT,  text:string, id_thread:any, message_id:any|null = null) {
         console.log('debug from botAlert')
         const params = Requests.MessageReplyThreadRequest(bot,text, id_thread, message_id);
+        console.log('debug from botAlert - params: ',JSON.stringify(params))
         const response =  await TG_REQ.tgSendRequest(bot.botINFO.TOKEN, tgRequestMethod.SEND_MESSAGE,  params );
           //await bot.tgSendMessageThread(bot.botINFO, text, id_thread, message_id);
           console.log('debug from botAlert - response: ',response)

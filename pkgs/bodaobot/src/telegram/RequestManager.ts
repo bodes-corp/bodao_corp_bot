@@ -40,7 +40,8 @@ export default class TG_REQ{
                          method: 'POST',
                          headers: { 'Content-Type': 'application/json' }
                     });
-           
+                    console.log('return fro fetch: ',JSON.stringify(response))
+        
                     const data:botResponse = await response.json();
                     if (!data.ok) {
                        throw new Error(`Telegram API Error: ${data.description}`);
