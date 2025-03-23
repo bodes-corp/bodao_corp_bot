@@ -597,12 +597,15 @@ export default class TG_BOT {
                     console.log(`debug from handleUserDefinedOperation - commandfound: `, selectedCommand);
                     const argument = msg_txt?.slice(selectedCommand.length).trim();
                     await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
-              
+                    console.log(`debug from handleUserDefinedOperation - require argument: `,requiresArg);
+                    
                     if (requiresArg && argument === '') {
                          response_ids.push(await TIOZAO_BOT_CMDs.botAlert( ctx.bot, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
                     } else if (requiresArg && !msg_txt?.startsWith(selectedCommand + ' ')) {
                          response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
                     } else {
+                         console.log(`debug from handleUserDefinedOperation - will run commandFunction: `);
+                    
                          response_ids = await commandFunction(ctx.bot, argument);
                     }
                }else{
