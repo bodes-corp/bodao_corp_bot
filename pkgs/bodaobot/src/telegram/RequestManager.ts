@@ -119,9 +119,9 @@ export default class TG_REQ{
                //      headers: { 'Content-Type': 'application/json' }
                //});
                if(response) {
-                    console.log('[debug from callApi] returned from fetch:');
+                    console.log('[debug from callApi] returned from fetch: response: ', JSON.stringify(response));
                     const data: botResponse = await response.json();
-                    console.log('[debug from callApi] response data:', data);
+                    console.log('[debug from callApi] response data:', JSON.stringify(data));
                     if (!data.ok) {
                          throw new Error(`Telegram API Error: ${data.description}`);
                     } else {
