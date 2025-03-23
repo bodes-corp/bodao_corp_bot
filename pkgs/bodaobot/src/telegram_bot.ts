@@ -584,7 +584,9 @@ export default class TG_BOT {
           let message:ContextMessage = ctx.update_message;
           const message_id = message.message_id;
           const id_thread = message.id_thread;
-          const id_user = message.id_user;
+          //const id_user = message.id_user;
+          console.log('debug from handleUserDefinedOperation: msg_text: ', message.msg_txt);
+          
           const msg_txt = message.msg_txt?.trim();
           let response_ids:any[] = [];
           ctx.user_operations.forEach(async (prefix) => {
@@ -596,6 +598,8 @@ export default class TG_BOT {
                     const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
                     console.log(`debug from handleUserDefinedOperation - commandfound: `, selectedCommand);
                     const argument = msg_txt?.slice(selectedCommand.length).trim();
+                    console.log(`debug from handleUserDefinedOperation - argument: `,argument);
+                    
                     await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
                     console.log(`debug from handleUserDefinedOperation - require argument: `,requiresArg);
                     
