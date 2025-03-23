@@ -1,8 +1,6 @@
 import { DB_API } from "../database_api";
 import { TG_HANDLER } from "../handlers/handlers";
 import { formatDate } from "../library";
-import { Requests } from "../telegram/requests";
-import TG_API from "../telegram/telegram_api";
 import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
 import TIOZAO_CMDS from "../tiozao/tiozao_api";
@@ -45,6 +43,7 @@ export default class BODAO_CMDS {
         let response_ids:any[] = [];
         const media_group_id = bot.currentContext.update_message.media_group_id;
         await TG_HANDLER.handleEditedMessage(bot.currentContext);
+        /*
         //1)Check media database
         //document is already in media database with correct type. This is handled by editMedia Handler
             //if it will execute media edit handler it is not necessary dbupdate here.
@@ -91,7 +90,7 @@ export default class BODAO_CMDS {
                 
             }
         }
-
+    */
         return response_ids;
     }
 
