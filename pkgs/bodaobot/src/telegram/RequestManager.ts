@@ -5,6 +5,26 @@ import { botResponse, tgRequestMethod_t } from "../types/Types";
 export default class TG_REQ{
 
      /**
+           * set an indefinite timeout
+           * In this case, the timeoutPromise is an empty Promise 
+           * that never rejects. Therefore, the fetchPromise will continue indefinitely until it resolves or encounters an error.
+           */
+     static timeoutPromise2 = new Promise((resolve, reject) => {});
+
+     /**
+      * In the example above, we create a timeoutPromise that will reject after the specified 
+      * time (3 seconds in this case). 
+      * Then, using Promise.race(), we can wait until either the Fetch API 
+      * request or the timeout promise is settled. Whichever settles first 
+      * will determine the outcome.
+      */
+     static timeoutPromise = new Promise((resolve, reject) => {
+          setTimeout(() => {
+            reject(new Error('Request timed out')) // reject the promise after 3 seconds
+          }, 3000) //3 seconds
+        });
+
+     /**
       * Get the API URL for a given bot API and slug
       * @param botApiURL - full URL to the telegram API without slug ('https://api.telegram.org/bot' + token)
       * @param slug - slug to append to the API URL
@@ -26,6 +46,8 @@ export default class TG_REQ{
           return api+`/${methodName}${query}`;
      }
 
+
+
      /**
       * Send quest to Telegram Bot API
       * @param method the request method ('sendMediaGroup','sendMessage','deleteMessage','answerCallbackQuery',)
@@ -33,18 +55,7 @@ export default class TG_REQ{
       * @returns the params appended to the request JSON formated
       */
      public static async tgSendRequest(token:string, method: tgRequestMethod_t,  params:Record<string, any >  ): Promise<botResponse> {
-               
-          const timeoutPromise2 = new Promise((resolve, reject) => {})
-          const timeoutPromise = new Promise((resolve, reject) => {
-               setTimeout(() => {
-                 reject(new Error('Request timed out')) // reject the promise after 3 seconds
-               }, 3000)
-             });
-
-// Since the timeoutPromise never rejects, the fetchPromise will continue indefinitely
-
-
-
+          
 
           try {
                     
@@ -53,10 +64,10 @@ export default class TG_REQ{
                     const fetchPromise = fetch(apiUrl, {
                          method: 'POST',
                          headers: { 'Content-Type': 'application/json' }
-                       })
+                    })
 
-                    const response:any = await Promise.race([fetchPromise, timeoutPromise])
-                                            // handle the successful fetch response
+                    const response:any = await Promise.race([fetchPromise, TG_REQ.timeoutPromise])
+                    // handle the successful fetch response
                     console.log('debug from tgSendRequest - return from fetch: ', JSON.stringify(response))
                     const data:any = await response.json();
                     if (!data.ok) {
@@ -84,10 +95,18 @@ export default class TG_REQ{
                params = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined && v !== null));
                }
                console.log('[debug from callApi] response params:', JSON.stringify(params));
-               const response = await fetch(TG_REQ.tgApiUrl(token, methodName, params),{
+               
+               const fetchPromise = fetch(TG_REQ.tgApiUrl(token, methodName, params),{
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                });
+
+               const response:any = await Promise.race([fetchPromise, TG_REQ.timeoutPromise])
+               
+               //const response = await fetch(TG_REQ.tgApiUrl(token, methodName, params),{
+               //     method: 'POST',
+               //      headers: { 'Content-Type': 'application/json' }
+               //});
                if(response) {
                     console.log('[debug from callApi] returned from fetch:');
                     const data: botResponse = await response.json();
