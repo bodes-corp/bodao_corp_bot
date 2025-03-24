@@ -309,7 +309,8 @@ export default class TG_BOT {
                         resolve(response);
                     }));
           }
-          
+          console.log('debug from runHandlers - will run promises');
+                    
 
           return Promise.all(promises);
           
