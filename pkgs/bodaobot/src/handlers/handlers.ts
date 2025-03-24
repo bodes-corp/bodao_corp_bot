@@ -97,8 +97,8 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
                 
                 break;
           }
-          await DB_API.dbEditMessage( ctx, message);
-          return new Response('ok');
+          return await DB_API.dbEditMessage( ctx, message);
+          
      }
 
      public static async handleCallbackQuery(ctx:TG_ExecutionContext) {
