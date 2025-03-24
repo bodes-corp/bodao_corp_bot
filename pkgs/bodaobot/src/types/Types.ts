@@ -197,7 +197,7 @@ export const updType = {
 } as const
 export type updType_t = typeof updType[keyof typeof  updType];
 
-export type handlerFunc = (ctx:TG_ExecutionContext) => Promise<any>
+export type handlerFunc = (ctx:TG_ExecutionContext) => Promise<Response>
 export type Handler = Record<string, handlerFunc>
 
 export type checkUserOperationFunc = (ctx:TG_ExecutionContext) => boolean
