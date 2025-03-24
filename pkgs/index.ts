@@ -50,6 +50,7 @@ export default {
 		.onCommand('/s', {name: 's', desc:'Search',func: TIOZAO_CMDS.searchTerm, requiresArg: true})
 		.onCommand('/info', { name: 'info', desc:'Perfil',func: TIOZAO_CMDS.listInfo, requiresArg: false })
 		.onCommand('/end', { name: 'end', desc:'teste end',func: TIOZAO_CMDS.testeEnd, requiresArg: false })
+		.onCommand('/ata', { name: 'ata', desc:'é ata',func: BODAO_CMDS.handleATA, requiresArg: false })
 		//.onCheck('isTD',checkTD)
 		//.onCheck("isRP",checkRP)
 		.onCheck('isATA',BODAO_CMDS.checkATA, { name: 'isATA', desc:'handle ata',func: BODAO_CMDS.handleATA, requiresArg: false });
