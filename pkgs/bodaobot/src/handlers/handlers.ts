@@ -73,7 +73,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
                
           }
           console.log('debug from handleMessage- returned from handleCreteTrhread and will execute db insert')
-          await DB_API.dbInsertMessage(ctx.bot, ctx.update_message);
+          await DB_API.dbInsertMessage(ctx, ctx.update_message);
           return new Response('ok');
      }
 
@@ -97,7 +97,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
                 
                 break;
           }
-          await DB_API.dbEditMessage( ctx.bot, message);
+          await DB_API.dbEditMessage( ctx, message);
           return new Response('ok');
      }
 
@@ -128,7 +128,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
           const threadName =  message.message.forum_topic_edited?.name;
           await TIOZAO_CMDS.checkDuplicatedThread(ctx.bot, threadName, message.id_thread);
           await ctx.bot.handleBotResponses(response_ids);
-          await DB_API.dbInsertMessage(ctx.bot, ctx.update_message);
+          await DB_API.dbInsertMessage(ctx, ctx.update_message);
           return new Response('ok');
      }
       
@@ -140,7 +140,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
           await TIOZAO_CMDS.checkDuplicatedThread(ctx.bot, threadName, message.id_thread);
           await ctx.bot.handleBotResponses(response_ids);
           console.log('debug from handleCreateThread- returned from checkDuplicatedThread and will execute db insert')
-          await DB_API.dbInsertMessage(ctx.bot, ctx.update_message);
+          await DB_API.dbInsertMessage(ctx, ctx.update_message);
           return new Response('ok');
      }
 

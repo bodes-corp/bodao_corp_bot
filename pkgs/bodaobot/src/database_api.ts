@@ -3,6 +3,7 @@
 
 import { removeAccents, stringToWordsArray } from "./library";
 import TG_BOT from "./telegram_bot";
+import TG_ExecutionContext from "./telegram_execution_context";
 import { ContextMessage } from "./types/TelegramMessage";
 import { mediaType, mediaType_t, updOperation } from "./types/Types";
 
@@ -106,10 +107,10 @@ public static async dbBatchInsertBot(db:any, array:any[]) {
      }
 }
  
-public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
+public static async dbInsertMessage(ctx:TG_ExecutionContext, message:ContextMessage) {
 	console.log("log from dbInsertMessage")
-	if (!bot.DB) return Promise.resolve(null);
-	const operation:any = bot.currentContext.update_operation;
+	if (!ctx.bot.DB) return Promise.resolve(null);
+	const operation:any = ctx.update_operation;
 	console.log("operation: ", operation);
      if (operation === updOperation.THREAD_CREATE || operation === updOperation.THREAD_EDIT) {    
 		//insert new or edit thread in threads database
@@ -133,7 +134,7 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 			ON CONFLICT (id_thread) 
 			DO UPDATE SET threadname = excluded.threadname, normalized_threadname = excluded.normalized_threadname
 		`;
-		await this.executeQuery(bot.DB, threadQuery, [message.id_thread, threadName, normalized_threadname], false);
+		await this.executeQuery(ctx.bot.DB, threadQuery, [message.id_thread, threadName, normalized_threadname], false);
 		}
 	}
 	if (operation === updOperation.THREAD_DELETE) { //not supported yet
@@ -146,7 +147,7 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 		   (id_msg, file_id, file_unique_id, msg_date, id_user, id_thread, type, deleted, media_group_id)
 		   VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
 	    `;
-	    await this.executeQuery(bot.DB, mediaQuery, [
+	    await this.executeQuery(ctx.bot.DB, mediaQuery, [
 		   message.message_id, 
 		   message.file_id, 
 		   message.file_unique_id, 
@@ -164,9 +165,9 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 		   INSERT INTO tg_msg (id_msg, msg_txt, msg_date, td, id_user, id_thread, deleted) 
 		   VALUES (?1,?2,?3,?4,?5,?6,0)
 	    `;
-	    	const isTD = bot.currentContext.checkUserOperation('isTD');
+	    	const isTD = ctx.checkUserOperation('isTD');
           
-	    	await this.executeQuery(bot.DB, messageQuery, [
+	    	await this.executeQuery(ctx.bot.DB, messageQuery, [
 		   message.message_id, 
 		   message.msg_txt,
 		   message.msg_date,
@@ -175,7 +176,7 @@ public static async dbInsertMessage(bot:TG_BOT, message:ContextMessage) {
 		   message.id_thread
 	    ], false);
 	    
-	    await DB_API.dbUpdateUserInfo(bot.DB, message);
+	    await DB_API.dbUpdateUserInfo(ctx.bot.DB, message);
 	}
  
 	return new Response("DB-Insert-ok");
@@ -234,9 +235,9 @@ public static async dbUpdateMediaType(bot: TG_BOT,media_type:mediaType_t, messag
          ], false)
 }
  
-public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
-     if (!bot.DB) return Promise.resolve(null);
-	const operation = bot.currentContext.update_operation;
+public static async dbEditMessage(ctx:TG_ExecutionContext, message:ContextMessage) {
+     if (!ctx.bot.DB) return Promise.resolve(null);
+	const operation = ctx.update_operation;
      if (operation === updOperation.DOC_EDIT){
 		const fileQuery = `
 		UPDATE tg_media
@@ -245,7 +246,7 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
 		    type = ?3
 		WHERE id_msg = ?4
 	 `;
-	 await this.executeQuery(bot.DB, fileQuery, [
+	 await this.executeQuery(ctx.bot.DB, fileQuery, [
 		message.file_id,
 		message.file_unique_id,
 		message.media_type,
@@ -257,7 +258,7 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
 		SET deleted = ?1
 		WHERE media_group_id = ?2
 	 `;
-	 await this.executeQuery(bot.DB, groupQuery, [
+	 await this.executeQuery(ctx.bot.DB, groupQuery, [
 		message.deleted,
 		message.media_group_id
 	 ], false);
@@ -270,7 +271,7 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
                  type = ?3
              WHERE id_msg = ?4
          `;
-         await this.executeQuery(bot.DB, fileQuery, [
+         await this.executeQuery(ctx.bot.DB, fileQuery, [
              message.file_id,
              message.file_unique_id,
              message.media_type,
@@ -294,7 +295,7 @@ public static async dbEditMessage(bot:TG_BOT, message:ContextMessage) {
              SET msg_txt =?1
              WHERE id_msg =?2
          `;
-         await this.executeQuery(bot.DB, messageQuery, [
+         await this.executeQuery(ctx.bot.DB, messageQuery, [
              message.msg_txt, 
              message.message_id
          ], false);
