@@ -310,9 +310,9 @@ export default class TG_BOT {
                     }));
           }
           console.log('debug from runHandlers - will run promises');
-                    
-
-          return Promise.all(promises);
+          const response =  await this.updateHandlers[this.currentHandlerName](this.currentContext);      
+          return response;
+          //return Promise.all(promises);
           
      }
 
