@@ -111,7 +111,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
           if (commandKey) {
               await ctx.bot.tgAnswerCallbackQuery(callbackQuery.id, commandKey);
               const commandFunction:commandFunc = ctx.bot.commands[commandKey];
-              response_ids = await commandFunction.func(ctx.bot, callbackQuery, command.slice(commandKey.length).trim());
+              response_ids = await commandFunction.func(ctx, callbackQuery, command.slice(commandKey.length).trim());
           } else {
               return new Response(`Unknown command: ${command}`, { status: 400 });
           }
@@ -170,7 +170,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
 
      public static async handlePollUpdate(ctx:TG_ExecutionContext){
           //const operation:any = ctx.update_operation;
-          const media_group_id = ctx.bot.currentContext.update_message.media_group_id;
+          const media_group_id = ctx.update_message.media_group_id;
           console.log("debug from handlePollUpdate - media-group-id: ",media_group_id )
           //console.log("debug from handlePollUpdate - operation: ", operation);
           const pollData:tgTypes.Poll | undefined= ctx.update.poll;

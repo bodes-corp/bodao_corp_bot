@@ -1,4 +1,3 @@
-import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
 
 export const tgRequestMethod = {
@@ -213,7 +212,7 @@ export interface botResponse {
 export type commandFunc = {
      name: string;
      desc:string;
-     func:(bot:TG_BOT , ...args:any) => Promise<any[]>;
+     func:(ctx:TG_ExecutionContext , ...args:any) => Promise<any[]>;
      requiresArg: boolean;
 }
 

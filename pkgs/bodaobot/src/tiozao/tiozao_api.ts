@@ -19,7 +19,8 @@ export default class TIOZAO_CMDS {
 ///////////////////////////////////////////////////////////////////////////////
  // Main functions
  
- public static async listChat (bot:  TG_BOT) {
+ public static async listChat (ctx:TG_ExecutionContext) {
+	const bot = ctx.bot;
 	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Bate Papo</b>\n═════════════════════\n`;
@@ -41,8 +42,8 @@ export default class TIOZAO_CMDS {
 	}
 	return response_ids;
  }
- public static async testeEnd(bot: TG_BOT){
-
+ public static async testeEnd(ctx:TG_ExecutionContext){
+     const bot = ctx.bot;
 	let response_ids:any[] = [];
 	const button: Hideable<InlineKeyboardButton.CallbackButton> = callback('I Accept', 'accept_rules');
 	const markup2 =   inlineKeyboard([button]) 
@@ -53,7 +54,8 @@ export default class TIOZAO_CMDS {
 	return response_ids;
  }
  
- public static async listActiveGp(bot:  TG_BOT) {
+ public static async listActiveGp(ctx:TG_ExecutionContext) {
+	const bot = ctx.bot;
 	//const env = bot.env
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>GPs ativas</b>\nGPs com TDs nos últimos 4 meses\n═════════════════════\n`;
@@ -80,7 +82,8 @@ export default class TIOZAO_CMDS {
 
 
  
- public static async listTopGp(bot:  TG_BOT) {
+ public static async listTopGp(ctx:TG_ExecutionContext) {
+	const bot = ctx.bot;
 	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Top GPs</b>\nGPs com TDs de usuários únicos\n═════════════════════\n`;
@@ -104,7 +107,8 @@ export default class TIOZAO_CMDS {
 	return response_ids;
  }
  
- public static async listTopRp(bot:  TG_BOT) {
+ public static async listTopRp(ctx:TG_ExecutionContext) {
+	const bot = ctx.bot;
 	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Top Repetecos</b>\nGPs com repetecos de usuários únicos\n═════════════════════\n`;
@@ -128,7 +132,8 @@ export default class TIOZAO_CMDS {
 	return response_ids;
  }
  
- public static async listTdGp(bot:  TG_BOT) {
+ public static async listTdGp(ctx:TG_ExecutionContext) {
+	const bot = ctx.bot;
 	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Lista GPs</b>\nGPs com TDs + repetecos\n═════════════════════\n`;
@@ -151,8 +156,9 @@ export default class TIOZAO_CMDS {
 	return response_ids;
  }
  
- public static async listTrendGp(bot:  TG_BOT) {
+ public static async listTrendGp(ctx:TG_ExecutionContext) {
 	//const env = bot.env;
+	const bot = ctx.bot;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>GPs Tendência</b>\nGPs com TDs nos últimos 4 meses de 2 ou mais usuários diferentes\n═════════════════════\n`;
  
@@ -175,7 +181,8 @@ export default class TIOZAO_CMDS {
 	return response_ids;
  }
  
- public static async listMembers(bot:  TG_BOT) {
+ public static async listMembers(ctx:TG_ExecutionContext) {
+	const bot = ctx.bot;
 	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = `═════════════════════\n<b>Membros</b>\n═════════════════════\n`;
@@ -200,7 +207,8 @@ export default class TIOZAO_CMDS {
 	return response_ids;
  }
  
- public static async listSpa (bot:  TG_BOT) {
+ public static async listSpa (ctx:TG_ExecutionContext) {
+	const bot = ctx.bot;
 	//const env = bot.env;
 	let response_ids:any[] = [];
 	let text = '';
@@ -225,16 +233,17 @@ export default class TIOZAO_CMDS {
 	return response_ids;
  }
 
- public static async handleSpaCommand(bot:  TG_BOT,callbackQuery:any, spa:string) {
+ public static async handleSpaCommand(ctx:TG_ExecutionContext,callbackQuery:any, spa:string) {
 		 if (spa === '') {
-			return await TIOZAO_CMDS.listSpa(bot);
+			return await TIOZAO_CMDS.listSpa(ctx);
 		 } else {
-			await bot.tgAnswerCallbackQuery(callbackQuery.id, spa);
-			return await TIOZAO_CMDS.searchSpa(bot,spa);
+			await ctx.bot.tgAnswerCallbackQuery(callbackQuery.id, spa);
+			return await TIOZAO_CMDS.searchSpa(ctx,spa);
 		 }
 	  }
  
- public static async searchSpa(bot:  TG_BOT, spa:string) {
+ public static async searchSpa(ctx:TG_ExecutionContext, spa:string) {
+	const bot = ctx.bot;
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>GPs ${spa}</b>\n═════════════════════\n`;
  
@@ -257,9 +266,9 @@ export default class TIOZAO_CMDS {
 	return response_ids;
  }
  
- public static async listInfo(bot:  TG_BOT) {
+ public static async listInfo(ctx:TG_ExecutionContext) {
 	//const env = bot.env;
-	const ctx:TG_ExecutionContext = bot.currentContext
+	const bot = ctx.bot;
 	const id_user = ctx.update_message.id_user;
 	console.log("debug listInfo - user:", id_user)
 	let response_ids: any[] = [];
@@ -314,8 +323,8 @@ export default class TIOZAO_CMDS {
 	return response_ids;
  }
  
- public static async searchTerm(bot:  TG_BOT, name:string) {
-	 
+ public static async searchTerm(ctx:TG_ExecutionContext, name:string) {
+	 const bot = ctx.bot;
 	let response_ids: any[] = [];
 	let text = `═════════════════════\n<b>Busca ${name}</b>\n═════════════════════\n`;
 	
@@ -382,15 +391,15 @@ export default class TIOZAO_CMDS {
 //		.onCheck("isRP",checkRP)
 //		.onCheck('isATA'
  
- public static async confirmTD(bot:  TG_BOT, message: ContextMessage, edit:any) {
- 
+ public static async confirmTD(ctx:TG_ExecutionContext, message: ContextMessage, edit:any) {
+	const bot = ctx.bot;
 	const result = await DB_API.dbSearchTDUserThread(bot.DB, message.id_user, message.id_thread);
 	if(Array.isArray(result) ) {
 
 		const number_rp = result.length;
 		let text = '';
 		let is_td = 0; 
-		const is_td_rp = bot.currentContext.checkUserOperation('isRP');
+		const is_td_rp = ctx.checkUserOperation('isRP');
 		// Determine if the user has a TD in the thread
 		if (number_rp > 0) {
 			//bot.currentContext.addUserOperation('isTD');

@@ -48,7 +48,7 @@ export default class TG_BOT {
      webhook: Webhook = new Webhook('', new Request('http://127.0.0.1'));
 
      /** The current bot context */
-     currentContext!: TG_ExecutionContext;
+     //currentContext!: TG_ExecutionContext;
 
      currentHandlerName:string='';
 
@@ -275,42 +275,43 @@ export default class TG_BOT {
      }
 
      async BotExecute(update: tgTypes.Update){
-          await this.handleUpdate(update);
-          await this.runHandlers(update);
+          const ctx = new TG_ExecutionContext(this, update); 
+          this.update = ctx.update;
+          await this.handleUpdate(ctx);
+          await this.runHandlers(ctx);
      }
 
-     async runHandlers(update: tgTypes.Update){
+     async runHandlers(ctx:TG_ExecutionContext){
           
-         
-               
+         const update: tgTypes.Update = ctx.update;
           //updateHandlers do not receive the this pointer.
           //remember to not use them in inside the methods
           //the best way is to make them static methods
 
           const promises:any[] = [];
-          if (this.currentContext.commandFlag) {
+          if (ctx.commandFlag) {
                promises.push(new Promise(async (resolve) => {
                     // setTimeout(async () => {
-                        const response =  await this.currentContext.bot.handleBotCommand(this.currentContext);                  
+                        const response =  await ctx.bot.handleBotCommand(ctx);                  
                         resolve(response);
                         //}, 1000);
                    }));
-          }else if (this.currentContext.user_operations.length >0 ) {
+          }else if (ctx.user_operations.length >0 ) {
                promises.push(new Promise(async (resolve) => {
                     // setTimeout(async () => {
-                        const response =  await this.currentContext.bot.handleUserDefinedOperation(this.currentContext);
+                        const response =  await ctx.bot.handleUserDefinedOperation(ctx);
                         resolve(response);
                     }));
                
           } else {
                promises.push(new Promise(async (resolve) => {
                     // setTimeout(async () => {
-                        const response =  await this.updateHandlers[this.currentHandlerName](this.currentContext);
+                        const response =  await this.updateHandlers[this.currentHandlerName](ctx);
                         resolve(response);
                     }));
           }
           console.log('debug from runHandlers - will run promises');
-          const response =  await this.updateHandlers[this.currentHandlerName](this.currentContext);      
+          const response =  await this.updateHandlers[this.currentHandlerName](ctx);      
           return response;
           //return Promise.all(promises);
           
@@ -326,19 +327,18 @@ export default class TG_BOT {
       * @param {*} env the worker env variables
       * @param {*} update the request object json formated
      */
-     async handleUpdate(update: tgTypes.Update) {
-          this.update = update;
+     async handleUpdate(ctx: TG_ExecutionContext) {
+         
           
           let handlerName /*: updType_t*/  = ':message';
           let args: string[] = [];
-          const ctx = new TG_ExecutionContext(this, this.update);
+          
           const userOper = await  this.checkUserOperations(ctx);
           console.log ('debug from handleUpdate - useroper: ' ,JSON.stringify(userOper))
           ctx.user_operations = userOper;
-          this.currentContext = ctx;
           console.log('debug from handleUpdate - debug ctx update_type: ',ctx.update_type);
           console.log("debug from handleUpdate - debug ctx message:", ctx.update.message);
-          console.log('debug from handleUpdate - update operation: ',ctx.update_operation)
+          console.log('debug from handleUpdate - update operation: ',ctx.update_operation);
           //console.log("debug ctx message user:", ctx.update?.message?.from.id)
           //console.log("debug ctx message user:",ctx.update_message.id_user);
           
@@ -543,7 +543,7 @@ export default class TG_BOT {
           const isTD = ctx.checkUserOperation('isTD');
           const isRP = ctx.checkUserOperation('isRP');
           if (isRP || isTD) {
-              response_ids.push(await TIOZAO_CMDS.confirmTD(ctx.bot, ctx.bot.currentContext.update_message, 0));
+              response_ids.push(await TIOZAO_CMDS.confirmTD(ctx, ctx.update_message, 0));
           }
           return await ctx.bot.handleBotResponses(response_ids);
       }
@@ -574,7 +574,7 @@ export default class TG_BOT {
           const isTD = ctx.checkUserOperation('isTD');
           const isRP = ctx.checkUserOperation('isRP');
           if (isRP || isTD) {
-              response_ids.push(await TIOZAO_CMDS.confirmTD(ctx.bot, ctx.bot.currentContext.update_message, 1));
+              response_ids.push(await TIOZAO_CMDS.confirmTD(ctx, ctx.update_message, 1));
           }
           return await ctx.bot.handleBotResponses(response_ids);
       
@@ -612,7 +612,7 @@ export default class TG_BOT {
                    // } else {
                          console.log(`debug from handleUserDefinedOperation - will run commandFunction: `);
                     
-                         response_ids = await commandFunction(ctx.bot, '');
+                         response_ids = await commandFunction(ctx, '');
                    // }
                }else{
                     response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, 'Handler not found for user defined operation: ' + prefix, id_thread, message_id));

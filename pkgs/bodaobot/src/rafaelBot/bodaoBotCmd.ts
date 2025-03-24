@@ -1,7 +1,6 @@
 import { DB_API } from "../database_api";
 import { TG_HANDLER } from "../handlers/handlers";
 import { formatDate } from "../library";
-import TG_BOT from "../telegram_bot";
 import TG_ExecutionContext from "../telegram_execution_context";
 import TIOZAO_CMDS from "../tiozao/tiozao_api";
 import { mediaType } from "../types/Types";
@@ -38,13 +37,13 @@ export default class BODAO_CMDS {
      * @param bot TG_BOT object
      * @returns 
      */
-    public static async handleATA(bot: TG_BOT){
-        if (!bot) return Promise.resolve([]);
+    public static async handleATA( ctx: TG_ExecutionContext){
+        if (!ctx) return Promise.resolve([]);
         let response_ids:any[] = [];
-        const media_group_id = bot.currentContext.update_message.media_group_id;
-        console.log('debug from handleATA -  context: ', JSON.stringify(bot.currentContext));
+        const media_group_id = ctx.update_message.media_group_id;
+        console.log('debug from handleATA -  context: ', JSON.stringify(ctx));
             
-        await TG_HANDLER.handleEditedMessage(bot.currentContext);
+        await TG_HANDLER.handleEditedMessage(ctx);
         /*
         //1)Check media database
         //document is already in media database with correct type. This is handled by editMedia Handler
@@ -101,51 +100,51 @@ export default class BODAO_CMDS {
      * @param bot The Bot object
      * @returns 
      */
-    public static async listAtas(bot:  TG_BOT) {
+    public static async listAtas(ctx: TG_ExecutionContext) {
         //const env = bot.env
         let response_ids:any[] = [];
         let text = `═════════════════════\n<b>Atass</b>\nAtas dos últimos 4 meses\n═════════════════════\n`;
      
         try {
-            const result = await DB_API.dbListMediabyType(bot.DB, mediaType.DOCUMENT_ATA);
+            const result = await DB_API.dbListMediabyType(ctx.bot.DB, mediaType.DOCUMENT_ATA);
             if (Array.isArray(result) && result.length === 0) {
                text += `Nenhum resultado encontrado`;
             } else if (Array.isArray(result)){
                for (const row of result) {
                   const day = formatDate(row[3]);
-                  text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
+                  text += `${day} - <a href="t.me/c/${ctx.bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
                }
             }
-            await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
+            await TIOZAO_CMDS.sendResponse(ctx.bot, text, response_ids);
         } catch (error) {
             console.error('Error during search operation:', error);
             text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-            await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
+            await TIOZAO_CMDS.sendResponse(ctx.bot, text, response_ids);
         }
      
         return response_ids;
     }
 
-    public static async listPolls(bot:  TG_BOT) {
+    public static async listPolls(ctx: TG_ExecutionContext) {
         //const env = bot.env
         let response_ids:any[] = [];
         let text = `═════════════════════\n<b>Quizes</b>\nQuizes dos últimos 4 meses\n═════════════════════\n`;
      
         try {
-            const result = await DB_API.dbListPolls(bot.DB);
+            const result = await DB_API.dbListPolls(ctx.bot.DB);
             if (Array.isArray(result) && result.length === 0) {
                text += `Nenhum resultado encontrado`;
             } else if (Array.isArray(result)){
                for (const row of result) {
                   const day = formatDate(row[3]);
-                  text += `${day} - <a href="t.me/c/${bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
+                  text += `${day} - <a href="t.me/c/${ctx.bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
                }
             }
-            await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
+            await TIOZAO_CMDS.sendResponse(ctx.bot, text, response_ids);
         } catch (error) {
             console.error('Error during search operation:', error);
             text += `Ocorreu um erro durante a busca. Tente novamente mais tarde.`;
-            await TIOZAO_CMDS.sendResponse(bot, text, response_ids);
+            await TIOZAO_CMDS.sendResponse(ctx.bot, text, response_ids);
         }
      
         return response_ids;
