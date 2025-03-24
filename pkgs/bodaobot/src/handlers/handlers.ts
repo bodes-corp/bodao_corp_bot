@@ -80,7 +80,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
      public static async handleEditedMessage(ctx:TG_ExecutionContext) {
           const messageJson:any = ctx.update.edited_message
           const message:ContextMessage = new ContextMessage(messageJson);
-          console.log("debug from handleEditedMessage- context: ", JSON.stringify(ctx));
+          //console.log("debug from handleEditedMessage- context: ", JSON.stringify(ctx));
           console.log("debug from handleEditedMessage- operation: ", ctx.update_operation);
           switch (ctx.update_operation) {
               case updOperation.MEDIA_EDIT:
