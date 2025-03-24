@@ -42,6 +42,8 @@ export default class BODAO_CMDS {
         if (!bot) return Promise.resolve([]);
         let response_ids:any[] = [];
         const media_group_id = bot.currentContext.update_message.media_group_id;
+        console.log('debug from handleATA -  context: ', JSON.stringify(bot.currentContext));
+            
         await TG_HANDLER.handleEditedMessage(bot.currentContext);
         /*
         //1)Check media database
