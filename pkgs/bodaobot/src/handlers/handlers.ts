@@ -77,6 +77,14 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
           return new Response('ok');
      }
 
+     public static async handleEditDocument (ctx: TG_ExecutionContext ) {
+               let message:ContextMessage = ctx.update_message;
+               let response_ids:any[] = [];
+               console.log('debug from handleEditDocument')
+               response_ids.push(await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true));
+               return await ctx.bot.handleBotResponses(response_ids);
+     }
+
      public static async handleEditedMessage(ctx:TG_ExecutionContext) {
           const messageJson:any = ctx.update.edited_message
           const message:ContextMessage = new ContextMessage(messageJson);
@@ -93,7 +101,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
                 if(ctx.checkUserOperation('isATA')){
                     message.media_type = mediaType.DOCUMENT_ATA
                 }
-                await ctx.bot.handleEditDocument(ctx);
+                await TG_HANDLER.handleEditDocument(ctx);
                 
                 break;
           }

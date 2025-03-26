@@ -311,9 +311,9 @@ export default class TG_BOT {
                     }));
           }
           console.log('debug from runHandlers - will run promises');
-          const response =  await this.updateHandlers[this.currentHandlerName](ctx);      
-          return response;
-          //return Promise.all(promises);
+          //const response =  await this.updateHandlers[this.currentHandlerName](ctx);      
+          //return response;
+          return Promise.all(promises);
           
      }
 
@@ -559,13 +559,7 @@ export default class TG_BOT {
       }
 
 
-     async handleEditDocument (ctx: TG_ExecutionContext ) {
-          let message:ContextMessage = ctx.update_message;
-          let response_ids:any[] = [];
-          console.log('debug from handleEditDocument')
-          response_ids.push(await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true));
-          return await ctx.bot.handleBotResponses(response_ids);
-      }
+     
       
      async handleEditPost (ctx: TG_ExecutionContext ) {
           let message:ContextMessage = ctx.update_message;

@@ -43,9 +43,9 @@ export default class BODAO_CMDS {
         if (!ctx) return Promise.resolve([]);
         let response_ids:any[] = [];
         const media_group_id = ctx.update_message.media_group_id;
-        console.log('debug from handleATA -  context: ', JSON.stringify(ctx));
+        //console.log('debug from handleATA -  context: ', JSON.stringify(ctx));
             
-        await TG_HANDLER.handleEditedMessage(ctx);
+        await TG_HANDLER.handleEditDocument(ctx);
         
         //1)Check media database
         //document is already in media database with correct type. This is handled by editMedia Handler
