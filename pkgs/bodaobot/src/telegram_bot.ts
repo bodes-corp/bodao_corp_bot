@@ -290,30 +290,43 @@ export default class TG_BOT {
 
           const promises:any[] = [];
           if (ctx.commandFlag) {
-               promises.push(new Promise( (resolve) => {
+               const response =  ctx.bot.handleBotCommand(ctx);
+               console.log('debug from runHandlers -response: ', JSON.stringify(response));
+               return response;
+              /* promises.push(new Promise( (resolve) => {
                     // setTimeout(async () => {
                         const response =  ctx.bot.handleBotCommand(ctx);                  
                         resolve(response);
                         //}, 1000);
                    }));
+                   */
           }else if (ctx.user_operations.length >0 ) {
-               promises.push(new Promise((resolve) => {
+               const response =  ctx.bot.handleUserDefinedOperation(ctx);
+               
+               console.log('debug from runHandlers -response: ', JSON.stringify(response));
+               return response;
+               /*promises.push(new Promise((resolve) => {
                     // setTimeout(async () => {
                         const response =  ctx.bot.handleUserDefinedOperation(ctx);
                         resolve(response);
                     }));
-               
+               */
           } else {
+               const response =   this.updateHandlers[this.currentHandlerName](ctx);
+               console.log('debug from runHandlers -response: ', JSON.stringify(response));
+               return response;
+               /*         
                promises.push(new Promise( (resolve) => {
                     // setTimeout(async () => {
                         const response =   this.updateHandlers[this.currentHandlerName](ctx);
                         resolve(response);
                     }));
+                    */
           }
-          console.log('debug from runHandlers - will run promises');
+          //console.log('debug from runHandlers - will run promises');
           //const response =  await this.updateHandlers[this.currentHandlerName](ctx);      
           //return response;
-          return Promise.all(promises);
+         // return Promise.all(promises);
           
      }
 
