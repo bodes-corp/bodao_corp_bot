@@ -290,23 +290,23 @@ export default class TG_BOT {
 
           const promises:any[] = [];
           if (ctx.commandFlag) {
-               promises.push(new Promise(async (resolve) => {
+               promises.push(new Promise( (resolve) => {
                     // setTimeout(async () => {
-                        const response =  await ctx.bot.handleBotCommand(ctx);                  
+                        const response =  ctx.bot.handleBotCommand(ctx);                  
                         resolve(response);
                         //}, 1000);
                    }));
           }else if (ctx.user_operations.length >0 ) {
-               promises.push(new Promise(async (resolve) => {
+               promises.push(new Promise((resolve) => {
                     // setTimeout(async () => {
-                        const response =  await ctx.bot.handleUserDefinedOperation(ctx);
+                        const response =  ctx.bot.handleUserDefinedOperation(ctx);
                         resolve(response);
                     }));
                
           } else {
-               promises.push(new Promise(async (resolve) => {
+               promises.push(new Promise( (resolve) => {
                     // setTimeout(async () => {
-                        const response =  await this.updateHandlers[this.currentHandlerName](ctx);
+                        const response =   this.updateHandlers[this.currentHandlerName](ctx);
                         resolve(response);
                     }));
           }
