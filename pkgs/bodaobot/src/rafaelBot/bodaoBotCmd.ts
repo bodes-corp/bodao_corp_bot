@@ -1,9 +1,11 @@
 import { DB_API } from "../database_api";
+import { TG_HANDLER } from "../handlers/handlers";
 import { formatDate } from "../library";
 import { Requests } from "../telegram/requests";
 import TG_API from "../telegram/telegram_api";
 import TG_ExecutionContext from "../telegram_execution_context";
 import TIOZAO_CMDS from "../tiozao/tiozao_api";
+import { ContextMessage } from "../types/TelegramMessage";
 import { mediaType } from "../types/Types";
 
 export default class BODAO_CMDS {
@@ -40,11 +42,20 @@ export default class BODAO_CMDS {
      */
     public static async handleATA( ctx: TG_ExecutionContext, args:string = ''){
         if (!ctx) return Promise.resolve([]);
+
+        let message:ContextMessage = ctx.update_message;
         let response_ids:any[] = [];
+        console.log('debug from handleEditDocument');
+        const resp = await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true);
+        if(Array.isArray(resp)) response_ids.push(resp);
+        await ctx.bot.handleBotResponses(response_ids);
+        return [];
+
+        
         const media_group_id = ctx.update_message.media_group_id;
         console.log('debug from handleATA -  context: ', JSON.stringify(ctx));
             
-        //const response =  await TG_HANDLER.handleEditDocument(ctx);
+        const response =  await TG_HANDLER.handleEditDocument(ctx);
         //console.log('debug from handleATA -  back from Edit document: ', JSON.stringify(response));
         
         //1)Check media database
@@ -81,8 +92,8 @@ export default class BODAO_CMDS {
                 // const has_protected_content = pollResponse.poll.has_protected_content === true? 1:0; 
                 // const is_topic_message = pollResponse.poll.is_topic_message === true? 1:0;
                 if (newPollData) {
-                    const responseInsert = await DB_API.dbInsertPoll(ctx.bot.DB,newPollData,Number(ctx.bot.botINFO.THREADBOT), media_group_id)
-                    console.log("debug from handleATA - response insert poll",JSON.stringify(responseInsert));
+                    //const responseInsert = await DB_API.dbInsertPoll(ctx.bot.DB,newPollData,Number(ctx.bot.botINFO.THREADBOT), media_group_id)
+                   // console.log("debug from handleATA - response insert poll",JSON.stringify(responseInsert));
                     
                     const params = Requests.MessageToBotTopicRequest(ctx.bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
                     const response  = await TG_API.sendMessage(ctx.bot.botINFO.TOKEN,params);
