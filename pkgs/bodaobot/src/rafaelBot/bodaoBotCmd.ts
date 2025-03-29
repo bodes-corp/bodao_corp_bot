@@ -1,5 +1,4 @@
 import { DB_API } from "../database_api";
-import { TG_HANDLER } from "../handlers/handlers";
 import { formatDate } from "../library";
 import { Requests } from "../telegram/requests";
 import TG_API from "../telegram/telegram_api";
@@ -45,8 +44,8 @@ export default class BODAO_CMDS {
         const media_group_id = ctx.update_message.media_group_id;
         console.log('debug from handleATA -  context: ', JSON.stringify(ctx));
             
-        const response =  await TG_HANDLER.handleEditDocument(ctx);
-        console.log('debug from handleATA -  back from Edit document: ', JSON.stringify(response));
+        //const response =  await TG_HANDLER.handleEditDocument(ctx);
+        //console.log('debug from handleATA -  back from Edit document: ', JSON.stringify(response));
         
         //1)Check media database
         //document is already in media database with correct type. This is handled by editMedia Handler
