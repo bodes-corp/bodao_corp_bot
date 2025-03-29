@@ -43,7 +43,7 @@ export default class BODAO_CMDS {
         if (!ctx) return Promise.resolve([]);
         let response_ids:any[] = [];
         const media_group_id = ctx.update_message.media_group_id;
-        //console.log('debug from handleATA -  context: ', JSON.stringify(ctx));
+        console.log('debug from handleATA -  context: ', JSON.stringify(ctx));
             
         await TG_HANDLER.handleEditDocument(ctx);
         
