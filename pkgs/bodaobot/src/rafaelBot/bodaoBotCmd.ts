@@ -39,7 +39,7 @@ export default class BODAO_CMDS {
      * @param bot TG_BOT object
      * @returns 
      */
-    public static async handleATA( ctx: TG_ExecutionContext){
+    public static async handleATA( ctx: TG_ExecutionContext, args:string = ''){
         if (!ctx) return Promise.resolve([]);
         let response_ids:any[] = [];
         const media_group_id = ctx.update_message.media_group_id;
