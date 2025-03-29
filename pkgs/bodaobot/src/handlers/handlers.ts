@@ -80,8 +80,9 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
      public static async handleEditDocument (ctx: TG_ExecutionContext ) {
                let message:ContextMessage = ctx.update_message;
                let response_ids:any[] = [];
-               console.log('debug from handleEditDocument')
-               response_ids.push(await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true));
+               console.log('debug from handleEditDocument');
+               const resp = await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true);
+               if(Array.isArray(resp)) response_ids.push(resp);
                return await ctx.bot.handleBotResponses(response_ids);
      }
 

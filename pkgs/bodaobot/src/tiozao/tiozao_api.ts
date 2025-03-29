@@ -432,9 +432,9 @@ export default class TIOZAO_CMDS {
  	console.log('debug from checkHaveCaption - caption: ', caption)
 	try {
 	    if (caption) {
-		   await  DB_API.dbInsertCaption(bot.DB, media_group_id, caption);
+		   return await  DB_API.dbInsertCaption(bot.DB, media_group_id, caption);
 	    } else if (edit) {
-		   await DB_API.dbDeleteCaption(bot.DB, media_group_id);
+		   return await DB_API.dbDeleteCaption(bot.DB, media_group_id);
 	    }
 	} catch (error) {
 	    console.error(`Error processing caption for media_group_id: ${media_group_id}`, error);
