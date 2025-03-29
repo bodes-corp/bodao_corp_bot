@@ -290,7 +290,7 @@ export default class TG_BOT {
 
           const promises:any[] = [];
           if (ctx.commandFlag) {
-               const response =  ctx.bot.handleBotCommand(ctx);
+               const response =  await ctx.bot.handleBotCommand(ctx);
                console.log('debug from runHandlers -response: ', JSON.stringify(response));
                return response;
               /* promises.push(new Promise( (resolve) => {
@@ -301,7 +301,7 @@ export default class TG_BOT {
                    }));
                    */
           }else if (ctx.user_operations.length >0 ) {
-               const response =  ctx.bot.handleUserDefinedOperation(ctx);
+               const response =  await ctx.bot.handleUserDefinedOperation(ctx);
                
                console.log('debug from runHandlers -response: ', JSON.stringify(response));
                return response;
@@ -312,7 +312,7 @@ export default class TG_BOT {
                     }));
                */
           } else {
-               const response =   this.updateHandlers[this.currentHandlerName](ctx);
+               const response =   await this.updateHandlers[this.currentHandlerName](ctx);
                console.log('debug from runHandlers -response: ', JSON.stringify(response));
                return response;
                /*         
