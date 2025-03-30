@@ -594,6 +594,7 @@ export default class TG_BOT {
           const id_thread = message.id_thread;
           //const id_user = message.id_user;
           console.log('debug from handleUserDefinedOperation: msg_text: ', message.msg_txt);
+          console.log('debug from handleUserDefinedOperation: message: ', ctx.update_message);
           
           const msg_txt = message.msg_txt?.trim();
           let response_ids:any[] = [];
