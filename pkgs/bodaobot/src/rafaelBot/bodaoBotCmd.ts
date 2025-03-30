@@ -46,6 +46,8 @@ export default class BODAO_CMDS {
         let message:ContextMessage = ctx.update_message;
         let response_ids:any[] = [];
         console.log('debug from handleEditDocument');
+	    console.log("debug from handleEditDocument - message: ", JSON.stringify(message))
+
         const resp = await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true);
         if(Array.isArray(resp)) response_ids.push(resp);
         await ctx.bot.handleBotResponses(response_ids);
