@@ -40,7 +40,7 @@ export default class BODAO_CMDS {
      * @param bot TG_BOT object
      * @returns 
      */
-    public static async handleATA( ctx: TG_ExecutionContext, args:string = ''){
+    public static async handleATA( ctx: TG_ExecutionContext){
         if (!ctx) return Promise.resolve([]);
 
         let message:ContextMessage = ctx.update_message;

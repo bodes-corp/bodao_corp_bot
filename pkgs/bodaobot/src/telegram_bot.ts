@@ -595,7 +595,7 @@ export default class TG_BOT {
           //const id_user = message.id_user;
           console.log('debug from handleUserDefinedOperation: msg_text: ', message.msg_txt);
           
-          //const msg_txt = message.msg_txt?.trim();
+          const msg_txt = message.msg_txt?.trim();
           let response_ids:any[] = [];
           ctx.user_operations.forEach(async (prefix) => {
                console.log('debug from handleUserDefinedOperation: find command for prefix: ',prefix)
@@ -605,22 +605,22 @@ export default class TG_BOT {
                     
                     const [selectedCommand, { func: commandFunction, requiresArg }] = commandEntry;
                     console.log(`debug from handleUserDefinedOperation - commandfound: `, selectedCommand);
-                    //const argument = msg_txt?.slice(selectedCommand.length).trim();
-                    //console.log(`debug from handleUserDefinedOperation - argument: `,argument);
+                    const argument = msg_txt?.slice(selectedCommand.length).trim();
+                    console.log(`debug from handleUserDefinedOperation - argument: `,argument);
                     
-                    //await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
-                    //console.log(`debug from handleUserDefinedOperation - require argument: `,requiresArg);
+                    await TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Voce usou o comando ${selectedCommand}`, id_thread, message_id);
+                    console.log(`debug from handleUserDefinedOperation - require argument: `,requiresArg);
                     
-                   // if (requiresArg && argument === '') {
-                    //     response_ids.push(await TIOZAO_BOT_CMDs.botAlert( ctx.bot, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
-                    //} else 
-                   // if (requiresArg && !msg_txt?.startsWith(selectedCommand + ' ')) {
-                   //      response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
-                   // } else {
+                    if (requiresArg && argument === '') {
+                         response_ids.push(await TIOZAO_BOT_CMDs.botAlert( ctx.bot, `O comando ${selectedCommand} precisa de um parâmetro.`, id_thread, message_id));
+                    } else 
+                    if (requiresArg && !msg_txt?.startsWith(selectedCommand + ' ')) {
+                         response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
+                    } else {
                          console.log(`debug from handleUserDefinedOperation - will run commandFunction: `);
                     
-                         response_ids = await commandFunction(ctx, '');
-                   // }
+                         response_ids = await commandFunction(ctx);
+                    }
                }else{
                     response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, 'Handler not found for user defined operation: ' + prefix, id_thread, message_id));
                }
