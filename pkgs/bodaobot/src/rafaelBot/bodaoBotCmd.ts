@@ -96,8 +96,8 @@ export default class BODAO_CMDS {
                 // const has_protected_content = pollResponse.poll.has_protected_content === true? 1:0; 
                 // const is_topic_message = pollResponse.poll.is_topic_message === true? 1:0;
                 if (newPollData) {
-                    //const responseInsert = await DB_API.dbInsertPoll(ctx.bot.DB,newPollData,Number(ctx.bot.botINFO.THREADBOT), media_group_id)
-                   // console.log("debug from handleATA - response insert poll",JSON.stringify(responseInsert));
+                    const responseInsert = await DB_API.dbInsertPoll(ctx.bot.DB,newPollData,Number(ctx.bot.botINFO.THREADBOT), media_group_id)
+                    console.log("debug from handleATA - response insert poll",JSON.stringify(responseInsert));
                     
                     const params = Requests.MessageToBotTopicRequest(ctx.bot,'Foi Inserida uma Nova Ata no Grupo. Por favor leia e responda o quiz')
                     const response  = await TG_API.sendMessage(ctx.bot.botINFO.TOKEN,params);

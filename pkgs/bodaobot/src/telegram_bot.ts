@@ -645,7 +645,7 @@ export default class TG_BOT {
           let response_ids:any[] = [];
           console.log('debugfrom handleBotCommand- command:', command);
           //ctx.bot.onCommand('/info', { func: (env:any, _:any) => TIOZAO_CMDS.listInfo(ctx.bot), requiresArg: false });
-          console.log('debug from handleBotCommand: message: ', ctx.update_message);
+          console.log('debug from handleBotCommand: message: ', JSON.stringify(ctx.update_message));
           
           const commandEntry:any = Object.entries(ctx.bot.commands).find(([prefix]) =>
               msg_txt?.startsWith(prefix)
