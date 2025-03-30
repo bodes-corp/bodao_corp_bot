@@ -47,8 +47,10 @@ export default class BODAO_CMDS {
         let response_ids:any[] = [];
         console.log('debug from handleATA');
 	    console.log("debug from handleATA - message: ", JSON.stringify(message))
-
+        
         const resp = await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true);
+       
+        
         if(Array.isArray(resp)) response_ids.push(resp);
         await ctx.bot.handleBotResponses(response_ids);
         return [];

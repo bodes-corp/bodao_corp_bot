@@ -428,8 +428,18 @@ export default class TIOZAO_CMDS {
  }
  
  public static async checkHaveCaption(bot:TG_BOT, message:ContextMessage, edit = false) {
-	const {  media_group_id, caption } = message;
- 	console.log('debug from checkHaveCaption - caption: ', caption)
+	let media_group_id, caption;
+	if(message.message.reply_to_message) {
+		media_group_id = message.message.reply_to_message.message_id;
+		caption = message.message.reply_to_message.caption;
+	}else {
+		media_group_id = message.media_group_id;
+		caption = message.caption;
+
+	}
+	
+ 	console.log('debug from checkHaveCaption - caption: ', caption);
+	console.log('debug from checkHaveCaption - media: ', media_group_id);
 	try {
 	    if (caption) {
 		   return await  DB_API.dbInsertCaption(bot.DB, media_group_id, caption);
