@@ -594,7 +594,7 @@ export default class TG_BOT {
           const id_thread = message.id_thread;
           //const id_user = message.id_user;
           console.log('debug from handleUserDefinedOperation: msg_text: ', message.msg_txt);
-          console.log('debug from handleUserDefinedOperation: message: ', ctx.update_message);
+          //console.log('debug from handleUserDefinedOperation: message: ', ctx.update_message);
           
           const msg_txt = message.msg_txt?.trim();
           let response_ids:any[] = [];
@@ -643,9 +643,10 @@ export default class TG_BOT {
           const msg_txt = message.msg_txt?.trim();
           const command = msg_txt?.split(' ')[0];
           let response_ids:any[] = [];
-          console.log('debug command:', command);
+          console.log('debugfrom handleBotCommand- command:', command);
           //ctx.bot.onCommand('/info', { func: (env:any, _:any) => TIOZAO_CMDS.listInfo(ctx.bot), requiresArg: false });
-      
+          console.log('debug from handleBotCommand: message: ', ctx.update_message);
+          
           const commandEntry:any = Object.entries(ctx.bot.commands).find(([prefix]) =>
               msg_txt?.startsWith(prefix)
           );
@@ -661,7 +662,7 @@ export default class TG_BOT {
               } else if (requiresArg && !msg_txt?.startsWith(selectedCommand + ' ')) {
                   response_ids.push(await  TIOZAO_BOT_CMDs.botAlert(ctx.bot, `Adicione espaço entre o ${selectedCommand} e o parâmetro.`, id_thread, message_id));
               } else {
-                  response_ids = await commandFunction(ctx.bot, argument);
+                  response_ids = await commandFunction(ctx, argument);
                   console.log('[debug from handleBotCommand] responseIds',JSON.stringify(response_ids))
               }
           } else {
