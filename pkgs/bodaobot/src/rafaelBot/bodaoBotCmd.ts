@@ -45,7 +45,7 @@ export default class BODAO_CMDS {
 
         let message:ContextMessage = ctx.update_message;
         let response_ids:any[] = [];
-        console.log('debug from handleATA');
+        /*console.log('debug from handleATA');
 	    console.log("debug from handleATA - message: ", JSON.stringify(message))
         
         const resp = await  TIOZAO_CMDS.checkHaveCaption(ctx.bot, message, true);
@@ -54,14 +54,14 @@ export default class BODAO_CMDS {
         if(Array.isArray(resp)) response_ids.push(resp);
         await ctx.bot.handleBotResponses(response_ids);
         return [];
-
+        */
         
         const media_group_id = ctx.update_message.media_group_id;
         console.log('debug from handleATA -  context: ', JSON.stringify(ctx));
             
         const response =  await TG_HANDLER.handleEditDocument(ctx);
-        //console.log('debug from handleATA -  back from Edit document: ', JSON.stringify(response));
-        
+        console.log('debug from handleATA -  back from Edit document: ', JSON.stringify(response));
+        if(Array.isArray(response)) response_ids.push(response);
         //1)Check media database
         //document is already in media database with correct type. This is handled by editMedia Handler
             //if it will execute media edit handler it is not necessary dbupdate here.
@@ -108,7 +108,6 @@ export default class BODAO_CMDS {
                 
             }
         }
-    
         return response_ids;
     }
 
