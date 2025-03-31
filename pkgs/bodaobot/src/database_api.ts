@@ -22,6 +22,7 @@ type d1Return = {
 	results: any[] | null, // [] if empty, or null if it does not apply
    }
 // response exemple: {\"success\":true,\"meta\":{\"served_by\":\"v3-prod\",\"served_by_region\":\"ENAM\",\"served_by_primary\":true,\"timings\":{\"sql_duration_ms\":0.2194},\"duration\":0.2194,\"changes\":0,\"last_row_id\":0,\"changed_db\":false,\"size_after\":118784,\"rows_read\":0,\"rows_written\":0},\"results\":[]}"
+type databaseReturn = d1Return | any[];
 
 export class DB_API {
 
@@ -30,24 +31,23 @@ public static async executeQuery(db:any, query:string, params:any[] = [],resp:bo
      if (!db || !query) return Promise.resolve(false);
 	const returnResults:boolean =  query.includes("SELECT");     
 	console.log('debug from executeQuery - shall return result: ', returnResults)
-     let response;//: d1Return | any[];
+     //let response:databaseReturn;//: d1Return | any[];
 	try {
 		console.log('debug from executeQuery -query: ', query)
 		console.log('debug from executeQuery -params: ',JSON.stringify(params));
 		const preparedStatement = await db.prepare(query).bind(...params);
           console.log('debug from executeQuery -comands: ',JSON.stringify(preparedStatement));
           if (returnResults) {
+			;
 			console.log('[debug from executeQuery] will run raw():');
-              response =  await preparedStatement.raw(); // For SELECT queries, return the results
+			const response: any[] =  await preparedStatement.raw(); // For SELECT queries, return the results
 		    console.log('[debug from executeQuery] result:', JSON.stringify(response));
 		    console.log('[debug from executeQuery] result from query:',query);
-		    if(response.results)
-		    		return Promise.resolve(response.results);
-			else return Promise.resolve(response);
+		    return Promise.resolve(response);
 		
 		} else {
 		    console.log('[debug from executeQuery] will run run():');
-              response =  await preparedStatement.run(); // For non-SELECT queries, just execute the query
+              const response:d1Return  =  await preparedStatement.run(); // For non-SELECT queries, just execute the query
 		    
 		    console.log('[debug from executeQuery] result:', JSON.stringify(response))
 		    console.log('[debug from executeQuery] result from query:',query);	
