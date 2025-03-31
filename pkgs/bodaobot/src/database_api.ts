@@ -30,7 +30,7 @@ public static async executeQuery(db:any, query:string, params:any[] = [],resp:bo
      if (!db || !query) return Promise.resolve(false);
 	const returnResults:boolean =  query.includes("SELECT");     
 	console.log('debug from executeQuery - shall return result: ', returnResults)
-     let response: d1Return;
+     let response;//: d1Return | any[];
 	try {
 		console.log('debug from executeQuery -query: ', query)
 		console.log('debug from executeQuery -params: ',JSON.stringify(params));
@@ -41,7 +41,9 @@ public static async executeQuery(db:any, query:string, params:any[] = [],resp:bo
               response =  await preparedStatement.raw(); // For SELECT queries, return the results
 		    console.log('[debug from executeQuery] result:', JSON.stringify(response));
 		    console.log('[debug from executeQuery] result from query:',query);
-		    return Promise.resolve(response.results);
+		    if(response.results)
+		    		return Promise.resolve(response.results);
+			else return Promise.resolve(response);
 		
 		} else {
 		    console.log('[debug from executeQuery] will run run():');
