@@ -148,9 +148,11 @@ export default class BODAO_CMDS {
      
         try {
             const result = await DB_API.dbListPolls(ctx.bot.DB);
+            console.log('debug from listPolls- result: ', JSON.stringify(result))
             if (Array.isArray(result) && result.length === 0) {
                text += `Nenhum resultado encontrado`;
             } else if (Array.isArray(result)){
+               response_ids = result; 
                for (const row of result) {
                   const day = formatDate(row[3]);
                   console.log('debug from listPolls- poll: ', JSON.stringify(row))
