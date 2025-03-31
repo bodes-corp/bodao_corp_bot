@@ -40,7 +40,7 @@ export default class BODAO_CMDS {
      * @param bot TG_BOT object
      * @returns 
      */
-    public static async handleATA( ctx: TG_ExecutionContext){
+    public static async handleATA( ctx: TG_ExecutionContext):Promise<any[]>{
         if (!ctx) return Promise.resolve([]);
 
         let message:ContextMessage = ctx.update_message;
@@ -141,7 +141,7 @@ export default class BODAO_CMDS {
         return response_ids;
     }
 
-    public static async listPolls(ctx: TG_ExecutionContext) {
+    public static async listPolls(ctx: TG_ExecutionContext):Promise<any[]> {
         //const env = bot.env
         let response_ids:any[] = [];
         let text = `═════════════════════\n<b>Quizes</b>\nQuizes dos últimos 4 meses\n═════════════════════\n`;
@@ -153,6 +153,7 @@ export default class BODAO_CMDS {
             } else if (Array.isArray(result)){
                for (const row of result) {
                   const day = formatDate(row[3]);
+                  console.log('debug from listPolls- poll: ', JSON.stringify(row))
                   text += `${day} - <a href="t.me/c/${ctx.bot.botINFO.CHATID.substring(3)}/${row[0]}/${row[1]}">${row[2]}</a>\n`;
                }
             }
