@@ -8,7 +8,7 @@ import { ContextMessage } from "./types/TelegramMessage";
 import { mediaType, mediaType_t, updOperation } from "./types/Types";
 
 type d1Return = {
-	success: boolean, // true if the operation was successful, false otherwise
+	success: boolean, // true if the operation was successful otherwise
 	meta: {
 	  served_by: string // the version of Cloudflare's backend Worker that returned the result
 	  duration: number, // the duration of the SQL query execution only, in milliseconds
@@ -27,7 +27,7 @@ type databaseReturn = d1Return | any[];
 export class DB_API {
 
 
-public static async executeQuery(db:any, query:string, params:any[] = [],resp:boolean=false):Promise< any[] | boolean | null> {
+public static async executeQuery(db:any, query:string, params:any[] = []):Promise< any[] | boolean | null> {
      if (!db || !query) return Promise.resolve(false);
 	const returnResults:boolean =  query.includes("SELECT");     
 	console.log('debug from executeQuery - shall return result: ', returnResults)
@@ -77,7 +77,7 @@ public static async dbInsertBotNotify(db:any, response:any, id_msg:any) {
          INSERT INTO tg_bot (id_msg, id_msg_ref) 
          VALUES (?1,?2)
      `;
-     await this.executeQuery(db, query, [response, id_msg], false);
+     await this.executeQuery(db, query, [response, id_msg]);
      return response;
 }
  
@@ -136,7 +136,7 @@ public static async dbInsertMessage(ctx:TG_ExecutionContext, message:ContextMess
 			ON CONFLICT (id_thread) 
 			DO UPDATE SET threadname = excluded.threadname, normalized_threadname = excluded.normalized_threadname
 		`;
-		await this.executeQuery(ctx.bot.DB, threadQuery, [message.id_thread, threadName, normalized_threadname], false);
+		await this.executeQuery(ctx.bot.DB, threadQuery, [message.id_thread, threadName, normalized_threadname]);
 		}
 	}
 	if (operation === updOperation.THREAD_DELETE) { //not supported yet
@@ -159,7 +159,7 @@ public static async dbInsertMessage(ctx:TG_ExecutionContext, message:ContextMess
 		   message.media_type, 
 		   message.deleted, 
 		   message.media_group_id
-	    ], false);     
+	    ]);     
 	}
  
 	if (operation === updOperation.POST_NEW) {
@@ -176,7 +176,7 @@ public static async dbInsertMessage(ctx:TG_ExecutionContext, message:ContextMess
 		   isTD,
 		   message.id_user,
 		   message.id_thread
-	    ], false);
+	    ]);
 	    
 	    await DB_API.dbUpdateUserInfo(ctx.bot.DB, message);
 	}
@@ -192,7 +192,7 @@ public static async dbUpdateUserInfo(db:any, message:ContextMessage){
 	ON CONFLICT (id_user)
 	DO UPDATE SET username = excluded.username, first_name = excluded.first_name, active=1
  `;
- await DB_API.executeQuery(db, userQuery, [message.id_user, message.username, message.first_name], false);
+ await DB_API.executeQuery(db, userQuery, [message.id_user, message.username, message.first_name]);
 
 }
 public static async dbDeactivateUser(db:any, message:ContextMessage){
@@ -201,7 +201,7 @@ public static async dbDeactivateUser(db:any, message:ContextMessage){
              SET active = 0
              WHERE id_user = ?1
  `;
- await DB_API.executeQuery(db, userQuery, [message.id_user], false);
+ await DB_API.executeQuery(db, userQuery, [message.id_user]);
 
 }
 
@@ -217,7 +217,7 @@ public static async dbUpdateUsers(db:any, users:tgTypes.User[]){
 			DO UPDATE SET username = excluded.username, first_name = excluded.first_name, active=1
 		`;
 		const username = user.username ? user.username : user.first_name;
- 		await DB_API.executeQuery(db, userQuery, [user.id, username,username], false);
+ 		await DB_API.executeQuery(db, userQuery, [user.id, username,username]);
 
 	})
 	}
@@ -234,7 +234,7 @@ public static async dbUpdateMediaType(bot: TG_BOT,media_type:mediaType_t, messag
          await this.executeQuery(bot.DB, fileQuery, [
              media_type,
              message_id
-         ], false)
+         ])
 }
  
 public static async dbEditMessage(ctx:TG_ExecutionContext, message:ContextMessage) {
@@ -253,7 +253,7 @@ public static async dbEditMessage(ctx:TG_ExecutionContext, message:ContextMessag
 		message.file_unique_id,
 		message.media_type,
 		message.message_id
-	 ], false);
+	 ]);
 
 	 const groupQuery = `
 		UPDATE tg_media
@@ -263,7 +263,7 @@ public static async dbEditMessage(ctx:TG_ExecutionContext, message:ContextMessag
 	 await this.executeQuery(ctx.bot.DB, groupQuery, [
 		message.deleted,
 		message.media_group_id
-	 ], false);
+	 ]);
 	}
 	if (operation === updOperation.MEDIA_EDIT ) {
          const fileQuery = `
@@ -278,7 +278,7 @@ public static async dbEditMessage(ctx:TG_ExecutionContext, message:ContextMessag
              message.file_unique_id,
              message.media_type,
              message.message_id
-         ], false);
+         ]);
  
          const groupQuery = `
              UPDATE tg_media
@@ -288,7 +288,7 @@ public static async dbEditMessage(ctx:TG_ExecutionContext, message:ContextMessag
          //await this.executeQuery(bot.DB, groupQuery, [
          //    message.deleted,
          //    message.media_group_id
-        // ], false);
+        // ]);
      }
  
      if (operation === updOperation.POST_EDIT) {
@@ -300,7 +300,7 @@ public static async dbEditMessage(ctx:TG_ExecutionContext, message:ContextMessag
          await this.executeQuery(ctx.bot.DB, messageQuery, [
              message.msg_txt, 
              message.message_id
-         ], false);
+         ]);
      }
  
      return new Response("DB-EDIT-ok");
@@ -348,7 +348,7 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 	let params:any[] = [data.id,  message_thread_id, data.question, data.total_voter_count,(data.is_closed === true? 1:0), (data.is_anonymous  === true? 1:0),data.type, (data.allows_multiple_answers  === true? 1:0)]
      console.log("debug from dbInsertPoll - params",JSON.stringify(params));
 	
-	const result = await this.executeQuery(db, query,params , false);
+	const result = await this.executeQuery(db, query,params );
 	console.log("debug from dbInsertPoll - result",JSON.stringify(result));
 	//add options
 	//const options = data.options;
@@ -363,7 +363,7 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 			VALUES (?1, ?2, ?3,?4)
 	    `;
 		let params:any[] = [data.id,index,option.text, option.voter_count ]
-		await this.executeQuery(db, query,params , false);
+		await this.executeQuery(db, query,params );
 
 	})
 					
@@ -374,7 +374,7 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 			ON CONFLICT DO NOTHING
 	    `;
 		let params:any[] = [data.id, media_group_id ]
-		await this.executeQuery(db, query,params , false);
+		await this.executeQuery(db, query,params );
 
 	}
 
@@ -385,6 +385,17 @@ public static async dbInsertPoll(db:any,data:tgTypes.Poll , message_thread_id:nu
 }
 
 public static async dbUpdatePoolAnswer(db:any,answers:tgTypes.PollAnswer){
+	/*
+	"{"id":"5140893596374794405",
+		"question":"Aprovação da Ata: undefined",
+		"options":[{"text":"Ata está Correta - Aprovada","voter_count":1},{"text":"Ata precisa de Alterações","voter_count":0}],
+		"total_voter_count":1,
+		"is_closed":false,
+		"is_anonymous":false,
+		"type":"regular",
+		"allows_multiple_answers":false
+	}
+	*/
 	if(Array.isArray(answers.option_ids)){
 		answers.option_ids.forEach(async (id)=>{
 			const userQuery = `INSERT INTO tg_poll_answers (id_poll,id_user, id_chat,is_bot,option_index)
@@ -393,7 +404,7 @@ public static async dbUpdatePoolAnswer(db:any,answers:tgTypes.PollAnswer){
 			 const userid = answers.user?.id? answers.user.id:'anonymous';
 			 const chatid = answers.voter_chat?.id? answers.voter_chat?.id: "undefined";
 			 let params:any[] = [answers.poll_id,userid,chatid,(answers.is_bot?1:0),id ]
-			 await this.executeQuery(db, userQuery,params , false);
+			 await this.executeQuery(db, userQuery,params );
 
 		})
 	}else{
@@ -403,7 +414,7 @@ public static async dbUpdatePoolAnswer(db:any,answers:tgTypes.PollAnswer){
 		const userid = answers.user?.id? answers.user.id:'anonymous';
 		const chatid = answers.voter_chat?.id? answers.voter_chat?.id: "undefined";
 		let params:any[] = [answers.poll_id,userid,chatid,(answers.is_bot?1:0),answers.option_ids ]
-		await this.executeQuery(db, userQuery,params , false);
+		await this.executeQuery(db, userQuery,params );
 	}
 	
 
@@ -422,7 +433,7 @@ public static async dbInsertPollOptions(db:any,pollID:number,data:tgTypes.PollOp
 			VALUES (?1, ?2, ?3,?4)
 	    `;
 		let params:any[] = [pollID,index,option.text, option.voter_count ]
-		await this.executeQuery(db, query,params , false);
+		await this.executeQuery(db, query,params );
 
 	})
 	
@@ -449,7 +460,7 @@ public static async dbInsertCaption(db:any, media_group_id:any, caption:string) 
          DO UPDATE SET caption = excluded.caption, normalized_caption = excluded.normalized_caption
      `;
      let params:any[] = [media_group_id, caption, normalized_caption]
-     await this.executeQuery(db, query,params , false);
+     await this.executeQuery(db, query,params );
      return caption;
  }
  
@@ -459,7 +470,7 @@ public static async dbDeleteCaption(db:any, media_group_id:any) {
          DELETE FROM tg_caption
          WHERE media_group_id =?1
      `;
-     await this.executeQuery(db, query, [media_group_id], false);
+     await this.executeQuery(db, query, [media_group_id]);
      return media_group_id;
 }
 

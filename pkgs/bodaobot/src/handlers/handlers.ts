@@ -169,7 +169,7 @@ import { commandFunc, mediaType, updOperation } from "../types/Types";
 
      public static async handlePollAnswer(ctx:TG_ExecutionContext){
           const operation:any = ctx.update_operation;
-          //console.log("debug from handlePollAnswer - operation: ", operation);
+          console.log("debug from handlePollAnswer - ctx: ", JSON.stringify(ctx));
           const answer:tgTypes.PollAnswer|undefined = ctx.update.poll_answer;
           console.log("debug from handlePollAnswer - Answer: ",JSON.stringify(answer))
           if(answer) DB_API.dbUpdatePoolAnswer(ctx.bot.DB,answer);
