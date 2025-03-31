@@ -395,8 +395,15 @@ public static async dbUpdatePoolAnswer(db:any,answers:tgTypes.PollAnswer){
 		"type":"regular",
 		"allows_multiple_answers":false
 	}
+		"debug from handlePollAnswer - Answer: 
+		{"poll_id":"5140893596374794405",
+		"user":{"id":1998627310,"is_bot":false,"first_name":"Salvatore","username":"SalvatoreGF","language_code":"pt-br"},
+		"option_ids":[0]}
 	*/
+	console.log('debug from  dbUpdatePoolAnswer -answers: ', JSON.stringify(answers) )
+		
 	if(Array.isArray(answers.option_ids)){
+		console.log('debug from -entered options_id array if: dbUpdatePoolAnswer', answers.option_ids )
 		answers.option_ids.forEach(async (id)=>{
 			const userQuery = `INSERT INTO tg_poll_answers (id_poll,id_user, id_chat,is_bot,option_index)
          		VALUES (?1, ?2, ?3, ?4,?5)
