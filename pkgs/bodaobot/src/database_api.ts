@@ -408,9 +408,9 @@ public static async dbUpdatePoolAnswer(db:any,answers:tgTypes.PollAnswer){
 			const userQuery = `INSERT INTO tg_poll_answers (id_poll,id_user, id_chat,is_bot,option_index)
          		VALUES (?1, ?2, ?3, ?4,?5)
  			`;
-			 const userid = answers.user?.id? answers.user.id:'anonymous';
-			 const chatid = answers.voter_chat?.id? answers.voter_chat?.id: 0;
-			 let params:any[] = [answers.poll_id,userid,chatid,(answers.is_bot?1:0),id ]
+			 const userid = answers.user?.id? Number(answers.user.id):0;
+			 const chatid = answers.voter_chat?.id? Number(answers.voter_chat?.id): 0;
+			 let params:any[] = [Number(answers.poll_id),userid,chatid,(answers.is_bot?1:0),id ]
 			 await this.executeQuery(db, userQuery,params );
 
 		})
