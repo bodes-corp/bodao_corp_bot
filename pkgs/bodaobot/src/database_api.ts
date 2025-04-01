@@ -400,7 +400,7 @@ public static async dbUpdatePoolAnswer(db:any,answers:tgTypes.PollAnswer){
 		"user":{"id":1998627310,"is_bot":false,"first_name":"Salvatore","username":"SalvatoreGF","language_code":"pt-br"},
 		"option_ids":[0]}
 	*/
-	console.log('debug from  dbUpdatePoolAnswer -answers: ', JSON.stringify(answers) )
+	console.log('debug from  dbUpdatePoolAnswer-answers: ', JSON.stringify(answers) )
 		
 	if(Array.isArray(answers.option_ids)){
 		console.log('debug from -entered options_id array if: dbUpdatePoolAnswer', answers.option_ids )
@@ -409,7 +409,7 @@ public static async dbUpdatePoolAnswer(db:any,answers:tgTypes.PollAnswer){
          		VALUES (?1, ?2, ?3, ?4,?5)
  			`;
 			 const userid = answers.user?.id? answers.user.id:'anonymous';
-			 const chatid = answers.voter_chat?.id? answers.voter_chat?.id: "undefined";
+			 const chatid = answers.voter_chat?.id? answers.voter_chat?.id: 0;
 			 let params:any[] = [answers.poll_id,userid,chatid,(answers.is_bot?1:0),id ]
 			 await this.executeQuery(db, userQuery,params );
 
